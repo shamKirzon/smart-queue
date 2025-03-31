@@ -1,7 +1,7 @@
 import cors from "cors"
 import express from "express"
 import dotenv from "dotenv"
-import { setupWebSocket } from "./websockets/setUpWebSocket"
+import { setupWebSocket } from "./websockets/setupWebSocket"
 import http from 'http'
 
 dotenv.config(); 
@@ -13,4 +13,3 @@ setupWebSocket(server)
 app.use(express.json()); 
 app.use(cors())
 
-console.log("solid ako, pogi na cute pa")

@@ -9,17 +9,18 @@ const { width, height } = Dimensions.get("window"); // Get screen width & height
 const boxSize = width * 0.2; // Boxes adjust size dynamically (20% of screen width)
 const buttonWidth = width * 0.4; // Buttons adjust to 40% of screen width
 
-const WelcomeScreen: React.FC<WelcomeProps> = ({ navigation }) => {
+const DimensionGuides: React.FC<WelcomeProps> = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-      <View className="flex-1 items-center justify-end bg-gray-900 p-6">
+      <View className="flex-1 items-center justify-center bg-gray-900 p-6">
         
         {/* Header Text */}
         <Text className="text-3xl font-bold text-white mb-4 text-center">
-          Smart Queue
+          YOUR DIMENSION GUIDE
         </Text>
         <Text className="text-lg text-gray-300 mb-6 text-center">
-          Streamline your workflow with our powerful business solutions.
+          apply this codes in different screens for better ui/ux experience hahaha 
+          located at ./screens/DimensionsGuides.tsx
         </Text>
 
         {/* Static Box Layout with Responsive Sizes */}
@@ -55,4 +56,4 @@ const WelcomeScreen: React.FC<WelcomeProps> = ({ navigation }) => {
   );
 };
 
-export default WelcomeScreen;
+export default DimensionGuides;
