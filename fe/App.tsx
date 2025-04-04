@@ -11,6 +11,9 @@ import ReceiptScreen from "./screens/ReceiptScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DimensionGuides from "./screens/DimensionsGuides";
 
+
+
+
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
 
@@ -30,7 +33,7 @@ const App = () => {
     <SafeAreaProvider className="flex-1">
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="DimensionGuideScreen"
+          initialRouteName="WelcomeScreen"
           screenOptions={{
             headerShown: false,
             animation: "none",
