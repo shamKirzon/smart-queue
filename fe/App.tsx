@@ -22,9 +22,15 @@ const App = () => {
 
   const [fontsLoaded] = useFonts({
     "RobotoMono": require("./assets/fonts/RobotoMono-Regular.ttf"),
+    "RobotoMono-Bold": require("./assets/fonts/RobotoMono-Bold.ttf"),
+    "RobotoMono-Bold-Italic": require("./assets/fonts/RobotoMono-BoldItalic.ttf"),
     "Poppins": require("./assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold-Italic": require("./assets/fonts/Poppins-BoldItalic.ttf"),
+    "Poppins-Semi-Bold": require("./assets/fonts/Poppins-SemiBold.ttf"),
     "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
     "Inter": require("./assets/fonts/Inter_18pt-Regular.ttf"),
+    "Inter-Bold": require("./assets/fonts/Inter_18pt-Bold.ttf"),
+    "Inter-Bold-Italic": require("./assets/fonts/Inter_18pt-BoldItalic.ttf"),
   });
 
  

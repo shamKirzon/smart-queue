@@ -20,13 +20,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <StartBackground
+        height={height*0.8}
+        width={width}
+        preserveAspectRatio="none" // para di magadjust both height and width 
         style={{
-          position: "absolute",
-          height: height * 0.8,
+          position: "absolute", 
           top: 0,
-          bottom: 0,
           left: 0,
-          right: 0,
         }}
       />
       <View style={{ alignItems: "center", gap:2}}>
@@ -54,6 +54,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
               fontFamily: "Poppins-Bold",
               lineHeight: textM + 2,
               color: "#FFFFFF",
+              // i dont know why shadows only works on iphone
+              shadowOffset: { width: 0, height: 2 }, // Shadow position
+              shadowOpacity: 0.8, // Shadow transparency
+              shadowRadius: 4, // Blur radius of the shadow
+              elevation: 5, // Elevation for Android 
             }}
           >
             SMART
