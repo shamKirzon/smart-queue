@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import Logo from "../assets/icons/logo.svg";
-import WelcomeBackground from "../assets/backgrounds/welcome-background.svg";
+import StartBackground from "../assets/backgrounds/start-background.svg";
 import { useFonts } from "expo-font";
 
 const { width, height } = Dimensions.get("window");
@@ -19,7 +19,7 @@ interface WelcomeScreenProps {
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <WelcomeBackground
+      <StartBackground
         style={{
           position: "absolute",
           height: height * 0.8,
