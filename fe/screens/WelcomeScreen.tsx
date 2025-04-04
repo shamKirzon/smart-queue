@@ -92,7 +92,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("HomeScreen")}
+        //onPress={() => navigation.navigate("HomeScreen")}
+        onPress={() => navigation.navigate("TransactionScreen")}
         style={{
           width: width * 0.5,
           height: height * 0.07,
