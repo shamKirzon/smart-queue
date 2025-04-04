@@ -40,7 +40,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({navigation, updateCustom
   return (
     <View>
       <Text>TransactionScreen</Text>
-      <Text>RinzThePogi</Text>
+      <Text>Rinz</Text>
     </View>
   )
 }
