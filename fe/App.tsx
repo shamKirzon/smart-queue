@@ -1,7 +1,7 @@
+import React, { useState, useEffect } from "react";
 import { View, Text, Dimensions } from "react-native";
-import React, { useState } from "react";
 import WelcomeScreen from "./screens/WelcomeScreen";
-import "./global.css";
+import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -13,13 +13,21 @@ import DimensionGuides from "./screens/DimensionsGuides";
 
 
 
-
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+
+  const [fontsLoaded] = useFonts({
+    "RobotoMono": require("./assets/fonts/RobotoMono-Regular.ttf"),
+    "Poppins": require("./assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
+    "Inter": require("./assets/fonts/Inter_18pt-Regular.ttf"),
+  });
+
+ 
   const [customerInfo, setCustomerInfo] = useState<ReceiptProps>({
     transaction: null,
     customerType: null,
@@ -29,8 +37,9 @@ const App = () => {
     counter: null,
   });
 
+  
   return (
-    <SafeAreaProvider className="flex-1">
+    <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="WelcomeScreen"
