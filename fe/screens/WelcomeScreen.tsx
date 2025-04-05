@@ -1,3 +1,4 @@
+
 import React from "react";
 import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import Logo from "../assets/icons/logo.svg";

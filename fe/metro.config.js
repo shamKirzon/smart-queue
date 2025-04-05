@@ -3,8 +3,6 @@ const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname)
 
-<<<<<<< HEAD
-=======
 // Add SVG transformer configuration
 config.transformer = {
     ...config.transformer,
@@ -17,5 +15,4 @@ config.transformer = {
     sourceExts: [...config.resolver.sourceExts, "svg"], // Add SVG to source extensions
   };
 
->>>>>>> dev
 module.exports = withNativeWind(config, { input: './global.css' })
