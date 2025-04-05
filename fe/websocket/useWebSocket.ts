@@ -27,6 +27,14 @@ const useWebSocket = (url: string) => {
     ws.current?.send(message);
   };
 
+<<<<<<< HEAD
+=======
+  function tryLangs(){
+    console.log("hello world hshshsh")
+  } 
+  
+
+>>>>>>> dev
     return{sendMessage}
 };
 
