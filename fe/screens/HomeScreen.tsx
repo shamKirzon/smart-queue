@@ -45,7 +45,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       inputRef.current[index + 1]?.focus();
     }
 
-    return console.log(enterPin)
+    return 
   }
   useEffect(() => {
     if (enterPin.join("").length === 4) {
@@ -88,7 +88,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     } else {
       handleResetPin()
     }
-    return console.log(buttonClicked, enterPin)
+    return 
   }
 
   return (
