@@ -527,4 +527,6 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   );
 };
 
+
 export default TransactionScreen;
+
