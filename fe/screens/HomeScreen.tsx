@@ -9,7 +9,7 @@ import {
   Dimensions,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect} from "react";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import Back from "../assets/icons/back.svg";
 import ExitModal from "../assets/icons/exit-modal.svg";
@@ -21,14 +21,74 @@ interface HomeScreenProps {
 const { width, height } = Dimensions.get("window");
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [enterPassword, setEnterPassword] = useState([" ", " ", " ", " "]);
+  // Pins:
+  const RECEIPT_GENERATOR_PIN = "1111";
+  const TELLER_PIN = "2222";
+  const MONITOR_PIN = "3333";
+
+  const [buttonClicked, setButtonClicked] = useState("");
+  const [enterPin, setEnterPin] = useState<string[]>([
+    "",
+    "",
+    "",
+    "",
+  ]);
+  const inputRef = useRef<(TextInput | null)[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
-  function handleEnterPassword(number: string, index: number) {
-    const newNumber = [...enterPassword]
-    newNumber[index] = number
-    setEnterPassword(newNumber)
-    
+  function handleEnterPin(pin: string, index: number) {
+    const newPin = [...enterPin];
+    newPin[index] = pin;
+    setEnterPin(newPin);
+
+    if (index < enterPin.length -1 && pin) {
+      inputRef.current[index + 1]?.focus();
+    }
+
+    return 
+  }
+  useEffect(() => {
+    if (enterPin.join("").length === 4) {
+      handleConfirmPins();
+    }
+  }, [enterPin]);
+
+  function handleDelete(pin: string, index: number) {
+    const newPin = [...enterPin];
+    newPin[index] = "";
+    setEnterPin(newPin);
+    inputRef.current[index - 1]?.focus();
+  }
+
+  function handleResetPin() {
+    setEnterPin(["", "", "", ""]);
+    inputRef.current[0]?.focus()
+
+  }
+
+  function handleConfirmPins() {
+    const pin = enterPin.join("");
+    if (
+      buttonClicked === "Receipt Generator" &&
+      pin === RECEIPT_GENERATOR_PIN
+    ) {
+      setModalVisible(false)
+      handleResetPin(); 
+      navigation.navigate("TransactionScreen");
+     
+    } else if (buttonClicked === "Teller" && pin === TELLER_PIN) {
+      setModalVisible(false)
+      handleResetPin()
+      navigation.navigate("TellerScreen");
+
+    } else if (buttonClicked === "Monitor" && pin === MONITOR_PIN) {
+      setModalVisible(false)
+      handleResetPin()
+      navigation.navigate("MonitorScreen");
+    } else {
+      handleResetPin()
+    }
+    return 
   }
 
   return (
@@ -97,7 +157,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 lineHeight: width * 0.06 + 2,
               }}
             >
-              Admin Authentication
+              Admin
             </Text>
 
             <Text
@@ -108,29 +168,43 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 lineHeight: width * 0.036 + 2,
               }}
             >
-              Please enter your administrator password
+              Please enter your administrator Pin
             </Text>
             <View
               style={{
                 flexDirection: "row",
                 gap: 10,
                 justifyContent: "center",
-                marginTop: height*0.04
+                marginTop: height * 0.04,
               }}
             >
-              {enterPassword.map((number, index) => (
-                <TextInput key={index} value={number} maxLength={1}
-                onChange={() => handleEnterPassword(number, index)}
-                keyboardType="numeric"
-                style={{
-                  backgroundColor:"#D9D9D9",
-                  width: width*0.16, 
-                  height: height * 0.09, 
-                  textAlign: "center",
-                  borderRadius: 9,
-                  fontSize: width * 0.06,
-                  fontFamily: "Roboto"
-                }}
+              {enterPin.map((pin, index) => (
+                <TextInput
+                  key={index}
+                  value={pin}
+                  maxLength={1}
+                  keyboardType="number-pad"
+                  returnKeyType="done"
+                  autoCorrect={false}
+                  autoComplete="off"
+                  ref={(ref) => (inputRef.current[index] = ref)}
+                  onChangeText={(pin) => {
+                    handleEnterPin(pin, index);
+                  }}
+                  onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === "Backspace") {
+                      handleDelete(pin, index);
+                    }
+                  }}
+                  style={{
+                    backgroundColor: "#D9D9D9",
+                    width: width * 0.16,
+                    height: height * 0.09,
+                    textAlign: "center",
+                    borderRadius: 9,
+                    fontSize: width * 0.06,
+                    fontFamily: "Roboto",
+                  }}
                 ></TextInput>
               ))}
             </View>
@@ -181,7 +255,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {["Receipt Generator", "Teller", "Monitor"].map((choices, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => setModalVisible(true)}
+            onPress={() => {
+              setModalVisible(true);
+              setButtonClicked(choices);
+            }}
             style={{
               backgroundColor: "#FFFFFF",
               height: height * 0.1,

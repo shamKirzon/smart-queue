@@ -68,10 +68,12 @@ const ActionButton: React.FC<{ text: string; onPress: () => void; image?: JSX.El
   </View>
 );
 
-const TransactionScreen: React.FC<TransactionProps> = ({navigation, updateCustomerInfo}) => {
-
-  const currentDate = format(new Date(), "MM/dd/yyyy").toString()
-  const currentTime = format(new Date(), "hh:mm a").toString()
+const TransactionScreen: React.FC<TransactionProps> = ({
+  navigation,
+  updateCustomerInfo,
+}) => {
+  const currentDate = format(new Date(), "MM/dd/yyyy").toString();
+  const currentTime = format(new Date(), "hh:mm a").toString();
 
   return (
     <View style={{ flex: 1 }}>
@@ -522,7 +524,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({navigation, updateCustom
         </Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default TransactionScreen
+export default TransactionScreen;
