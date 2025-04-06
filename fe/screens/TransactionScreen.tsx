@@ -492,6 +492,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
               text={''}
             />
             <Text 
+            //HAHAHAAHAHAHAHAHAHAtry
               adjustsFontSizeToFit={true}
               style={{ 
                 marginTop: 5, 
