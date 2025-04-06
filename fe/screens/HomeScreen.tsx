@@ -268,13 +268,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               borderRadius: 10,
               marginTop: height * 0.04,
               shadowColor: "#000",
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 2,
-              shadowRadius: 4,
-              elevation: 9,
+            shadowOffset: {
+              width: 0,
+              height: 4,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
             }}
           >
             <Text

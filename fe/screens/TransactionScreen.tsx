@@ -78,7 +78,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   return (
     <View style={{ flex: 1 }}>
       <Transactionbg 
-        height={height * 1}
+        height={height }
         width={width}
         preserveAspectRatio="none"
         style={{
@@ -136,7 +136,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
             style={{
               fontSize: textL,
               fontFamily: "Poppins-Bold",
-              lineHeight: textL + 3,
+              lineHeight: textL + 2,
               color: "#FFFFFF",
               shadowColor: "#000", 
               shadowOffset: { width: 0, height: 2 },
