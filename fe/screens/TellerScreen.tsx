@@ -29,7 +29,6 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
     "Counter 4": "Active",
     "Counter A1": "Active",
     "Counter P1": "Inactive",
-
   };
 
   const fetchCounterStatus = (
@@ -104,7 +103,9 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
               General Transaction
             </Text>
             {/* select*/}
-            <View style={{ alignItems: "flex-end", paddingTop:height*0.017 }}>
+            <View
+              style={{ alignItems: "flex-end", paddingTop: height * 0.017 }}
+            >
               <TouchableOpacity
                 disabled={true}
                 style={{ flexDirection: "row", alignItems: "center" }}
@@ -185,8 +186,10 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
             >
               General Transaction
             </Text>
-            {/* select*/}
-            <View style={{ alignItems: "flex-end", paddingTop:height*0.017 }}>
+            {/* select -- pwede ring 0.017*/}
+            <View
+              style={{ alignItems: "flex-end", paddingTop: height * 0.017 }}
+            >
               <TouchableOpacity
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
@@ -239,7 +242,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
         return counterP1 === "Active"
           ? updateCounterStatus(counterP1)
           : updateCounterStatus(counterP1);
-    } 
+    }
 
     return null;
   };
@@ -344,6 +347,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                     marginRight:
                       columnIndex !== row.length - 1 ? width * 0.028 : 0, // putting space except on the last part of view
                     borderRadius: 10,
+                    // i dont know why shadows only works on iphone
+                    shadowOffset: { width: 0, height: 2 }, // Shadow position
+                    shadowOpacity: 0.8, // Shadow transparency
+                    shadowRadius: 4, // Blur radius of the shadow
+                    elevation: 5, // Elevation for Android
                   }}
                 >
                   {/* counters content - dynamic*/}
@@ -418,14 +426,15 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                     marginRight:
                       columnIndex !== row.length - 1 ? width * 0.028 : 0, // putting space except at the last part of view
                     borderRadius: 10,
+                    // i dont know why shadows only works on iphone
+                    shadowOffset: { width: 0, height: 2 }, // Shadow position
+                    shadowOpacity: 0.8, // Shadow transparency
+                    shadowRadius: 4, // Blur radius of the shadow
+                    elevation: 5, // Elevation for Android
                   }}
                 >
                   {/* status*/}
                   {fetchCounterStatus(tempStatusObj, counter)}
-
-                  
-                  
-
                 </View>
               ))}
             </View>

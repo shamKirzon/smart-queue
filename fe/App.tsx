@@ -64,6 +64,7 @@ const App = () => {
           <Stack.Screen name="DimensionGuideScreen" component={DimensionGuides} />
 
           {/* WELCOME SCREEN */}
+          
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
 
           {/* HOME SCREEN */}
