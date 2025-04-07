@@ -51,7 +51,7 @@ const App = () => {
     <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="HomeScreen"
+          initialRouteName="TellerScreen"
           screenOptions={{
             headerShown: false,
             animation: "none",
@@ -85,6 +85,7 @@ const App = () => {
           <Stack.Screen name="ReceiptScreen">
             {(props: any) => <ReceiptScreen {...props} />}
           </Stack.Screen>
+
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
