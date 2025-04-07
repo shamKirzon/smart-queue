@@ -18,6 +18,7 @@ import Services from "../assets/icons/services.svg";
 import Payment from "../assets/icons/payment.svg";
 import Forex from "../assets/icons/forex.svg";
 import Openaccount from "../assets/icons/openaccount.svg";
+
 //selectedIcon
 import SelectedPriority from "../assets/icons/selectedpriority.svg";
 import SelectedRegular from "../assets/icons/selectedregular.svg";
