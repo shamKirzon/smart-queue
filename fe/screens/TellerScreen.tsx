@@ -12,7 +12,8 @@ import TellerBottomBackground from "../assets/backgrounds/teller-bottom-backgrou
 import Back from "../assets/icons/back.svg";
 import InUseStatus from "../assets/icons/in-use-status.svg";
 import AvailableStatus from "../assets/icons/available-status.svg";
-import TellerCounterSelect from "../assets/icons/teller-counter-select.svg";
+import TellerCounterDisable from "../assets/icons/teller-counter-disable.svg";
+import TellerCounterEnable from "../assets/icons/teller-counter-enable.svg";
 import { useState } from "react";
 
 interface TellerScreenProps {
@@ -21,12 +22,14 @@ interface TellerScreenProps {
 
 const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
-
   const tempStatusObj = {
     "Counter 1": "Inactive",
     "Counter 2": "Inactive",
     "Counter 3": "Active",
     "Counter 4": "Active",
+    "Counter A1": "Active",
+    "Counter P1": "Inactive",
+
   };
 
   const fetchCounterStatus = (
@@ -39,65 +42,172 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
       "Counter 2": counter2,
       "Counter 3": counter3,
       "Counter 4": counter4,
+      "Counter A1": counterA1,
+      "Counter P1": counterP1,
     } = status;
 
     const updateCounterStatus = (status: string): JSX.Element | null => {
       if (status === "Active") {
         return (
-          <View
-            style={{
-              borderColor: "#737373",
-              borderWidth: 1,
-              width: width * 0.18,
-              borderRadius: 10,
-              height: height * 0.02,
-              backgroundColor: "white",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
-            }}
-          >
-            <InUseStatus width={width * 0.02} height={height * 0.009} />
+          <View>
+            {/* status*/}
+            <View style={{ alignItems: "flex-end" }}>
+              <View
+                style={{
+                  borderColor: "#737373",
+                  borderWidth: 1,
+                  width: width * 0.18,
+                  borderRadius: 10,
+                  height: height * 0.02,
+                  backgroundColor: "white",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <InUseStatus width={width * 0.02} height={height * 0.009} />
+                <Text
+                  style={{
+                    fontSize: width * 0.024,
+                    color: "#737373",
+                    fontFamily: "Poppins",
+                    lineHeight: width * 0.037 + 1,
+                    marginLeft: width * 0.01,
+                  }}
+                >
+                  In Use
+                </Text>
+              </View>
+            </View>
+            {/* counter*/}
             <Text
               style={{
-                fontSize: width * 0.024,
-                color: "#737373",
-                fontFamily: "Poppins",
+                fontSize: width * 0.037,
+                color: "#BC1823",
+                fontFamily: "Poppins-Bold",
                 lineHeight: width * 0.037 + 1,
-                marginLeft: width * 0.01,
+                marginTop: width * 0.04,
               }}
             >
-              In Use
+              {counter}{" "}
             </Text>
+            <Text
+              style={{
+                fontSize: width * 0.029,
+                color: "#BC1823",
+                fontFamily: "Poppins",
+                paddingTop: height * 0.002,
+                lineHeight: width * 0.03 + 1,
+                paddingRight: width * 0.04,
+              }}
+            >
+              General Transaction
+            </Text>
+            {/* select*/}
+            <View style={{ alignItems: "flex-end" }}>
+              <TouchableOpacity
+                disabled={true}
+                style={{ flexDirection: "row", alignItems: "center" }}
+              >
+                <Text
+                  style={{
+                    fontSize: width * 0.024,
+                    color: "#737373",
+                    fontFamily: "Poppins",
+                    lineHeight: width * 0.037 + 1,
+                    paddingRight: width * 0.01,
+                  }}
+                >
+                  Select
+                </Text>
+                <TellerCounterDisable
+                  preserveAspectRatio="none"
+                  width={width * 0.03}
+                  height={height * 0.015}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         );
       } else if (status === "Inactive") {
         return (
-          <View
-            style={{
-              borderColor: "#737373",
-              borderWidth: 1,
-              width: width * 0.18,
-              borderRadius: 10,
-              height: height * 0.02,
-              backgroundColor: "white",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "row",
-            }}
-          >
-            <AvailableStatus width={width * 0.02} height={height * 0.009} />
+          <View>
+            {/* status*/}
+            <View style={{ alignItems: "flex-end" }}>
+              <View
+                style={{
+                  borderColor: "#737373",
+                  borderWidth: 1,
+                  width: width * 0.18,
+                  borderRadius: 10,
+                  height: height * 0.02,
+                  backgroundColor: "white",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "row",
+                }}
+              >
+                <AvailableStatus width={width * 0.02} height={height * 0.009} />
+                <Text
+                  style={{
+                    fontSize: width * 0.024,
+                    color: "#737373",
+                    fontFamily: "Poppins",
+                    lineHeight: width * 0.037 + 1,
+                    marginLeft: width * 0.01,
+                  }}
+                >
+                  Available
+                </Text>
+              </View>
+            </View>
+            {/* counter*/}
             <Text
               style={{
-                fontSize: width * 0.024,
-                color: "#737373",
-                fontFamily: "Poppins",
+                fontSize: width * 0.037,
+                color: "#BC1823",
+                fontFamily: "Poppins-Bold",
                 lineHeight: width * 0.037 + 1,
-                marginLeft: width * 0.01,
+                marginTop: width * 0.04,
               }}
             >
-              Available
+              {counter}{" "}
             </Text>
+            <Text
+              style={{
+                fontSize: width * 0.029,
+                color: "#BC1823",
+                fontFamily: "Poppins",
+                paddingTop: height * 0.002,
+                lineHeight: width * 0.03 + 1,
+                paddingRight: width * 0.04,
+              }}
+            >
+              General Transaction
+            </Text>
+            {/* select*/}
+            <View style={{ alignItems: "flex-end" }}>
+              <TouchableOpacity
+                style={{ flexDirection: "row", alignItems: "center" }}
+              >
+                <Text
+                  style={{
+                    fontSize: width * 0.024,
+                    color: "#F48CA0",
+                    fontFamily: "Poppins",
+                    lineHeight: width * 0.037 + 1,
+                    paddingRight: width * 0.01,
+                  }}
+                >
+                  Select
+                </Text>
+                <TellerCounterEnable
+                  preserveAspectRatio="none"
+                  width={width * 0.03}
+                  height={height * 0.015}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         );
       }
@@ -121,7 +231,15 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
         return counter4 === "Active"
           ? updateCounterStatus(counter4)
           : updateCounterStatus(counter4);
-    }
+      case "Counter A1":
+        return counterA1 === "Active"
+          ? updateCounterStatus(counterA1)
+          : updateCounterStatus(counterA1);
+      case "Counter P1":
+        return counterP1 === "Active"
+          ? updateCounterStatus(counterP1)
+          : updateCounterStatus(counterP1);
+    } 
 
     return null;
   };
@@ -228,56 +346,8 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                     borderRadius: 10,
                   }}
                 >
-                  {/* status*/}
-                  <View style={{ alignItems: "flex-end" }}>
-                    {fetchCounterStatus(tempStatusObj, counter)}
-                  </View>
-
-                  <Text
-                    style={{
-                      fontSize: width * 0.037,
-                      color: "#BC1823",
-                      fontFamily: "Poppins-Bold",
-                      lineHeight: width * 0.037 + 1,
-                      marginTop: width * 0.04,
-                    }}
-                  >
-                    {counter}{" "}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: width * 0.029,
-                      color: "#BC1823",
-                      fontFamily: "Poppins",
-                      paddingTop: height * 0.002,
-                      lineHeight: width * 0.03 + 1,
-                      paddingRight: width * 0.04,
-                    }}
-                  >
-                    General Transaction
-                  </Text>
-                  <View style={{ alignItems: "flex-end" }}>
-                    <TouchableOpacity
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: width * 0.024,
-                          color: "#737373",
-                          fontFamily: "Poppins",
-                          lineHeight: width * 0.037 + 1,
-                          paddingRight: width * 0.01,
-                        }}
-                      >
-                        Select
-                      </Text>
-                      <TellerCounterSelect
-                        preserveAspectRatio="none"
-                        width={width * 0.03}
-                        height={height * 0.015}
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  {/* counters content - dynamic*/}
+                  {fetchCounterStatus(tempStatusObj, counter)}
                 </View>
               ))}
             </View>
@@ -351,84 +421,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                   }}
                 >
                   {/* status*/}
-                  <View style={{ alignItems: "flex-end" }}>
-                    <View
-                      style={{
-                        borderColor: "#737373",
-                        borderWidth: 1,
-                        width: width * 0.18,
-                        borderRadius: 10,
-                        height: height * 0.02,
-                        backgroundColor: "white",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <AvailableStatus
-                        width={width * 0.02}
-                        height={height * 0.009}
-                      />
-                      <Text
-                        style={{
-                          fontSize: width * 0.024,
-                          color: "#737373",
-                          fontFamily: "Poppins",
-                          lineHeight: width * 0.037 + 1,
-                          marginLeft: width * 0.01,
-                        }}
-                      >
-                        Available
-                      </Text>
-                    </View>
-                  </View>
+                  {fetchCounterStatus(tempStatusObj, counter)}
 
-                  <Text
-                    style={{
-                      fontSize: width * 0.037,
-                      color: "#BC1823",
-                      fontFamily: "Poppins-Bold",
-                      lineHeight: width * 0.037 + 1,
-                      marginTop: width * 0.04,
-                    }}
-                  >
-                    {counter}{" "}
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: width * 0.029,
-                      color: "#BC1823",
-                      fontFamily: "Poppins",
-                      paddingTop: height * 0.002,
-                      lineHeight: width * 0.03 + 1,
-                      paddingRight: width * 0.04,
-                    }}
-                  >
-                    General Transaction
-                  </Text>
-                  <View style={{ alignItems: "flex-end" }}>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: width * 0.024,
-                          color: "#737373",
-                          fontFamily: "Poppins",
-                          lineHeight: width * 0.037 + 1,
-                          paddingRight: width * 0.01,
-                        }}
-                      >
-                        Select
-                      </Text>
-                      <TellerCounterSelect
-                        preserveAspectRatio="none"
-                        width={width * 0.03}
-                        height={height * 0.015}
-                        style={{ alignSelf: "center" }}
-                      />
-                    </View>
-                  </View>
+                  
+                  
+
                 </View>
               ))}
             </View>
