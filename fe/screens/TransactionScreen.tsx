@@ -47,7 +47,8 @@ const ActionButton: React.FC<{
   onPress: () => void; 
   image?: JSX.Element;
   isSelected?: boolean;
-}> = ({onPress, image, isSelected }) => (
+  isDisabled?: boolean; // Add a prop to handle disabled state
+}> = ({onPress, image, isSelected, isDisabled }) => (
   <View
     style={{
       width: width * 0.18,
@@ -60,10 +61,11 @@ const ActionButton: React.FC<{
       backgroundColor: isSelected ? "#BC1823" : "#FFFFFF",
       borderColor: "#BC1823",
       borderWidth: 1,
+      opacity: isDisabled ? 0.5 : 1,
     }}
   >
     <TouchableOpacity
-      onPress={onPress}
+      onPress={!isDisabled ? onPress : undefined} 
       style={{
         width: "100%",
         height: "100%",
@@ -89,15 +91,28 @@ const TransactionScreen: React.FC<TransactionProps> = ({
 
 
   
-  const toggleTransactionType = (type: string) => {
+  const selectingtransactiontype = (type: string) => {
     const alreadySelected = selectedTransactionTypes.includes(type);
-    if (alreadySelected) {
-      const newList = selectedTransactionTypes.filter(item => item !== type);
-      setSelectedTransactionTypes(newList);
+
+    if (type === "Open Account") {
+      if (alreadySelected) {
+        setSelectedTransactionTypes([]);
+      } else {
+        setSelectedTransactionTypes(["Open Account"]);
+      }
     } else {
-      if (selectedTransactionTypes.length < 3) {
-        const newList = [...selectedTransactionTypes, type];
+      if (selectedTransactionTypes.includes("Open Account")) {
+        return;
+      }
+
+      if (alreadySelected) {
+        const newList = selectedTransactionTypes.filter(item => item !== type);
         setSelectedTransactionTypes(newList);
+      } else {
+        if (selectedTransactionTypes.length < 3) {
+          const newList = [...selectedTransactionTypes, type];
+          setSelectedTransactionTypes(newList);
+        }
       }
     }
   };
@@ -315,11 +330,28 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         <View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", paddingHorizontal: width * 0.02 }}>
           <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly", width: "100%" }}>
             {transactionTypes1strow.map((type, index) => (
-              <View key={index} style={{ flex: 1, maxWidth: width * 0.24, justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+              <View
+                key={index}
+                style={{
+                  flex: 1,
+                  maxWidth: width * 0.24,
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  opacity: selectedTransactionTypes.includes("Open Account") 
+                    ? (type.text === "Open Account" ? 1 : 0.5) 
+                    : (selectedTransactionTypes.length > 0 && type.text === "Open Account" ? 0.5 : 1),
+                }}
+              >
                 <ActionButton
-                  onPress={() => toggleTransactionType(type.text)} // Corrected onPress
+                  onPress={() => selectingtransactiontype(type.text)}
                   image={selectedTransactionTypes.includes(type.text) ? type.selectedIcon : type.icon}
                   isSelected={selectedTransactionTypes.includes(type.text)}
+                  isDisabled={
+                    selectedTransactionTypes.length > 0 && 
+                    !selectedTransactionTypes.includes("Open Account") && 
+                    type.text === "Open Account" // Disable "Open Account" when other types are selected
+                  }
                 />
                 <Text
                   adjustsFontSizeToFit={true}
@@ -341,11 +373,28 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         <View style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%", paddingHorizontal: width * 0.02 }}>
           <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-evenly", width: "100%" }}>
             {transactionTypes2ndrow.map((type, index) => (
-              <View key={index} style={{ flex: 1, maxWidth: width * 0.24, justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+              <View
+                key={index}
+                style={{
+                  flex: 1,
+                  maxWidth: width * 0.24,
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  opacity: selectedTransactionTypes.includes("Open Account") 
+                    ? (type.text === "Open Account" ? 1 : 0.5) 
+                    : (selectedTransactionTypes.length > 0 && type.text === "Open Account" ? 0.5 : 1),
+                }}
+              >
                 <ActionButton
-                  onPress={() => toggleTransactionType(type.text)} // Corrected onPress
+                  onPress={() => selectingtransactiontype(type.text)}
                   image={selectedTransactionTypes.includes(type.text) ? type.selectedIcon : type.icon}
                   isSelected={selectedTransactionTypes.includes(type.text)}
+                  isDisabled={
+                    selectedTransactionTypes.length > 0 && 
+                    !selectedTransactionTypes.includes("Open Account") && 
+                    type.text === "Open Account"
+                  }
                 />
                 <Text
                   adjustsFontSizeToFit={true}
