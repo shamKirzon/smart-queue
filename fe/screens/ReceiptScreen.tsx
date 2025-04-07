@@ -4,6 +4,7 @@ import ReceiptBackground from "../assets/backgrounds/receipt-background.svg";
 import { Dimensions } from "react-native"; // mahalaga to
 
 // props -> properties na nilalaman ng components mo (ReceiptScreen.tsx)
+// hakdog mani papcorn
 
 interface ReceiptScreenProps {
   // contains key-value pairs ["name": "shammy"], object type

@@ -118,7 +118,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
     }
   };
 
-  // Array mapping for transaction types
+  // Array mapping for transaction types 
   const transactionTypes1strow = [
     { 
       text: "Withdraw", 
