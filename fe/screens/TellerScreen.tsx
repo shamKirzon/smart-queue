@@ -1,4 +1,10 @@
-import { View, Text, Dimensions, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ViewStyle,
+} from "react-native";
 import React from "react";
 import TellerBackground from "../assets/backgrounds/teller-background.svg"; // issue here, merong white pixel na line (issue: background itself na)
 import HomeBackground from "../assets/backgrounds/home-background.svg";
@@ -7,6 +13,7 @@ import Back from "../assets/icons/back.svg";
 import InUseStatus from "../assets/icons/in-use-status.svg";
 import AvailableStatus from "../assets/icons/available-status.svg";
 import TellerCounterSelect from "../assets/icons/teller-counter-select.svg";
+import { useState } from "react";
 
 interface TellerScreenProps {
   navigation: any;
@@ -14,6 +21,111 @@ interface TellerScreenProps {
 
 const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
+
+  const tempStatusObj = {
+    "Counter 1": "Inactive",
+    "Counter 2": "Inactive",
+    "Counter 3": "Active",
+    "Counter 4": "Active",
+  };
+
+  const fetchCounterStatus = (
+    status: Record<string, string>,
+    counter: string
+  ) => {
+    // destructuring lang ng obj, just for example lang naman
+    const {
+      "Counter 1": counter1,
+      "Counter 2": counter2,
+      "Counter 3": counter3,
+      "Counter 4": counter4,
+    } = status;
+
+    const updateCounterStatus = (status: string): JSX.Element | null => {
+      if (status === "Active") {
+        return (
+          <View
+            style={{
+              borderColor: "#737373",
+              borderWidth: 1,
+              width: width * 0.18,
+              borderRadius: 10,
+              height: height * 0.02,
+              backgroundColor: "white",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
+            }}
+          >
+            <InUseStatus width={width * 0.02} height={height * 0.009} />
+            <Text
+              style={{
+                fontSize: width * 0.024,
+                color: "#737373",
+                fontFamily: "Poppins",
+                lineHeight: width * 0.037 + 1,
+                marginLeft: width * 0.01,
+              }}
+            >
+              In Use
+            </Text>
+          </View>
+        );
+      } else if (status === "Inactive") {
+        return (
+          <View
+            style={{
+              borderColor: "#737373",
+              borderWidth: 1,
+              width: width * 0.18,
+              borderRadius: 10,
+              height: height * 0.02,
+              backgroundColor: "white",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "row",
+            }}
+          >
+            <AvailableStatus width={width * 0.02} height={height * 0.009} />
+            <Text
+              style={{
+                fontSize: width * 0.024,
+                color: "#737373",
+                fontFamily: "Poppins",
+                lineHeight: width * 0.037 + 1,
+                marginLeft: width * 0.01,
+              }}
+            >
+              Available
+            </Text>
+          </View>
+        );
+      }
+      return null;
+    };
+
+    switch (counter) {
+      case "Counter 1":
+        return counter1 === "Active"
+          ? updateCounterStatus(counter1)
+          : updateCounterStatus(counter1);
+      case "Counter 2":
+        return counter2 === "Active"
+          ? updateCounterStatus(counter2)
+          : updateCounterStatus(counter2);
+      case "Counter 3":
+        return counter3 === "Active"
+          ? updateCounterStatus(counter3)
+          : updateCounterStatus(counter3);
+      case "Counter 4":
+        return counter4 === "Active"
+          ? updateCounterStatus(counter4)
+          : updateCounterStatus(counter4);
+    }
+
+    return null;
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <HomeBackground
@@ -87,7 +199,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
             backgroundColor: "rgba(255, 255, 255, 0.33)",
             width: width * 0.9,
             borderRadius: 10,
-            padding: width*0.023
+            padding: width * 0.023,
           }}
         >
           {[
@@ -112,41 +224,13 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                     paddingRight: height * 0.016,
                     paddingTop: height * 0.01,
                     marginRight:
-                      columnIndex !== row.length - 1 ? width * 0.028 : 0, // putting space except at the last part of view
+                      columnIndex !== row.length - 1 ? width * 0.028 : 0, // putting space except on the last part of view
                     borderRadius: 10,
                   }}
                 >
                   {/* status*/}
                   <View style={{ alignItems: "flex-end" }}>
-                    <View
-                      style={{
-                        borderColor: "#737373",
-                        borderWidth: 1,
-                        width: width * 0.18,
-                        borderRadius: 10,
-                        height: height * 0.02,
-                        backgroundColor: "white",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexDirection: "row",
-                      }}
-                    >
-                      <AvailableStatus
-                        width={width * 0.02}
-                        height={height * 0.009}
-                      />
-                      <Text
-                        style={{
-                          fontSize: width * 0.024,
-                          color: "#737373",
-                          fontFamily: "Poppins",
-                          lineHeight: width * 0.037 + 1,
-                          marginLeft: width * 0.01,
-                        }}
-                      >
-                        Available
-                      </Text>
-                    </View>
+                    {fetchCounterStatus(tempStatusObj, counter)}
                   </View>
 
                   <Text
@@ -173,7 +257,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                     General Transaction
                   </Text>
                   <View style={{ alignItems: "flex-end" }}>
-                    <View
+                    <TouchableOpacity
                       style={{ flexDirection: "row", alignItems: "center" }}
                     >
                       <Text
@@ -191,11 +275,8 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                         preserveAspectRatio="none"
                         width={width * 0.03}
                         height={height * 0.015}
-                        
-
-                        style={{alignSelf:"center"}}
                       />
-                    </View>
+                    </TouchableOpacity>
                   </View>
                 </View>
               ))}
@@ -227,7 +308,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
             fontFamily: "Poppins",
             fontSize: width * 0.037,
             color: "#FFF9F9",
-             lineHeight: width * 0.037 + 1,
+            lineHeight: width * 0.037 + 1,
           }}
         >
           Reserved for clients with special assistance requirements.
@@ -242,14 +323,12 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "rgba(255, 255, 255, 0.33)",
-            padding: width * 0.03, 
+            padding: width * 0.03,
             width: width * 0.9,
             borderRadius: 10,
           }}
         >
-          {[
-            ["Counter A1", "Counter P1"],
-          ].map((row, rowIndex) => (
+          {[["Counter A1", "Counter P1"]].map((row, rowIndex) => (
             <View
               key={rowIndex}
               style={{
@@ -346,9 +425,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                         preserveAspectRatio="none"
                         width={width * 0.03}
                         height={height * 0.015}
-                        
-
-                        style={{alignSelf:"center"}}
+                        style={{ alignSelf: "center" }}
                       />
                     </View>
                   </View>
