@@ -4,13 +4,13 @@ import { ReceiptProps } from '../types/ReceiptProps'
 
 interface ReceiptScreenProps{
   navigation: any, 
-  getInfo: ReceiptProps
+  getInfo: ReceiptProps 
 }
-
+//waitings sa tapos ni boss rinz
 const ReceiptScreen: React.FC<ReceiptScreenProps> = ({navigation , getInfo}) => {
   return (
     <View>
-      <Text>{getInfo.customerType}</Text>
+      <Text>{getInfo.customerType}</Text> 
       <Text>{getInfo.transaction}</Text>
       
       <Text>ReceiptScreen</Text>
