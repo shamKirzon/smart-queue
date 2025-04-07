@@ -104,7 +104,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
               General Transaction
             </Text>
             {/* select*/}
-            <View style={{ alignItems: "flex-end" }}>
+            <View style={{ alignItems: "flex-end", paddingTop:height*0.017 }}>
               <TouchableOpacity
                 disabled={true}
                 style={{ flexDirection: "row", alignItems: "center" }}
@@ -186,7 +186,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
               General Transaction
             </Text>
             {/* select*/}
-            <View style={{ alignItems: "flex-end" }}>
+            <View style={{ alignItems: "flex-end", paddingTop:height*0.017 }}>
               <TouchableOpacity
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
@@ -335,12 +335,12 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                 <View
                   key={columnIndex}
                   style={{
-                    height: height * 0.14,
                     width: width * 0.41,
                     backgroundColor: "#FFFFFF",
                     paddingLeft: height * 0.02,
                     paddingRight: height * 0.016,
                     paddingTop: height * 0.01,
+                    paddingBottom: height * 0.01,
                     marginRight:
                       columnIndex !== row.length - 1 ? width * 0.028 : 0, // putting space except on the last part of view
                     borderRadius: 10,
@@ -409,12 +409,12 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
                 <View
                   key={columnIndex}
                   style={{
-                    height: height * 0.14,
                     width: width * 0.41,
                     backgroundColor: "#FFFFFF",
                     paddingLeft: height * 0.02,
                     paddingRight: height * 0.016,
                     paddingTop: height * 0.01,
+                    paddingBottom: height * 0.01,
                     marginRight:
                       columnIndex !== row.length - 1 ? width * 0.028 : 0, // putting space except at the last part of view
                     borderRadius: 10,
