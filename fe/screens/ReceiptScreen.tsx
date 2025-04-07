@@ -11,6 +11,7 @@ interface ReceiptScreenProps {
 }
 
 // destructuring -> kunukuha mo data dipende sa pwesto
+// checking lang 
 
 const { width, height } = Dimensions.get("window");
 // [width, height]
