@@ -36,7 +36,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
     status: Record<string, string>,
     counter: string
   ) => {
-    // destructuring lang ng obj, just for example lang naman
+    // destructuring lang ng obj, just for example lang naman hahahahaha ewan ko ba
     const {
       "Counter 1": counter1,
       "Counter 2": counter2,
