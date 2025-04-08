@@ -11,8 +11,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 type TellerScreenRouteProp = RouteProp<RootStackParamLists, "TellerScreen">;
 type TellerScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamLists,
-  "TellerScreen"
->;
+  "TellerScreen">
+;
+
 
 interface TellerScreenProps {
   route: TellerScreenRouteProp;
@@ -20,231 +21,9 @@ interface TellerScreenProps {
 }
 
 const { width, height } = Dimensions.get("window");
-const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
-  const tempStatusObj = {
-    "Counter 1": "Active",
-    "Counter 2": "Inactive",
-    "Counter 3": "Active",
-    "Counter 4": "Active",
-    "Counter A1": "Active",
-    "Counter P1": "Inactive",
-  };
 
-  const fetchCounterStatus = (
-    status: Record<string, string>,
-    counter: string
-  ) => {
-    // destructuring lang ng obj, just for example lang naman hahahahaha ewan ko ba
-    const {
-      "Counter 1": counter1,
-      "Counter 2": counter2,
-      "Counter 3": counter3,
-      "Counter 4": counter4,
-      "Counter A1": counterA1,
-      "Counter P1": counterP1,
-    } = status;
-
-    const updateCounterStatus = (status: string): JSX.Element | null => {
-      if (status === "Active") {
-        return (
-          <View>
-            {/* status*/}
-            <View style={{ alignItems: "flex-end" }}>
-              <View
-                style={{
-                  borderColor: "#737373",
-                  borderWidth: 1,
-                  width: width * 0.18,
-                  borderRadius: 10,
-                  height: height * 0.02,
-                  backgroundColor: "white",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                }}
-              >
-                <InUseStatus width={width * 0.02} height={height * 0.009} />
-                <Text
-                  style={{
-                    fontSize: width * 0.024,
-                    color: "#737373",
-                    fontFamily: "Poppins",
-                    lineHeight: width * 0.037 + 1,
-                    marginLeft: width * 0.01,
-                  }}
-                >
-                  In Use
-                </Text>
-              </View>
-            </View>
-            {/* counter*/}
-            <Text
-              style={{
-                fontSize: width * 0.037,
-                color: "#BC1823",
-                fontFamily: "Poppins-Bold",
-                lineHeight: width * 0.037 + 1,
-                marginTop: width * 0.04,
-              }}
-            >
-              {counter}{" "}
-            </Text>
-            <Text
-              style={{
-                fontSize: width * 0.029,
-                color: "#BC1823",
-                fontFamily: "Poppins",
-                paddingTop: height * 0.002,
-                lineHeight: width * 0.03 + 1,
-                paddingRight: width * 0.04,
-              }}
-            >
-              General Transaction
-            </Text>
-            {/* select*/}
-            <View
-              style={{ alignItems: "flex-end", paddingTop: height * 0.017 }}
-            >
-              <TouchableOpacity
-                disabled={true}
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
-                <Text
-                  style={{
-                    fontSize: width * 0.024,
-                    color: "#737373",
-                    fontFamily: "Poppins",
-                    lineHeight: width * 0.037 + 1,
-                    paddingRight: width * 0.01,
-                  }}
-                >
-                  Select
-                </Text>
-                <TellerCounterDisable
-                  preserveAspectRatio="none"
-                  width={width * 0.03}
-                  height={height * 0.015}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
-      } else if (status === "Inactive") {
-        return (
-          <View>
-            {/* status*/}
-            <View style={{ alignItems: "flex-end" }}>
-              <View
-                style={{
-                  borderColor: "#737373",
-                  borderWidth: 1,
-                  width: width * 0.18,
-                  borderRadius: 10,
-                  height: height * 0.02,
-                  backgroundColor: "white",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "row",
-                }}
-              >
-                <AvailableStatus width={width * 0.02} height={height * 0.009} />
-                <Text
-                  style={{
-                    fontSize: width * 0.024,
-                    color: "#737373",
-                    fontFamily: "Poppins",
-                    lineHeight: width * 0.037 + 1,
-                    marginLeft: width * 0.01,
-                  }}
-                >
-                  Available
-                </Text>
-              </View>
-            </View>
-            {/* counter*/}
-            <Text
-              style={{
-                fontSize: width * 0.037,
-                color: "#BC1823",
-                fontFamily: "Poppins-Bold",
-                lineHeight: width * 0.037 + 1,
-                marginTop: width * 0.04,
-              }}
-            >
-              {counter}{" "}
-            </Text>
-            <Text
-              style={{
-                fontSize: width * 0.029,
-                color: "#BC1823",
-                fontFamily: "Poppins",
-                paddingTop: height * 0.002,
-                lineHeight: width * 0.03 + 1,
-                paddingRight: width * 0.04,
-              }}
-            >
-              General Transaction
-            </Text>
-            {/* select -- pwede ring 0.017*/}
-            <View
-              style={{ alignItems: "flex-end", paddingTop: height * 0.017 }}
-            >
-              <TouchableOpacity
-                style={{ flexDirection: "row", alignItems: "center" }}
-              >
-                <Text
-                  style={{
-                    fontSize: width * 0.024,
-                    color: "#F48CA0",
-                    fontFamily: "Poppins",
-                    lineHeight: width * 0.037 + 1,
-                    paddingRight: width * 0.01,
-                  }}
-                >
-                  Select
-                </Text>
-                <TellerCounterEnable
-                  preserveAspectRatio="none"
-                  width={width * 0.03}
-                  height={height * 0.015}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
-      }
-      return null;
-    };
-
-    switch (counter) {
-      case "Counter 1":
-        return counter1 === "Active"
-          ? updateCounterStatus(counter1)
-          : updateCounterStatus(counter1);
-      case "Counter 2":
-        return counter2 === "Active"
-          ? updateCounterStatus(counter2)
-          : updateCounterStatus(counter2);
-      case "Counter 3":
-        return counter3 === "Active"
-          ? updateCounterStatus(counter3)
-          : updateCounterStatus(counter3);
-      case "Counter 4":
-        return counter4 === "Active"
-          ? updateCounterStatus(counter4)
-          : updateCounterStatus(counter4);
-      case "Counter A1":
-        return counterA1 === "Active"
-          ? updateCounterStatus(counterA1)
-          : updateCounterStatus(counterA1);
-      case "Counter P1":
-        return counterP1 === "Active"
-          ? updateCounterStatus(counterP1)
-          : updateCounterStatus(counterP1);
-    }
-
-    return null;
-  };
+const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
+  const { counterName } = route.params;
 
   return (
     <View style={{ flex: 1 }}>
@@ -279,16 +58,58 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
       </TouchableOpacity>
 
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <Text
+        {/* white container */}
+        <View
           style={{
-            fontFamily: "Poppins-Bold",
-            fontSize: width * 0.05,
-            color: "#FFF9F9",
-            lineHeight: width * 0.09 + 2,
+            marginTop: height * 0.05,
+            alignItems: "center",
+            backgroundColor: "#FFFFFF",
+            width: width * 0.84,
+            borderRadius: 40,
           }}
         >
-          {counterName}
-        </Text>
+          {/* counter header container  */}
+          <View
+            style={{
+              marginTop: height * 0.05,
+              width: width * 0.6,
+              backgroundColor: "rgba(213, 0, 0, 0.74)",
+              borderRadius: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              height: height * 0.08,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Poppins-Bold",
+                fontSize: width * 0.08,
+                color: "#FFF9F9",
+                lineHeight: width * 0.08 + 10,
+              }}
+            >
+              {counterName.toUpperCase()}
+            </Text>
+          </View>
+          {/* current customer number  */}
+          <Text
+            style={{
+              fontSize: width * 0.25,
+              fontFamily: "RobotoMono-Bold",
+              marginTop: height * 0.03,
+              color: "rgba(213, 0, 0, 0.74)",
+            }}
+          >
+            003
+          </Text>
+          {/* TEXT - "on going "  */}
+          <Text style={{
+            fontSize: width * 0.06,
+            fontFamily: "Poppins-Semi-Bold",
+            marginTop: height * 0.03,
+            color: "rgba(213, 0, 0, 0.74)",
+          }}>On Going </Text>
+        </View>
       </View>
     </View>
   );
