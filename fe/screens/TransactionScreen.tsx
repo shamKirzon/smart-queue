@@ -1,7 +1,7 @@
 //di ko alam HAHAHAAHHAA
 import { View,Text,ScrollView,Dimensions,TouchableOpacity, Modal } from 'react-native'
 import React, { useState } from 'react';
-import { ReceiptProps } from '../types/ReceiptProps'
+import { ReceiptProps } from '../types/receiptProps'
 import {format} from "date-fns"
 import Back from "../assets/icons/back.svg";
 import Transactionbg from "../assets/backgrounds/transactionscreen-background.svg";
@@ -200,7 +200,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           marginTop: height * 0.08,
           paddingLeft: width * 0.08,
         }}
-        onPress={() => navigation.navigate("WelcomeScreen")}
+        onPress={() => navigation.navigate("HomeScreen")}
       >
         <Back />
       </TouchableOpacity>

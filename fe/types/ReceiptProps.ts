@@ -1,4 +1,4 @@
-export interface ReceiptProps {
+export interface receiptProps {
   transaction: string | null;
   customerType: string | null;
   queueNumber: string | null;

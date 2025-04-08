@@ -105,7 +105,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
             </Text>
             {/* select*/}
             <View
-              style={{ alignItems: "flex-end", paddingTop: height * 0.017 }}
+              style={{ alignItems: "flex-end", paddingTop: height * 0.013 }}
             >
               <TouchableOpacity
                 disabled={true}
@@ -187,11 +187,13 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
             >
               General Transaction
             </Text>
-            {/* select -- pwede ring 0.017*/}
+            {/* select */}
             <View
-              style={{ alignItems: "flex-end", paddingTop: height * 0.017 }}
+              style={{ alignItems: "flex-end", paddingTop: height * 0.013 }}
             >
               <TouchableOpacity
+
+              onPress={() => navigation.navigate('TellerScreen', {counterName: counter})}
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
                 <Text
