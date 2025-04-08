@@ -23,7 +23,7 @@ interface TellerScreenProps {
 const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
   const tempStatusObj = {
-    "Counter 1": "Inactive",
+    "Counter 1": "Active",
     "Counter 2": "Inactive",
     "Counter 3": "Active",
     "Counter 4": "Active",
