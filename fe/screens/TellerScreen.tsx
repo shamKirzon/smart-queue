@@ -96,7 +96,6 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                   if (row === "Cancel") {
                     setModalVisible(false);
                   } else if (row === "Yes, Proceed") {
-                    setModalVisible(false);
                     navigation.navigate("TellerHomeScreen");
                   }
                 }
