@@ -1,25 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, RootTagContext } from "react-native";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ReceiptProps } from "./types/ReceiptProps";
+import { receiptProps } from "./types/receiptProps";
 import TransactionScreen from "./screens/TransactionScreen";
 import ReceiptScreen from "./screens/ReceiptScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DimensionGuides from "./screens/DimensionsGuides";
 import  "./global.css"
 import MonitorScreen from "./screens/MonitorScreen";
+import TellerHomeScreen from "./screens/TellerHomeScreen";
 import TellerScreen from "./screens/TellerScreen";
+import { RootStackParamLists } from "./types/types";
 
 
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamLists>();
 
 const App = () => {
 
@@ -37,7 +39,7 @@ const App = () => {
   });
 
  
-  const [customerInfo, setCustomerInfo] = useState<ReceiptProps>({
+  const [customerInfo, setCustomerInfo] = useState<receiptProps>({
     transaction: null,
     customerType: null,
     queueNumber: null,
@@ -51,7 +53,7 @@ const App = () => {
     <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="TellerScreen"
+          initialRouteName="TellerHomeScreen"
           screenOptions={{
             headerShown: false,
             animation: "none",
@@ -64,12 +66,18 @@ const App = () => {
           <Stack.Screen name="DimensionGuideScreen" component={DimensionGuides} />
 
           {/* WELCOME SCREEN */}
-          
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
 
           {/* HOME SCREEN */}
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
+            
+          {/* Teller  Screen */}
           <Stack.Screen name="TellerScreen" component={TellerScreen} />
+          
+          {/* Teller Home Screen */}
+          <Stack.Screen name="TellerHomeScreen" component={TellerHomeScreen} />
+        
+          {/* Monitor Screen*/}
           <Stack.Screen name="MonitorScreen" component={MonitorScreen} />
 
           {/* TRANSACTION SCREEN */}
