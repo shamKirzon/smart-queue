@@ -1,8 +1,8 @@
 //di ko alam HAHAHAAHHAA
-import { View,Text,ScrollView,Dimensions,TouchableOpacity, Modal } from 'react-native'
+import { View, Text, ScrollView, Dimensions, TouchableOpacity, Modal } from 'react-native'
 import React, { useState } from 'react';
 import { ReceiptProps } from '../types/ReceiptProps'
-import {format} from "date-fns"
+import { format } from "date-fns"
 import Back from "../assets/icons/back.svg";
 import Transactionbg from "../assets/backgrounds/transactionscreen-background.svg";
 import Logo from "../assets/icons/logo.svg";
@@ -18,7 +18,8 @@ import Services from "../assets/icons/services.svg";
 import Payment from "../assets/icons/payment.svg";
 import Forex from "../assets/icons/forex.svg";
 import Openaccount from "../assets/icons/openaccount.svg";
-
+import Confirm from "../assets/icons/confirm.svg";
+import Exit from "../assets/icons/exit-modal.svg";
 //selectedIcon
 import SelectedPriority from "../assets/icons/selectedpriority.svg";
 import SelectedRegular from "../assets/icons/selectedregular.svg";
@@ -39,17 +40,17 @@ const containerH = height * 0.2;
 const containerW = width * 0.2;
 const textL = width * 0.08;
 
-interface TransactionProps{
-  navigation: any, 
-  updateCustomerInfo: (CustomerInfo: ReceiptProps) => void; 
+interface TransactionProps {
+  navigation: any,
+  updateCustomerInfo: (CustomerInfo: ReceiptProps) => void;
 }
 
-const ActionButton: React.FC<{ 
-  onPress: () => void; 
+const ActionButton: React.FC<{
+  onPress: () => void;
   image?: JSX.Element;
   isSelected?: boolean;
-  isDisabled?: boolean; 
-}> = ({onPress, image, isSelected, isDisabled }) => (
+  isDisabled?: boolean;
+}> = ({ onPress, image, isSelected, isDisabled }) => (
   <View
     style={{
       width: width * 0.18,
@@ -66,7 +67,7 @@ const ActionButton: React.FC<{
     }}
   >
     <TouchableOpacity
-      onPress={!isDisabled ? onPress : undefined} 
+      onPress={!isDisabled ? onPress : undefined}
       style={{
         width: "100%",
         height: "100%",
@@ -80,7 +81,6 @@ const ActionButton: React.FC<{
   </View>
 );
 
-
 const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   updateCustomerInfo,
@@ -89,7 +89,17 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   const currentTime = format(new Date(), "hh:mm a").toString();
   const [selectedCustomerType, setSelectedCustomerType] = useState<string | null>(null);
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
+  const [ModalVisible, setModalVisible] = useState(false);
 
+  const isConfirmDisabled = selectedCustomerType === null || selectedTransactionTypes.length === 0;
+
+  const handleConfirm = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
 
   const selectingtransactiontype = (type: string) => {
     const alreadySelected = selectedTransactionTypes.includes(type);
@@ -117,70 +127,74 @@ const TransactionScreen: React.FC<TransactionProps> = ({
     }
   };
 
-    // Array mapping for customer types
-    const customerTypes = [
-      { text: "Priority",
-        icon: <Priority />,
-        selectedIcon: <SelectedPriority /> 
-      },
-      { text: "Regular",
-        icon: <Regular />,
-        selectedIcon: <SelectedRegular /> 
-      },
-    ];
-  
+  // Array mapping for customer types
+  const customerTypes = [
+    {
+      text: "Priority",
+      icon: <Priority />,
+      selectedIcon: <SelectedPriority />
+    },
+    {
+      text: "Regular",
+      icon: <Regular />,
+      selectedIcon: <SelectedRegular />
+    },
+  ];
 
   // Array mapping for transaction types
   const transactionTypes1strow = [
-    { 
-      text: "Withdraw", 
-      icon: <Withdraw />, 
+    {
+      text: "Withdraw",
+      icon: <Withdraw />,
       selectedIcon: <SelectedWithdraw />,
       selectable: true,
     },
-    { 
-      text: "Deposit", 
-      icon: <Deposit />, 
+    {
+      text: "Deposit",
+      icon: <Deposit />,
       selectedIcon: <SelectedDeposit />,
       selectable: true,
     },
-    { 
-      text: "Transfer", 
-      icon: <Transfer />, 
+    {
+      text: "Transfer",
+      icon: <Transfer />,
       selectedIcon: <SelectedTransfer />,
       selectable: true,
     },
-    { 
-      text: "Loan", 
-      icon: <Loan />, 
+    {
+      text: "Loan",
+      icon: <Loan />,
       selectedIcon: <SelectedLoan />,
       selectable: true,
     },
   ];
 
   const transactionTypes2ndrow = [
-    { text: "Services", 
+    {
+      text: "Services",
       icon: <Services />,
-      selectedIcon: <SelectedServices />, 
-      selectable: true, 
+      selectedIcon: <SelectedServices />,
+      selectable: true,
     },
-    { text: "Payment", 
-      icon: <Payment />, 
+    {
+      text: "Payment",
+      icon: <Payment />,
       selectedIcon: <SelectedPayment />,
-      selectable: true, 
+      selectable: true,
     },
-    { text: "Forex", 
-      icon: <Forex />, 
+    {
+      text: "Forex",
+      icon: <Forex />,
       selectedIcon: <SelectedForex />,
-      selectable: true, 
+      selectable: true,
     },
-    { text: "Open Account", 
-      icon: <Openaccount />, 
+    {
+      text: "Open Account",
+      icon: <Openaccount />,
       selectedIcon: <SelectedOpenaccount />,
-      selectable: true, 
+      selectable: true,
     },
   ];
-
 
   return (
     <View style={{ flex: 1, position: 'relative' }}>
@@ -275,9 +289,9 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           >
             Customer Type:
           </Text>
-          
+
           <View //CustomerType Priority and Regular 
-          style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%" }}>
+            style={{ flexDirection: "row", justifyContent: "space-evenly", width: "100%" }}>
             {customerTypes.map((type, index) => (
               <TouchableOpacity
                 key={index}
@@ -303,7 +317,6 @@ const TransactionScreen: React.FC<TransactionProps> = ({
 
         </View>
 
-
         <Text
           style={{
             paddingTop: height * 0.05,
@@ -327,8 +340,8 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   justifyContent: "center",
                   flexDirection: "column",
                   alignItems: "center",
-                  opacity: selectedTransactionTypes.includes("Open Account") 
-                    ? (type.text === "Open Account" ? 1 : 0.5) 
+                  opacity: selectedTransactionTypes.includes("Open Account")
+                    ? (type.text === "Open Account" ? 1 : 0.5)
                     : (selectedTransactionTypes.length > 0 && type.text === "Open Account" ? 0.5 : 1),
                 }}
               >
@@ -337,7 +350,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   image={selectedTransactionTypes.includes(type.text) ? type.selectedIcon : type.icon}
                   isSelected={selectedTransactionTypes.includes(type.text)}
                   isDisabled={
-                    selectedTransactionTypes.length > 0 && 
+                    selectedTransactionTypes.length > 0 &&
                     !selectedTransactionTypes.includes("Open Account") && type.text === "Open Account"
                   }
                 />
@@ -369,8 +382,8 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   justifyContent: "center",
                   flexDirection: "column",
                   alignItems: "center",
-                  opacity: selectedTransactionTypes.includes("Open Account") 
-                    ? (type.text === "Open Account" ? 1 : 0.5) 
+                  opacity: selectedTransactionTypes.includes("Open Account")
+                    ? (type.text === "Open Account" ? 1 : 0.5)
                     : (selectedTransactionTypes.length > 0 && type.text === "Open Account" ? 0.5 : 1),
                 }}
               >
@@ -379,8 +392,8 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   image={selectedTransactionTypes.includes(type.text) ? type.selectedIcon : type.icon}
                   isSelected={selectedTransactionTypes.includes(type.text)}
                   isDisabled={
-                    selectedTransactionTypes.length > 0 && 
-                    !selectedTransactionTypes.includes("Open Account") && 
+                    selectedTransactionTypes.length > 0 &&
+                    !selectedTransactionTypes.includes("Open Account") &&
                     type.text === "Open Account"
                   }
                 />
@@ -399,9 +412,9 @@ const TransactionScreen: React.FC<TransactionProps> = ({
             ))}
           </View>
         </View>
-        </View>
+      </View>
 
-        <Footerbg
+      <Footerbg
         height={height * 0.08}
         width={width}
         preserveAspectRatio="none"
@@ -409,10 +422,11 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           position: "absolute",
           bottom: 0,
         }}
-        />
+      />
 
       <TouchableOpacity
-        //onPress={handleConfirm}
+        onPress={handleConfirm}
+        disabled={isConfirmDisabled}
         style={{
           width: width * 0.5,
           height: height * 0.07,
@@ -421,15 +435,82 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           position: "absolute",
           bottom: height * 0.01,
           right: width * 0.07,
+          opacity: isConfirmDisabled ? 0.5 : 1,
         }}
       >
-        <Text style={{ fontSize: width * 0.07, color: "white", letterSpacing: 1, fontWeight: "bold" }}>Confirm {'>'}</Text>
+        <Text style={{ fontSize: width * 0.07, color: "white", fontWeight: "bold" }}>Confirm <Confirm /></Text>
       </TouchableOpacity>
 
-      </View>
       
+      <Modal
+        visible={ModalVisible}
+        transparent={true}
+        animationType="slide"
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <View
+            style={{
+              paddingTop: height * 0.03,
+              height: height * 0.5,
+              width: width * 0.84,
+              padding: 20,
+              backgroundColor: "#BB2B35",
+              borderRadius: 25,
+              alignItems: "center",
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 4,
+              elevation: 5,
+            }}
+          >
+            <Exit />
+            <Text style={{ fontSize: width * 0.05, marginBottom: 20 }}>
+              Transaction Verified
+            </Text>
+            
+            <View>
+            <TouchableOpacity
+              onPress={closeModal}
+              style={{
+                backgroundColor: "#BC1823",
+                padding: 10,
+                borderRadius: 5,
+                width: "50%",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "white", fontSize: width * 0.04 }}>Exit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={closeModal}
+              style={{
+                backgroundColor: "#BC1823",
+                padding: 10,
+                borderRadius: 5,
+                width: "50%",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "white", fontSize: width * 0.04 }}>Proceed</Text>
+            </TouchableOpacity>
+            </View>
+            
+          </View>
+        </View>
+      </Modal>
+
+    </View>
   );
 };
-
 
 export default TransactionScreen;
