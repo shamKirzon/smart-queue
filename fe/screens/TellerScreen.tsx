@@ -22,7 +22,7 @@ interface TellerScreenProps {
 const { width, height } = Dimensions.get("window");
 
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
-    const{counterName} = route.params; 
+  const { counterName } = route.params;
 
   return (
     <View style={{ flex: 1 }}>
@@ -57,16 +57,53 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       </TouchableOpacity>
 
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <Text
+        {/* white container */}
+        <View
           style={{
-            fontFamily: "Poppins-Bold",
-            fontSize: width * 0.05,
-            color: "#FFF9F9",
-            lineHeight: width * 0.09 + 2,
+            marginTop: height * 0.05,
+            alignItems: "center",
+            backgroundColor: "#FFFFFF",
+            width: width * 0.84,
+            borderRadius: 40,
           }}
         >
-          {counterName}
-        </Text>
+          {/* counter header container  */}
+          <View
+            style={{
+              marginTop: height * 0.05,
+              width: width * 0.6,
+              backgroundColor: "rgba(213, 0, 0, 0.74)",
+              borderRadius: 20,
+              alignItems: "center",
+              justifyContent: "center",
+              height: height * 0.08,
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Poppins-Bold",
+                fontSize: width * 0.08,
+                color: "#FFF9F9",
+                lineHeight: width * 0.08 + 10,
+              }}
+            >
+              {counterName.toUpperCase()}
+            </Text>
+          </View>
+           {/* current customer number  */}
+          <Text
+            style={{
+              fontSize: width * 0.25,
+              fontFamily: "RobotoMono-Bold",
+              marginTop: height * 0.03,
+              color: "rgba(213, 0, 0, 0.74)",
+            }}
+          >
+            003
+          </Text>
+           {/* TEXT - "on going "  */}
+          <View><Text>On Going </Text></View>
+        </View>
       </View>
     </View>
   );
