@@ -16,12 +16,13 @@ import TellerCounterDisable from "../assets/icons/teller-counter-disable.svg";
 import TellerCounterEnable from "../assets/icons/teller-counter-enable.svg";
 import { useState } from "react";
 
-interface TellerScreenProps {
+interface TellerHomeScreen {
   navigation: any;
 }
 
 const { width, height } = Dimensions.get("window");
-const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
+const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
+  
   const tempStatusObj = {
     "Counter 1": "Inactive",
     "Counter 2": "Inactive",
@@ -445,4 +446,4 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ navigation }) => {
   );
 };
 
-export default TellerScreen;
+export default TellerHomeScreen;

@@ -12,7 +12,7 @@ import HomeScreen from "./screens/HomeScreen";
 import DimensionGuides from "./screens/DimensionsGuides";
 import  "./global.css"
 import MonitorScreen from "./screens/MonitorScreen";
-import TellerScreen from "./screens/TellerScreen";
+import TellerHomeScreen from "./screens/TellerHomeScreen";
 
 
 
@@ -51,7 +51,7 @@ const App = () => {
     <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="TellerScreen"
+          initialRouteName="TellerHomeScreen"
           screenOptions={{
             headerShown: false,
             animation: "none",
@@ -64,12 +64,11 @@ const App = () => {
           <Stack.Screen name="DimensionGuideScreen" component={DimensionGuides} />
 
           {/* WELCOME SCREEN */}
-          
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
 
           {/* HOME SCREEN */}
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
-          <Stack.Screen name="TellerScreen" component={TellerScreen} />
+          <Stack.Screen name="TellerHomeScreen" component={TellerHomeScreen} />
           <Stack.Screen name="MonitorScreen" component={MonitorScreen} />
 
           {/* TRANSACTION SCREEN */}

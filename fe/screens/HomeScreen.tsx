@@ -79,7 +79,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     } else if (buttonClicked === "Teller" && pin === TELLER_PIN) {
       setModalVisible(false)
       handleResetPin()
-      navigation.navigate("TellerScreen");
+      navigation.navigate("TellerHomeScreen");
 
     } else if (buttonClicked === "Monitor" && pin === MONITOR_PIN) {
       setModalVisible(false)
