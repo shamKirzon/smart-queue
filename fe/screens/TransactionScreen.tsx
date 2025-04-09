@@ -1,13 +1,11 @@
 //di ko alam HAHAHAAHHAA
-import { View, Text, ScrollView, Dimensions, TouchableOpacity, Modal } from 'react-native'
 import React, { useState } from 'react';
-import { receiptProps } from '../types/receiptProps'
-import {format} from "date-fns"
+import { View, Text, ScrollView, Dimensions, TouchableOpacity, Modal } from 'react-native';
+import { receiptProps } from '../types/receiptProps';
+import { format } from 'date-fns';
+// Assets (Icons and Backgrounds)
 import Back from "../assets/icons/back.svg";
-import Transactionbg from "../assets/backgrounds/transactionscreen-background.svg";
 import Logo from "../assets/icons/logo.svg";
-import Footerbg from "../assets/backgrounds/rectangle-background.svg";
-//icons
 import Priority from "../assets/icons/priority.svg";
 import Regular from "../assets/icons/regular.svg";
 import Withdraw from "../assets/icons/withdraw.svg";
@@ -20,7 +18,9 @@ import Forex from "../assets/icons/forex.svg";
 import Openaccount from "../assets/icons/openaccount.svg";
 import Confirm from "../assets/icons/confirm.svg";
 import Exit from "../assets/icons/exit-modal.svg";
-//selectedIcon
+import Verified from "../assets/icons/verified.svg";
+import Line from "../assets/icons/line.svg";
+// Selected Icons
 import SelectedPriority from "../assets/icons/selectedpriority.svg";
 import SelectedRegular from "../assets/icons/selectedregular.svg";
 import SelectedWithdraw from "../assets/icons/selectedwithdraw.svg";
@@ -31,6 +31,11 @@ import SelectedServices from "../assets/icons/selectedservices.svg";
 import SelectedPayment from "../assets/icons/selectedpayment.svg";
 import SelectedForex from "../assets/icons/selectedforex.svg";
 import SelectedOpenaccount from "../assets/icons/selectedopenaccount.svg";
+// Backgrounds
+import Transactionbg from "../assets/backgrounds/transactionscreen-background.svg";
+import Footerbg from "../assets/backgrounds/rectangle-background.svg";
+//import Modalbackground from "../assets/backgrounds/modal-background.svg"; not sure
+
 
 const { width, height } = Dimensions.get("window");
 const boxSize = width * 0.2;
@@ -441,7 +446,6 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         <Text style={{ fontSize: width * 0.07, color: "white", fontWeight: "bold" }}>Confirm <Confirm /></Text>
       </TouchableOpacity>
 
-      
       <Modal
         visible={ModalVisible}
         transparent={true}
@@ -457,13 +461,10 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         >
           <View
             style={{
-              paddingTop: height * 0.03,
-              height: height * 0.5,
+              height: height * 0.6,
               width: width * 0.84,
-              padding: 20,
-              backgroundColor: "#BB2B35",
-              borderRadius: 25,
-              alignItems: "center",
+              borderRadius: 15,
+              overflow: 'hidden',
               shadowOffset: {
                 width: 0,
                 height: 2,
@@ -473,38 +474,120 @@ const TransactionScreen: React.FC<TransactionProps> = ({
               elevation: 5,
             }}
           >
-            <Exit />
-            <Text style={{ fontSize: width * 0.05, marginBottom: 20 }}>
-              Transaction Verified
-            </Text>
-            
-            <View>
-            <TouchableOpacity
-              onPress={closeModal}
+            <View
               style={{
-                backgroundColor: "#BC1823",
-                padding: 10,
-                borderRadius: 5,
-                width: "50%",
+                flex: 2,
+                backgroundColor: '#D94A5A',
+                padding: 20,
                 alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              <Text style={{ color: "white", fontSize: width * 0.04 }}>Exit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={closeModal}
+              <Verified />
+              <Text style={{ 
+                fontSize: width * 0.06, 
+                marginTop: 5,
+                color: "white",
+                fontFamily: "Poppins-Semi-Bold",
+              }}>
+                Transaction Verified
+              </Text>
+
+              {/* Display selected transaction types, each on a new line */}
+              {selectedTransactionTypes.length > 0 && 
+              selectedTransactionTypes.map((type, index) => (
+              <Text
+              key={index}
               style={{
-                backgroundColor: "#BC1823",
-                padding: 10,
-                borderRadius: 5,
-                width: "50%",
-                alignItems: "center",
+                fontSize: width * 0.045,
+                color: "white",
+                textAlign: "center",
+                fontFamily: "Poppins-Regular",
               }}
-            >
-              <Text style={{ color: "white", fontSize: width * 0.04 }}>Proceed</Text>
-            </TouchableOpacity>
+              >
+                {type}
+                </Text>
+              ))
+              }
+
+              {/* Display selected customer type fixed at the bottom */}
+              <Text style={{
+                fontSize: width * 0.045,
+                color: "white",
+                fontFamily: "Poppins-Regular",
+                height: "13%",
+                width: "60%",
+                borderRadius: 40,
+                backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                textAlign: "center",
+                lineHeight: height * 0.05,
+              }}>
+                {selectedCustomerType === "Priority"
+                  ? "Priority Customer"
+                  : selectedCustomerType === "Regular"
+                  ? "Regular Customer"
+                  : "None"}
+              </Text>
             </View>
-            
+
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "white",
+                padding: 20,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text style={{
+                fontSize: width * 0.045,
+                color: "#737373",
+                marginBottom: 10,
+              }}>
+                {format(new Date(), "MMMM dd, yyyy • hh:mm a")}
+              </Text>
+
+              {/* Center the Line component */}
+              <Line style={{ marginVertical: 15, alignSelf: "center" }} />
+
+              <View style={{
+                flexDirection: "row",
+                width: "100%",
+                height: height * 0.06,
+                justifyContent: "space-around",
+              }}>
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)} 
+                  style={{
+                    backgroundColor: "#FFFFFF",
+                    padding: 10,
+                    borderRadius: 15,
+                    width: "50%",
+                    alignItems: "center",
+                    borderWidth: 1,
+                    borderColor: "#737373",
+                  }}
+                >
+                  <Text style={{ color: "#BB2B35", fontSize: 20, fontFamily: "Poppins-Semi-Bold" }}>Edit</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  onPress={() => {
+                    // Replace with your proceed function
+                    setModalVisible(false);
+                  }}
+                  style={{
+                    backgroundColor: "#D94A5A",
+                    padding: 10,
+                    borderRadius: 15,
+                    width: "45%",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text style={{ color: "#FFFF", fontSize: 20, fontFamily: "Poppins-Semi-Bold"  }}>Proceed</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         </View>
       </Modal>
