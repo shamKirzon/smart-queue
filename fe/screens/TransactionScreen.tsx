@@ -461,7 +461,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         >
           <View
             style={{
-              height: height * 0.8,
+              height: height * 0.7,
               width: width * 0.84,
               borderRadius: 15,
               overflow: 'hidden',
