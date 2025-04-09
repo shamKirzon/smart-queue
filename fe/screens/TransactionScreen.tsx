@@ -281,7 +281,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           style={{
             width: width * 0.9,
             height: height * 0.27,
-            paddingTop: 16,
+            paddingTop: 5,
             padding: 2,
             gap: 20,
           }}
@@ -461,7 +461,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         >
           <View
             style={{
-              height: height * 0.6,
+              height: height * 0.8,
               width: width * 0.84,
               borderRadius: 15,
               overflow: 'hidden',
@@ -493,7 +493,6 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 Transaction Verified
               </Text>
 
-              {/* Display selected transaction types, each on a new line */}
               {selectedTransactionTypes.length > 0 && 
               selectedTransactionTypes.map((type, index) => (
               <Text
@@ -510,7 +509,6 @@ const TransactionScreen: React.FC<TransactionProps> = ({
               ))
               }
 
-              {/* Display selected customer type fixed at the bottom */}
               <Text style={{
                 fontSize: width * 0.045,
                 color: "white",
@@ -547,7 +545,6 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 {format(new Date(), "MMMM dd, yyyy • hh:mm a")}
               </Text>
 
-              {/* Center the Line component */}
               <Line style={{ marginVertical: 15, alignSelf: "center" }} />
 
               <View style={{
@@ -568,12 +565,11 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     borderColor: "#737373",
                   }}
                 >
-                  <Text style={{ color: "#BB2B35", fontSize: 20, fontFamily: "Poppins-Semi-Bold" }}>Edit</Text>
+                  <Text style={{ color: "#BB2B35", fontSize: 17, fontFamily: "Poppins-Semi-Bold" }}>Edit</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity
                   onPress={() => {
-                    // Replace with your proceed function
                     setModalVisible(false);
                   }}
                   style={{
@@ -584,7 +580,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: "#FFFF", fontSize: 20, fontFamily: "Poppins-Semi-Bold"  }}>Proceed</Text>
+                  <Text style={{ color: "#FFFF", fontSize: 17, fontFamily: "Poppins-Semi-Bold"  }}>Proceed</Text>
                 </TouchableOpacity>
               </View>
             </View>
