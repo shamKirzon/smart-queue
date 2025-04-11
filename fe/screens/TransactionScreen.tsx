@@ -234,7 +234,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   return (
     <View style={{ flex: 1, position: 'relative' }}>
       <Transactionbg
-        height={height * 1}
+        height={height} 
         width={width}
         preserveAspectRatio="none"
         style={{

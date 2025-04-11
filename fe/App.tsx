@@ -5,18 +5,17 @@ import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { receiptProps } from "./types/receiptProps";
+import useWebSocket from "./websocket/useWebSocket";
 import TransactionScreen from "./screens/TransactionScreen";
 import ReceiptScreen from "./screens/ReceiptScreen";
 import HomeScreen from "./screens/HomeScreen";
 import DimensionGuides from "./screens/DimensionsGuides";
-import  "./global.css"
+import "./global.css";
 import MonitorScreen from "./screens/MonitorScreen";
 import TellerHomeScreen from "./screens/TellerHomeScreen";
 import TellerScreen from "./screens/TellerScreen";
 import { RootStackParamLists } from "./types/types";
-
-
+import { receiptProps } from "./types/receiptProps";
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
@@ -24,36 +23,34 @@ const { width, height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator<RootStackParamLists>();
 
 const App = () => {
+  useWebSocket("ws://192.168.55.105:5000");
 
   const [fontsLoaded] = useFonts({
-    "RobotoMono": require("./assets/fonts/RobotoMono-Regular.ttf"),
+    RobotoMono: require("./assets/fonts/RobotoMono-Regular.ttf"),
     "RobotoMono-Bold": require("./assets/fonts/RobotoMono-Bold.ttf"),
     "RobotoMono-Bold-Italic": require("./assets/fonts/RobotoMono-BoldItalic.ttf"),
-    "Poppins": require("./assets/fonts/Poppins-Regular.ttf"),
+    Poppins: require("./assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold-Italic": require("./assets/fonts/Poppins-BoldItalic.ttf"),
     "Poppins-Semi-Bold": require("./assets/fonts/Poppins-SemiBold.ttf"),
     "Poppins-Bold": require("./assets/fonts/Poppins-Bold.ttf"),
-    "Inter": require("./assets/fonts/Inter_18pt-Regular.ttf"),
+    Inter: require("./assets/fonts/Inter_18pt-Regular.ttf"),
     "Inter-Bold": require("./assets/fonts/Inter_18pt-Bold.ttf"),
     "Inter-Bold-Italic": require("./assets/fonts/Inter_18pt-BoldItalic.ttf"),
   });
 
- 
   const [customerInfo, setCustomerInfo] = useState<receiptProps>({
     transaction: null,
     customerType: null,
     queueNumber: null,
     date: null,
     time: null,
-    counter: null,
   });
 
-  
   return (
     <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="TellerHomeScreen"
+          initialRouteName="WelcomeScreen"
           screenOptions={{
             headerShown: false,
             animation: "none",
@@ -63,20 +60,24 @@ const App = () => {
           }}
         >
           {/* DIMENSIONS GUIDES */}
-          <Stack.Screen name="DimensionGuideScreen" component={DimensionGuides} />
+          <Stack.Screen
+            name="DimensionGuideScreen"
+            component={DimensionGuides}
+          />
 
           {/* WELCOME SCREEN */}
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
 
           {/* HOME SCREEN */}
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
-            
+
           {/* Teller  Screen */}
           <Stack.Screen name="TellerScreen" component={TellerScreen} />
-          
+
           {/* Teller Home Screen */}
           <Stack.Screen name="TellerHomeScreen" component={TellerHomeScreen} />
-        
+
+
           {/* Monitor Screen*/}
           <Stack.Screen name="MonitorScreen" component={MonitorScreen} />
 
@@ -94,7 +95,6 @@ const App = () => {
           <Stack.Screen name="ReceiptScreen">
             {(props: any) => <ReceiptScreen {...props} />}
           </Stack.Screen>
-
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
