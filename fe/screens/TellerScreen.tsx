@@ -288,6 +288,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                 justifyContent: "center",
                 height: height * 0.08,
                 borderRadius: 15,
+                 // i dont know why shadows only works on iphone
+                 shadowOffset: { width: 0, height: 2 }, // Shadow position
+                 shadowOpacity: 0.8, // Shadow transparency
+                 shadowRadius: 4, // Blur radius of the shadow
+                 elevation: 5, // Elevation for Android
               }}
             >
               <Text

@@ -20,16 +20,16 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <StartBackground
-        height={height*0.8}
+        height={height * 0.8}
         width={width}
-        preserveAspectRatio="none" // para di magadjust both height and width 
+        preserveAspectRatio="none" // para di magadjust both height and width
         style={{
-          position: "absolute", 
+          position: "absolute",
           top: 0,
           left: 0,
         }}
       />
-      <View style={{ alignItems: "center", gap:2}}>
+      <View style={{ alignItems: "center", gap: 2 }}>
         {/* Logo */}
         <View
           style={{
@@ -47,18 +47,13 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={{ alignItems: "center", marginTop: height * 0.03}}>
+        <View style={{ alignItems: "center", marginTop: height * 0.03 }}>
           <Text
             style={{
               fontSize: textM,
               fontFamily: "Poppins-Bold",
               lineHeight: textM + 2,
               color: "#FFFFFF",
-              // i dont know why shadows only works on iphone
-              shadowOffset: { width: 0, height: 2 }, // Shadow position
-              shadowOpacity: 0.8, // Shadow transparency
-              shadowRadius: 4, // Blur radius of the shadow
-              elevation: 5, // Elevation for Android 
             }}
           >
             SMART
@@ -69,14 +64,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
               fontFamily: "Poppins-Bold",
               lineHeight: textL + 3,
               color: "#FFFFFF",
-              shadowColor: "#000", 
-              // i dont know why shadows only works on iphone
-              shadowOffset: { width: 0, height: 2 }, // Shadow position
-              shadowOpacity: 0.8, // Shadow transparency
-              shadowRadius: 4, // Blur radius of the shadow
-              elevation: 5, // Elevation for Android 
+              shadowColor: "#000",
             }}
-            className="text-white text-[30px] font-bold shadow shadow-black"
           >
             QUEUE
           </Text>
@@ -88,7 +77,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
             fontFamily: "Poppins",
             lineHeight: textS + 2,
             color: "#FFFFFF",
-            marginTop: height * 0.03
+            marginTop: height * 0.03,
           }}
           className="text-[#FFFFFF]"
         >
@@ -102,14 +91,27 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
           width: width * 0.5,
           height: height * 0.07,
           backgroundColor: "#A52A2A",
-
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: 20,
+          borderRadius: 28,
           marginTop: height * 0.3,
+           // i dont know why shadows only works on iphone
+           shadowOffset: { width: 0, height: 2 }, // Shadow position
+           shadowOpacity: 0.8, // Shadow transparency
+           shadowRadius: 4, // Blur radius of the shadow
+           elevation: 5, // Elevation for Android
         }}
       >
-        <Text style={{ fontSize: width * 0.07, color: "white" }}>PROCEED</Text>
+        <Text
+          style={{
+            fontSize: width * 0.07,
+            color: "white",
+            fontFamily: "Poppins-Bold",
+            lineHeight: width * 0.07 + 9
+          }}
+        >
+          PROCEED
+        </Text>
       </TouchableOpacity>
     </View>
   );
