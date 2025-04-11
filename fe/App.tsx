@@ -44,6 +44,7 @@ const App = () => {
     queueNumber: null,
     date: null,
     time: null,
+    //counter: null,
   });
 
   return (
