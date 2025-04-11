@@ -4,5 +4,5 @@ export interface receiptProps {
   queueNumber: string | null;
   date: string | null;
   time: string | null;
-  counter: string | null;
+  //counter: string | null;
 }

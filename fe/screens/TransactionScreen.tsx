@@ -34,7 +34,7 @@ import SelectedOpenaccount from "../assets/icons/selectedopenaccount.svg";
 // Backgrounds
 import Transactionbg from "../assets/backgrounds/transactionscreen-background.svg";
 import Footerbg from "../assets/backgrounds/rectangle-background.svg";
-//import Modalbackground from "../assets/backgrounds/modal-background.svg"; not sure
+//import Modalbackground from "../assets/backgrounds/modal-background.svg"; not sure pa eh
 
 
 const { width, height } = Dimensions.get("window");
@@ -86,6 +86,7 @@ const ActionButton: React.FC<{
   </View>
 );
 
+
 const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   updateCustomerInfo,
@@ -95,16 +96,45 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   const [selectedCustomerType, setSelectedCustomerType] = useState<string | null>(null);
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [ModalVisible, setModalVisible] = useState(false);
-
+  const [queueNumber, setQueueNumber] = useState(1);
   const isConfirmDisabled = selectedCustomerType === null || selectedTransactionTypes.length === 0;
 
-  const handleConfirm = () => {
+
+  const openModal = () => {
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
   };
+
+  const handleProceed = () => {
+    const formattedQueueNumber = queueNumber.toString().padStart(3, "0");
+
+    //delete ko din hahahaha pang testing lang
+    console.log("Transaction:", selectedTransactionTypes.join(", "));
+    console.log("Customer Type:", selectedCustomerType || "None");
+    console.log("Queue Number:", queueNumber.toString().padStart(3, "0"));
+    console.log("Date:", currentDate);
+    console.log("Time:", currentTime);
+
+    //
+    //deretso receipt iyan
+    navigation.navigate("ReceiptScreen", {
+      transaction: selectedTransactionTypes.join(", "),
+      customerType: selectedCustomerType || "",
+      queueNumber: formattedQueueNumber,
+      date: currentDate,
+      time: currentTime,
+    });
+
+    //reset to null
+    setQueueNumber(queueNumber + 1);
+    setSelectedCustomerType(null);
+    setSelectedTransactionTypes([]);
+    setModalVisible(false);
+  };
+
 
   const selectingtransactiontype = (type: string) => {
     const alreadySelected = selectedTransactionTypes.includes(type);
@@ -240,7 +270,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           />
         </View>
 
-        <View style={{ alignItems: "center", marginTop: height * 0.0 }}>
+        <View style={{ alignItems: "center", marginTop: height * 0.01 }}>
           <Text
             style={{
               fontSize: textM,
@@ -430,7 +460,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
       />
 
       <TouchableOpacity
-        onPress={handleConfirm}
+        onPress={openModal}
         disabled={isConfirmDisabled}
         style={{
           width: width * 0.5,
@@ -554,7 +584,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 justifyContent: "space-around",
               }}>
                 <TouchableOpacity
-                  onPress={() => setModalVisible(false)} 
+                  onPress={closeModal} 
                   style={{
                     backgroundColor: "#FFFFFF",
                     padding: 10,
@@ -569,9 +599,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 </TouchableOpacity>
                 
                 <TouchableOpacity
-                  onPress={() => {
-                    setModalVisible(false);
-                  }}
+                  onPress={handleProceed}
                   style={{
                     backgroundColor: "#D94A5A",
                     padding: 10,
