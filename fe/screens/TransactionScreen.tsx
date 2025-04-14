@@ -29,6 +29,7 @@ import SelectedServices from "../assets/icons/selectedservices.svg";
 import SelectedPayment from "../assets/icons/selectedpayment.svg";
 import SelectedForex from "../assets/icons/selectedforex.svg";
 import SelectedOpenaccount from "../assets/icons/selectedopenaccount.svg";
+import Logout from "../assets/icons/log-out.svg";
 // Backgrounds
 import Transactionbg1 from "../assets/backgrounds/transactionscreenbg1.svg";
 //if di pa talaga responsive
@@ -237,7 +238,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         }}
         onPress={() => navigation.navigate("HomeScreen")}
       >
-        <Back />
+        <Logout />
       </TouchableOpacity>
 
       <View style={{ alignItems: "center", gap: 1 }}>
