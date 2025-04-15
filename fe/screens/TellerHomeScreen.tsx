@@ -33,7 +33,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
     "Counter P1": "Inactive",
   };
 
-  const { sendMessage, setCounterStatus } = useWebSocket(
+  const { sendMessage, setCounterStatus ,tryDataBase} = useWebSocket(
     "ws://192.168.55.105:5000"
   );
 
@@ -215,7 +215,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
               <TouchableOpacity
                 // navigation.navigate('TellerScreen', {counterName: counter})
                 onPress={() => {
-                  setCounterStatus(counter);
+                  tryDataBase();
                 }}
                 style={{ flexDirection: "row", alignItems: "center" }}
               >

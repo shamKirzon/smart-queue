@@ -1,7 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws";
 import { Server } from "http";
 import { TellerService } from "../teller/teller.service";
-import { json } from "stream/consumers";
+import { TellerRepository } from "../teller/teller.repository";
 
 
 export function setupWebSocket(server: Server) {
@@ -14,24 +14,25 @@ export function setupWebSocket(server: Server) {
     console.log(`Client ${clientCounter} connected`)
 
     // incoming messages
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
         console.log(`received: `, message.toString()); 
 
         const data = JSON.parse(message.toString()); 
 
-        if(data.type === "get-status"){
-          const status = tellerService.getStatus(); 
-          ws.send(JSON.stringify({type: "status-response", status}))
+         // show database - testing part: 
+         if(data.type === "show-database"){
+          const showDB =  await TellerRepository.getCounterData(); 
+          console.log(showDB)
         }
-        else if(data.type === "set-status"){
-         const { counter, status} = data
-         tellerService.setCounterStatus(counter, status)
+      
+        // }
+        // else if(data.type === "set-status"){
+        //  const { counter, status} = data
+        //  tellerService.setCounterStatus(counter, status)
          
-         const updatedCounterStatus = tellerService.getStatus()
-         ws.send(JSON.stringify({type: "set-status-data", displayStatus: updatedCounterStatus }))
-        }
-
-
+        //  const updatedCounterStatus = tellerService.getStatus()
+        //  ws.send(JSON.stringify({type: "set-status-data", displayStatus: updatedCounterStatus }))
+        // }
     })
 
     ws.on('close', () => console.log(`Client ${clientCounter} disconnected`))

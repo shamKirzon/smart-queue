@@ -70,7 +70,13 @@ const useWebSocket = (url: string) => {
     }
   }
 
-  return {setCounterStatus, sendMessage, };
+  const tryDataBase = () => {
+    if(ws.current?.readyState == WebSocket.OPEN) {
+      ws.current?.send(JSON.stringify({type: "show-database"}))
+    }
+  }
+
+  return {setCounterStatus, sendMessage,tryDataBase };
 };
 
 export default useWebSocket;
