@@ -14,7 +14,9 @@ import InUseStatus from "../assets/icons/in-use-status.svg";
 import AvailableStatus from "../assets/icons/available-status.svg";
 import TellerCounterDisable from "../assets/icons/teller-counter-disable.svg";
 import TellerCounterEnable from "../assets/icons/teller-counter-enable.svg";
+import useWebSocket from "../websocket/useWebSocket";
 import { useState } from "react";
+// import useWebSocket from "../websocket/useWebSocket";
 
 interface TellerHomeScreen {
   navigation: any;
@@ -22,15 +24,18 @@ interface TellerHomeScreen {
 
 const { width, height } = Dimensions.get("window");
 const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
-  
   const tempStatusObj = {
     "Counter 1": "Inactive",
     "Counter 2": "Inactive",
-    "Counter 3": "Active",
-    "Counter 4": "Active",
-    "Counter A1": "Active",
+    "Counter 3": "Inactive",
+    "Counter 4": "Inactive",
+    "Counter A1": "Inactive",
     "Counter P1": "Inactive",
   };
+
+  const { sendMessage, setCounterStatus } = useWebSocket(
+    "ws://192.168.55.105:5000"
+  );
 
   const fetchCounterStatus = (
     status: Record<string, string>,
@@ -46,7 +51,23 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
       "Counter P1": counterP1,
     } = status;
 
-    const updateCounterStatus = (status: string): JSX.Element | null => {
+    const updateCounterStatus = (
+      status: string,
+      counter: string
+    ): JSX.Element | null => {
+      const counterTransaction = () => {
+        let transactionText = "";
+        if (counter !== "Counter A1" && counter !== "Counter P1") {
+          transactionText = "General Transaction";
+        } else if (counter === "Counter A1") {
+          transactionText = "Open Accounts";
+        } else if (counter === "Counter P1") {
+          transactionText = "Priority Services";
+        }
+
+        return transactionText;
+      };
+
       if (status === "Active") {
         return (
           <View>
@@ -98,10 +119,10 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
                 fontFamily: "Poppins",
                 paddingTop: height * 0.002,
                 lineHeight: width * 0.03 + 1,
-                paddingRight: width * 0.04,
+                paddingRight: width * 0.113,
               }}
             >
-              General Transaction
+              {counterTransaction()}
             </Text>
             {/* select*/}
             <View
@@ -182,18 +203,20 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
                 fontFamily: "Poppins",
                 paddingTop: height * 0.002,
                 lineHeight: width * 0.03 + 1,
-                paddingRight: width * 0.04,
+                paddingRight: width * 0.113,
               }}
             >
-              General Transaction
+              {counterTransaction()}
             </Text>
             {/* select */}
             <View
               style={{ alignItems: "flex-end", paddingTop: height * 0.013 }}
             >
               <TouchableOpacity
-
-              onPress={() => navigation.navigate('TellerScreen', {counterName: counter})}
+                // navigation.navigate('TellerScreen', {counterName: counter})
+                onPress={() => {
+                  setCounterStatus(counter);
+                }}
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
                 <Text
@@ -223,28 +246,28 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
     switch (counter) {
       case "Counter 1":
         return counter1 === "Active"
-          ? updateCounterStatus(counter1)
-          : updateCounterStatus(counter1);
+          ? updateCounterStatus(counter1, counter)
+          : updateCounterStatus(counter1, counter);
       case "Counter 2":
         return counter2 === "Active"
-          ? updateCounterStatus(counter2)
-          : updateCounterStatus(counter2);
+          ? updateCounterStatus(counter2, counter)
+          : updateCounterStatus(counter2, counter);
       case "Counter 3":
         return counter3 === "Active"
-          ? updateCounterStatus(counter3)
-          : updateCounterStatus(counter3);
+          ? updateCounterStatus(counter3, counter)
+          : updateCounterStatus(counter3, counter);
       case "Counter 4":
         return counter4 === "Active"
-          ? updateCounterStatus(counter4)
-          : updateCounterStatus(counter4);
+          ? updateCounterStatus(counter4, counter)
+          : updateCounterStatus(counter4, counter);
       case "Counter A1":
         return counterA1 === "Active"
-          ? updateCounterStatus(counterA1)
-          : updateCounterStatus(counterA1);
+          ? updateCounterStatus(counterA1, counter)
+          : updateCounterStatus(counterA1, counter);
       case "Counter P1":
         return counterP1 === "Active"
-          ? updateCounterStatus(counterP1)
-          : updateCounterStatus(counterP1);
+          ? updateCounterStatus(counterP1, counter)
+          : updateCounterStatus(counterP1, counter);
     }
 
     return null;

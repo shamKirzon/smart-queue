@@ -14,6 +14,8 @@ import HomeBackground from "../assets/backgrounds/home-background.svg";
 import Back from "../assets/icons/back.svg";
 import ExitModal from "../assets/icons/exit-modal.svg";
 import Lock from "../assets/icons/lock.svg";
+import useWebSocket from "../websocket/useWebSocket";
+
 
 interface HomeScreenProps {
   navigation: any;
@@ -26,6 +28,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const TELLER_PIN = "2222";
   const MONITOR_PIN = "3333";
 
+  // websocket
+ 
   const [buttonClicked, setButtonClicked] = useState("");
   const [enterPin, setEnterPin] = useState<string[]>([
     "",
