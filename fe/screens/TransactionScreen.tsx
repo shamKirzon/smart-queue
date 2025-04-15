@@ -33,7 +33,7 @@ import SelectedOpenaccount from "../assets/icons/selectedopenaccount.svg";
 import Transactionbg1 from "../assets/backgrounds/transactionscreenbg1.svg";
 //if di pa talaga responsive
 //import Tv from "../assets/backgrounds/tv.svg";
-import Stand from "../assets/backgrounds/stand.svg";
+import Stand from "../assets/backgrounds/stand-background.svg";
 import Footerbg from "../assets/backgrounds/rectangle-background.svg";
 
 const { width, height } = Dimensions.get("window");
