@@ -11,8 +11,8 @@ export type RootStackParamLists = {
   TransactionScreen: undefined;
   ReceiptScreen: receiptProps;
 
-  TellerScreen: {
-    counterName: string;
-  };
+  TellerScreen:{
+    counterName: string
+  }
 
 };

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import TellerBackground from "../assets/backgrounds/teller-background.svg"; // issue here, merong white pixel na line (issue: background itself na)
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import TellerBottomBackground from "../assets/backgrounds/teller-bottom-background.svg";
@@ -15,42 +15,30 @@ import AvailableStatus from "../assets/icons/available-status.svg";
 import TellerCounterDisable from "../assets/icons/teller-counter-disable.svg";
 import TellerCounterEnable from "../assets/icons/teller-counter-enable.svg";
 import useWebSocket from "../websocket/useWebSocket";
-import { useState } from "react";
-// import useWebSocket from "../websocket/useWebSocket";
+
 
 interface TellerHomeScreen {
   navigation: any;
 }
 
 const { width, height } = Dimensions.get("window");
-const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
-  const tempStatusObj = {
-    "Counter 1": "Inactive",
-    "Counter 2": "Inactive",
-    "Counter 3": "Inactive",
-    "Counter 4": "Inactive",
-    "Counter A1": "Inactive",
-    "Counter P1": "Inactive",
-  };
 
-  const { sendMessage, setCounterStatus ,tryDataBase} = useWebSocket(
+const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
+  const [status, setStatus ] = useState<{[key: string]: string}>({})
+  const {getCounterStatus, fetchCounterStatus,  setToInuse} = useWebSocket(
     "ws://192.168.55.105:5000"
   );
 
-  const fetchCounterStatus = (
-    status: Record<string, string>,
+useEffect(() => {
+  if(getCounterStatus()){
+    setStatus(getCounterStatus())
+  }
+}, [getCounterStatus()])
+
+  const fetchStatus = (
     counter: string
   ) => {
-    // destructuring lang ng obj, just for example lang naman
-    const {
-      "Counter 1": counter1,
-      "Counter 2": counter2,
-      "Counter 3": counter3,
-      "Counter 4": counter4,
-      "Counter A1": counterA1,
-      "Counter P1": counterP1,
-    } = status;
-
+    
     const updateCounterStatus = (
       status: string,
       counter: string
@@ -68,7 +56,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
         return transactionText;
       };
 
-      if (status === "Active") {
+      if (status === "inuse") {
         return (
           <View>
             {/* status*/}
@@ -152,7 +140,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
             </View>
           </View>
         );
-      } else if (status === "Inactive") {
+      } else if (status === "available") {
         return (
           <View>
             {/* status*/}
@@ -213,9 +201,10 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
               style={{ alignItems: "flex-end", paddingTop: height * 0.013 }}
             >
               <TouchableOpacity
-                // navigation.navigate('TellerScreen', {counterName: counter})
+                
                 onPress={() => {
-                  tryDataBase();
+                  setToInuse(counter)
+                  navigation.navigate("TellerScreen", {counterName: counter})
                 }}
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
@@ -243,32 +232,34 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
       return null;
     };
 
-    switch (counter) {
-      case "Counter 1":
-        return counter1 === "Active"
-          ? updateCounterStatus(counter1, counter)
-          : updateCounterStatus(counter1, counter);
-      case "Counter 2":
-        return counter2 === "Active"
-          ? updateCounterStatus(counter2, counter)
-          : updateCounterStatus(counter2, counter);
-      case "Counter 3":
-        return counter3 === "Active"
-          ? updateCounterStatus(counter3, counter)
-          : updateCounterStatus(counter3, counter);
-      case "Counter 4":
-        return counter4 === "Active"
-          ? updateCounterStatus(counter4, counter)
-          : updateCounterStatus(counter4, counter);
-      case "Counter A1":
-        return counterA1 === "Active"
-          ? updateCounterStatus(counterA1, counter)
-          : updateCounterStatus(counterA1, counter);
-      case "Counter P1":
-        return counterP1 === "Active"
-          ? updateCounterStatus(counterP1, counter)
-          : updateCounterStatus(counterP1, counter);
+
+    switch(counter){
+      case "Counter 1": 
+      return updateCounterStatus(status["counter_1"], counter)
+      break; 
+
+      case "Counter 2": 
+      return updateCounterStatus(status["counter_2"], counter)
+      break;
+
+      case "Counter 3": 
+      return updateCounterStatus(status["counter_3"], counter)
+      break; 
+      
+      case "Counter 4": 
+      return updateCounterStatus(status["counter_4"], counter)
+      break; 
+      
+      case "Counter A1": 
+      return updateCounterStatus(status["counter_A1"], counter)
+      break; 
+      
+      case "Counter P1": 
+      return updateCounterStatus(status["counter_P1"], counter)
+      break; 
     }
+
+  
 
     return null;
   };
@@ -381,7 +372,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
                   }}
                 >
                   {/* counters content - dynamic*/}
-                  {fetchCounterStatus(tempStatusObj, counter)}
+                  {fetchStatus(counter)}
                 </View>
               ))}
             </View>
@@ -460,7 +451,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
                   }}
                 >
                   {/* status*/}
-                  {fetchCounterStatus(tempStatusObj, counter)}
+                  {fetchStatus(counter)}
                 </View>
               ))}
             </View>

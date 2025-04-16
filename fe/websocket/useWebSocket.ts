@@ -1,12 +1,15 @@
 import { View, Text } from "react-native";
 import { useRef, useEffect, useState } from "react";
 
+
+type CounterStatus = {
+  counter_name: string, 
+  status: string
+}
+
 const useWebSocket = (url: string) => {
+  const [status, setStatus ] = useState<{[key: string]: string}>({})
   const ws = useRef<WebSocket | null>(null);
-  const [statusResponse, setStatusResponse] = useState<Record<
-    string,
-    string
-  > | null>(null);
 
   useEffect(() => {
     if (ws.current) return;
@@ -16,20 +19,15 @@ const useWebSocket = (url: string) => {
     // on open
     ws.current.onopen = () => {
       console.log("Connected to websocket");
-
-      // to have a latest copy of the counters status
-      requestStatus();
+      fetchCounterStatus()
     };
 
     // incoming messages from backend (ws.send)
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-      if (data.type === "status-response") {
-        setStatusResponse(data.status);
-      }
-     else  if (data.type === "set-status-data") {
-       setStatusResponse(data.displayStatus)
+      if (data.type === "set-counter-status") {
+        setCounterStatus(data.data);
       }
     };
 
@@ -44,39 +42,44 @@ const useWebSocket = (url: string) => {
     };
   }, []); // ensuring our websocket initiliazes once
 
-  useEffect(() => {
-
-    console.log(statusResponse)
-  }, [statusResponse])
-  const sendMessage = (message: any) => {
-    ws.current?.send(JSON.stringify(message));
-  };
+ 
 
   // FUNCTIONS
-  const requestStatus = () => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({ type: "get-status" }));
+  const fetchCounterStatus = () => {
+    if (ws.current?.readyState == WebSocket.OPEN) {
+      ws.current?.send(JSON.stringify({ type: "get-counter-status" }));
     }
+  };
+
+  const setToAvailable = (counter: string) => {
+    if (ws.current?.readyState == WebSocket.OPEN) {
+      ws.current?.send(JSON.stringify({ type: "set-counter-available", counter: counter}));
+    }
+  };
+  
+  const setToInuse = (counter: string ) => {
+    if (ws.current?.readyState == WebSocket.OPEN) {
+      ws.current?.send(JSON.stringify({ type: "set-counter-inuse" , counter: counter}));
+    }
+  };
+
+  const setCounterStatus = (data: {counter_name: string, status: string}[]) => {
+    const counterStatusMap: { [key: string]: string } = {};
+  
+    data.forEach(({ counter_name, status }) => {
+      counterStatusMap[counter_name] = status;
+    });
+
+    setStatus(counterStatusMap)
+    
   };
 
   const getCounterStatus = () => {
-    return statusResponse;
-  };
-
-  const setCounterStatus = (counter: string) => {
-
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({ type: "set-status", counter: counter, status: "active" }));
-    }
+  
+    return status; 
   }
-
-  const tryDataBase = () => {
-    if(ws.current?.readyState == WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({type: "show-database"}))
-    }
-  }
-
-  return {setCounterStatus, sendMessage,tryDataBase };
+  
+  return { fetchCounterStatus, getCounterStatus, setToAvailable, setToInuse};
 };
 
 export default useWebSocket;

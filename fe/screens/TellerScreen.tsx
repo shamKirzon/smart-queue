@@ -14,6 +14,7 @@ import Lock from "../assets/icons/lock.svg";
 
 // sample from modals
 import ExitModal from "../assets/icons/exit-modal.svg";
+import useWebSocket from "../websocket/useWebSocket";
 
 type TellerScreenRouteProp = RouteProp<RootStackParamLists, "TellerScreen">;
 type TellerScreenNavigationProp = NativeStackNavigationProp<
@@ -31,6 +32,9 @@ const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
+  const {getCounterStatus, setToAvailable, setToInuse} = useWebSocket(
+    "ws://192.168.55.105:5000"
+  );
 
   const modalContent = (): JSX.Element => {
     return (
@@ -96,6 +100,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                   if (row === "Cancel") {
                     setModalVisible(false);
                   } else if (row === "Yes, Proceed") {
+                    setToAvailable(counterName)
                     navigation.navigate("TellerHomeScreen");
                     setModalVisible(false);
                   }
