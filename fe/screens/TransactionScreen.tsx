@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Dimensions, TouchableOpacity, Modal } from 'react-native';
-import { receiptProps } from '../types/receiptProps';
+import { receiptProps } from '../types/ReceiptProps';
 import { format } from 'date-fns';
 // Assets (Icons and Backgrounds)
 import Back from "../assets/icons/back.svg";

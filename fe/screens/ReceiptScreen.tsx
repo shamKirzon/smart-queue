@@ -5,7 +5,9 @@ import { format } from "date-fns";
 import { Dimensions } from "react-native";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 
+
 let globalQueueCounter = 0;
+const { width } = Dimensions.get("window");
 
 interface ReceiptScreenProps {
   route: {
@@ -16,12 +18,6 @@ interface ReceiptScreenProps {
   };
   navigation: any;
 }
-
-// destructuring -> kunukuha mo data dipende sa pwesto
-// checking lang 
-
-const { width, height } = Dimensions.get("window");
-// [width, height]
 
 const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
   const receiptAnimation = useRef(new Animated.Value(-500)).current;
@@ -37,7 +33,7 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
 
   const currentFormattedDate = format(new Date(), "EEE, MMM dd, yyyy");
   const currentTime = format(new Date(), "h:mm:ss a");
-  const formattedDateTime = `${currentFormattedDate} • ${currentTime}`;
+  const formattedDateTime = `${currentFormattedDate} • ${currentTime}`; 
 
   const generateQueueNumber = () => {
     globalQueueCounter = globalQueueCounter + 1;
@@ -123,7 +119,7 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
     : "None selected";
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#BC1823' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
       <HomeBackground 
         style={{
           position: 'absolute',
