@@ -15,6 +15,7 @@ import Lock from "../assets/icons/lock.svg";
 // sample from modals
 import ExitModal from "../assets/icons/exit-modal.svg";
 import useWebSocket from "../websocket/useWebSocket";
+import WS_URL from "../constant/constant";
 
 type TellerScreenRouteProp = RouteProp<RootStackParamLists, "TellerScreen">;
 type TellerScreenNavigationProp = NativeStackNavigationProp<
@@ -33,9 +34,7 @@ const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
-  const {getCounterStatus, setToAvailable, setToInuse} = useWebSocket(
-    "ws://192.168.55.105:5000"
-  );
+  const { getCounterStatus, setToAvailable, tellerNext } = useWebSocket(WS_URL);
 
   const modalContent = (): JSX.Element => {
     return (
@@ -101,7 +100,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                   if (row === "Cancel") {
                     setModalVisible(false);
                   } else if (row === "Yes, Proceed") {
-                    setToAvailable(counterName)
+                    setToAvailable(counterName);
                     navigation.navigate("TellerHomeScreen");
                     setModalVisible(false);
                   }
@@ -286,6 +285,8 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
           {/* Next*/}
           <View style={{ alignItems: "flex-end", width: width * 0.7 }}>
             <TouchableOpacity
+
+            onPress={() => tellerNext(counterName)}
               style={{
                 marginTop: height * 0.05,
                 width: width * 0.4,
@@ -294,11 +295,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                 justifyContent: "center",
                 height: height * 0.08,
                 borderRadius: 15,
-                 // i dont know why shadows only works on iphone
-                 shadowOffset: { width: 0, height: 2 }, // Shadow position
-                 shadowOpacity: 0.8, // Shadow transparency
-                 shadowRadius: 4, // Blur radius of the shadow
-                 elevation: 5, // Elevation for Android
+                // i dont know why shadows only works on iphone
+                shadowOffset: { width: 0, height: 2 }, // Shadow position
+                shadowOpacity: 0.8, // Shadow transparency
+                shadowRadius: 4, // Blur radius of the shadow
+                elevation: 5, // Elevation for Android
               }}
             >
               <Text
