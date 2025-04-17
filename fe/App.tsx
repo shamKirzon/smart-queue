@@ -16,6 +16,7 @@ import TellerHomeScreen from "./screens/TellerHomeScreen";
 import TellerScreen from "./screens/TellerScreen";
 import { RootStackParamLists } from "./types/types";
 import { receiptProps } from "./types/receiptProps";
+import WS_URL from "./constant/constant";
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
@@ -23,7 +24,7 @@ const { width, height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator<RootStackParamLists>();
 
 const App = () => {
-  useWebSocket("ws://192.168.55.105:5000");
+  useWebSocket(WS_URL);
 
   const [fontsLoaded] = useFonts({
     RobotoMono: require("./assets/fonts/RobotoMono-Regular.ttf"),

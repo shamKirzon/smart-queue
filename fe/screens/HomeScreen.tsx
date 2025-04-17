@@ -14,7 +14,7 @@ import HomeBackground from "../assets/backgrounds/home-background.svg";
 import Back from "../assets/icons/back.svg";
 import ExitModal from "../assets/icons/exit-modal.svg";
 import Lock from "../assets/icons/lock.svg";
-import useWebSocket from "../websocket/useWebSocket";
+
 
 
 interface HomeScreenProps {

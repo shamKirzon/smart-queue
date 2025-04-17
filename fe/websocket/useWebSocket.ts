@@ -78,8 +78,14 @@ const useWebSocket = (url: string) => {
   
     return status; 
   }
+
+  const tellerNext = (counter: string) => {
+    if (ws.current?.readyState == WebSocket.OPEN) {
+      ws.current?.send(JSON.stringify({ type: "teller-next-fe", counter: counter}));
+    }
+  };
   
-  return { fetchCounterStatus, getCounterStatus, setToAvailable, setToInuse};
+  return { fetchCounterStatus, getCounterStatus, setToAvailable, setToInuse, tellerNext};
 };
 
 export default useWebSocket;

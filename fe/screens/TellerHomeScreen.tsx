@@ -15,7 +15,7 @@ import AvailableStatus from "../assets/icons/available-status.svg";
 import TellerCounterDisable from "../assets/icons/teller-counter-disable.svg";
 import TellerCounterEnable from "../assets/icons/teller-counter-enable.svg";
 import useWebSocket from "../websocket/useWebSocket";
-
+import WS_URL from "../constant/constant";
 
 interface TellerHomeScreen {
   navigation: any;
@@ -24,21 +24,17 @@ interface TellerHomeScreen {
 const { width, height } = Dimensions.get("window");
 
 const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
-  const [status, setStatus ] = useState<{[key: string]: string}>({})
-  const {getCounterStatus, fetchCounterStatus,  setToInuse} = useWebSocket(
-    "ws://192.168.55.105:5000"
-  );
+  const [status, setStatus] = useState<{ [key: string]: string }>({});
+  const { getCounterStatus, fetchCounterStatus, setToInuse } =
+    useWebSocket(WS_URL);
 
-useEffect(() => {
-  if(getCounterStatus()){
-    setStatus(getCounterStatus())
-  }
-}, [getCounterStatus()])
+  useEffect(() => {
+    if (getCounterStatus()) {
+      setStatus(getCounterStatus());
+    }
+  }, [getCounterStatus()]);
 
-  const fetchStatus = (
-    counter: string
-  ) => {
-    
+  const fetchStatus = (counter: string) => {
     const updateCounterStatus = (
       status: string,
       counter: string
@@ -201,10 +197,9 @@ useEffect(() => {
               style={{ alignItems: "flex-end", paddingTop: height * 0.013 }}
             >
               <TouchableOpacity
-                
                 onPress={() => {
-                  setToInuse(counter)
-                  navigation.navigate("TellerScreen", {counterName: counter})
+                  setToInuse(counter);
+                  navigation.navigate("TellerScreen", { counterName: counter });
                 }}
                 style={{ flexDirection: "row", alignItems: "center" }}
               >
@@ -232,34 +227,31 @@ useEffect(() => {
       return null;
     };
 
+    switch (counter) {
+      case "Counter 1":
+        return updateCounterStatus(status["counter_1"], counter);
+        break;
 
-    switch(counter){
-      case "Counter 1": 
-      return updateCounterStatus(status["counter_1"], counter)
-      break; 
+      case "Counter 2":
+        return updateCounterStatus(status["counter_2"], counter);
+        break;
 
-      case "Counter 2": 
-      return updateCounterStatus(status["counter_2"], counter)
-      break;
+      case "Counter 3":
+        return updateCounterStatus(status["counter_3"], counter);
+        break;
 
-      case "Counter 3": 
-      return updateCounterStatus(status["counter_3"], counter)
-      break; 
-      
-      case "Counter 4": 
-      return updateCounterStatus(status["counter_4"], counter)
-      break; 
-      
-      case "Counter A1": 
-      return updateCounterStatus(status["counter_A1"], counter)
-      break; 
-      
-      case "Counter P1": 
-      return updateCounterStatus(status["counter_P1"], counter)
-      break; 
+      case "Counter 4":
+        return updateCounterStatus(status["counter_4"], counter);
+        break;
+
+      case "Counter A1":
+        return updateCounterStatus(status["counter_A1"], counter);
+        break;
+
+      case "Counter P1":
+        return updateCounterStatus(status["counter_P1"], counter);
+        break;
     }
-
-  
 
     return null;
   };
