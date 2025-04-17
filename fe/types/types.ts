@@ -1,7 +1,5 @@
 // params of each screen accepts
 
-import { receiptProps } from "./receiptProps";
-
 export type RootStackParamLists = {
   DimensionGuideScreen: undefined;
   WelcomeScreen: undefined;
@@ -9,7 +7,14 @@ export type RootStackParamLists = {
   TellerHomeScreen: undefined;
   MonitorScreen: undefined;
   TransactionScreen: undefined;
-  ReceiptScreen: receiptProps;
+
+  ReceiptScreen:  {
+    transaction: string | null;
+    customerType: string | null;
+    queueNumber: string | null;
+    date: string | null;
+    time: string | null;
+  };
 
   TellerScreen:{
     counterName: string
