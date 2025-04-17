@@ -1,65 +1,54 @@
-import { View, Text, SafeAreaView, Animated } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Animated,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { Easing } from "react-native-reanimated";
-import React, { useEffect, useState, useRef } from "react";
-import { format } from "date-fns";
-import { Dimensions } from "react-native";
+import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
+import { RootStackParamLists } from "../types/types";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-let globalQueueCounter = 0;
+
+
+type ReceiptRouteProp = RouteProp<RootStackParamLists, "ReceiptScreen">;
+type ReceiptScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamLists,
+  "ReceiptScreen"
+>;
+interface ReceiptScreenProps{
+  route: ReceiptRouteProp, 
+  navigation: ReceiptScreenNavigationProp
+}
 const { width } = Dimensions.get("window");
 
-interface ReceiptScreenProps {
-  route: {
-    params?: {
-      selectedTransactionTypes?: string[];
-      selectedCustomerType?: string;
-    };
-  };
-  navigation: any;
-}
+const ReceiptScreen: React.FC<ReceiptScreenProps> = ({route, navigation}) => {
+  const [receiptPrinted, setReceiptPrinted] = useState(false);
+  
+  const { transaction, customerType, queueNumber, date, time } = route.params;
 
-const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
+  console.log("Route params:", route.params);
+  console.log("Transaction:", transaction);
+  console.log("Customer Type:", customerType);
+  console.log("Queue Number:", queueNumber);
+
   const receiptAnimation = useRef(new Animated.Value(-500)).current;
   const receiptOpacity = useRef(new Animated.Value(0)).current;
   const receiptScale = useRef(new Animated.Value(0.95)).current;
   const printerLightOpacity = useRef(new Animated.Value(0.4)).current;
   const printerSlotWidth = useRef(new Animated.Value(0)).current;
 
-  const [isPrinting, setIsPrinting] = useState(true);
-  const [queueNumber, setQueueNumber] = useState("001");
-  const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<
-    string[]
-  >([]);
-  const [selectedCustomerType, setSelectedCustomerType] = useState("Regular");
-
-  const currentFormattedDate = format(new Date(), "EEE, MMM dd, yyyy");
-  const currentTime = format(new Date(), "h:mm:ss a");
-  const formattedDateTime = `${currentFormattedDate} • ${currentTime}`;
-
-  const generateQueueNumber = () => {
-    globalQueueCounter = globalQueueCounter + 1;
-    if (globalQueueCounter > 999) globalQueueCounter = 1;
-    return String(globalQueueCounter).padStart(3, "0");
-  };
+  const isPrinting = !receiptPrinted;
+  const formattedDateTime =` ${date} • ${time}`;
+  const AnimatedView = Animated.createAnimatedComponent(View);
 
   useEffect(() => {
-    const newQueueNumber = generateQueueNumber();
-    setQueueNumber(newQueueNumber);
-
-    if (route.params) {
-      const { selectedTransactionTypes, selectedCustomerType } = route.params;
-
-      if (selectedTransactionTypes) {
-        setSelectedTransactionTypes(selectedTransactionTypes);
-      }
-
-      if (selectedCustomerType) {
-        setSelectedCustomerType(selectedCustomerType);
-      }
-    }
-
     Animated.loop(
-      Animated.sequence([
+      Animated.sequence([  
         Animated.timing(printerLightOpacity, {
           toValue: 1,
           duration: 800,
@@ -101,28 +90,16 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
             easing: Easing.out(Easing.ease),
           }),
         ]),
-      ]).start(({ finished }) => {
-        if (finished) {
-          setIsPrinting(false);
-        }
+      ]).start(() => {
+        setReceiptPrinted(true);
       });
     }, 1200);
 
-    return () => {
-      clearTimeout(printingTimeout);
-    };
+    return () => clearTimeout(printingTimeout);
   }, []);
 
-  const AnimatedView = Animated.createAnimatedComponent(View);
-
-  const formattedTransactions =
-    Array.isArray(selectedTransactionTypes) &&
-    selectedTransactionTypes.length > 0
-      ? selectedTransactionTypes.join(", ")
-      : "None selected";
-
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#BC1823" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <HomeBackground
         style={{
           position: "absolute",
@@ -246,9 +223,7 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
             }}
           >
             <View style={{ alignItems: "center", marginBottom: 16 }}>
-              <Text
-                style={{ fontWeight: "bold", fontSize: 16, color: "#4B5563" }}
-              >
+              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#4B5563" }}>
                 QUEUE NUMBER
               </Text>
               <Text
@@ -261,20 +236,12 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
               >
                 {queueNumber}
               </Text>
-              <Text
-                style={{ fontSize: 14, color: "#6B7280", marginBottom: 16 }}
-              >
+              <Text style={{ fontSize: 14, color: "#6B7280", marginBottom: 16 }}>
                 {formattedDateTime}
               </Text>
             </View>
 
-            <View
-              style={{
-                height: 1,
-                backgroundColor: "#E5E7EB",
-                marginVertical: 16,
-              }}
-            />
+            <View style={{ height: 1, backgroundColor: "#E5E7EB", marginVertical: 16 }} />
 
             <View
               style={{
@@ -283,9 +250,7 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
                 marginVertical: 8,
               }}
             >
-              <Text style={{ fontSize: 14, color: "#6B7280" }}>
-                Transaction
-              </Text>
+              <Text style={{ fontSize: 14, color: "#6B7280" }}>Transaction</Text>
               <Text
                 style={{
                   fontSize: 14,
@@ -295,9 +260,10 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
                   textAlign: "right",
                 }}
               >
-                {formattedTransactions}
+                {transaction}
               </Text>
             </View>
+
             <View
               style={{
                 flexDirection: "row",
@@ -305,50 +271,29 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
                 marginVertical: 8,
               }}
             >
-              <Text style={{ fontSize: 14, color: "#6B7280" }}>
-                Customer Type
-              </Text>
-              <Text
-                style={{ fontSize: 14, color: "#4B5563", fontWeight: "bold" }}
-              >
-                {selectedCustomerType}
+              <Text style={{ fontSize: 14, color: "#6B7280" }}>Customer Type</Text>
+              <Text style={{ fontSize: 14, color: "#4B5563", fontWeight: "bold" }}>
+                {customerType}
               </Text>
             </View>
 
-            <View
-              style={{
-                height: 1,
-                backgroundColor: "#E5E7EB",
-                marginVertical: 16,
-              }}
-            />
+            <View style={{ height: 1, backgroundColor: "#E5E7EB", marginVertical: 16 }} />
 
             <View style={{ alignItems: "center", marginVertical: 20 }}>
-              <Text
-                style={{ fontSize: 14, color: "#4B5563", textAlign: "center" }}
-              >
+              <Text style={{ fontSize: 14, color: "#4B5563", textAlign: "center" }}>
                 You will be served based on your queue number.
               </Text>
             </View>
 
             <View style={{ alignItems: "center" }}>
-              <Text
-                style={{ fontSize: 16, fontWeight: "bold", color: "#4B5563" }}
-              >
+              <Text style={{ fontSize: 16, fontWeight: "bold", color: "#4B5563" }}>
                 Have a nice day!
               </Text>
             </View>
           </AnimatedView>
         </View>
 
-        <View
-          style={{
-            position: "absolute",
-            bottom: 0,
-            width: "100%",
-            height: 192,
-          }}
-        >
+        <View style={{ position: "absolute", bottom: 0, width: "100%", height: 192 }}>
           <View
             style={{
               width: "100%",
@@ -361,6 +306,31 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
             }}
           />
         </View>
+        
+        {receiptPrinted && (
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 30,
+              right: 30,
+              backgroundColor: "transparent",
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: "transparent",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+            onPress={() => {
+             navigation.navigate("TransactionScreen")
+            }}
+          >
+            <Text style={{ color: "#BB2B35", fontWeight: "600", fontSize: 20, marginRight: 20 }}>
+              Proceed 
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
