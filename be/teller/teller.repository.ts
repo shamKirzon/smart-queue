@@ -16,7 +16,8 @@ export class TellerRepository {
   }
 
   static async setCounterInuse(counter: string) {
-    counter = counter.replace(/^Counter/i, "counter").replace(/\s+/g, "_");
+    counter = TellerService.formattedCounter(counter);
+
     const query = `UPDATE counters
                     SET status = 'inuse'
                     WHERE counter_name = $1`;
@@ -46,8 +47,41 @@ export class TellerRepository {
   }
 
   static async tellerNext(counter: string) {
-    counter = TellerService.formattedCounter(counter)
+    counter = TellerService.formattedCounter(counter);
 
-    const isRegular = TellerService.isRegularCounter(counter)
+    const isRegular = TellerService.isRegularCounter(counter);
+
+    if (isRegular) {
+      this.deleteRegular(counter);
+    } 
   }
+
+  static async deleteRegular(counter: string) {
+    try {
+      const queryCurrentRegularCustomer = `SELECT regular_receipt_id 
+                                    FROM counters 
+                                    WHERE counter_name = $1`;
+      const currentRegularIdResult = await pool.query(
+        queryCurrentRegularCustomer,
+        [counter]
+      );
+
+      const currentRegularId =
+        currentRegularIdResult.rows[0]?.regular_receipt_id;
+
+      if (currentRegularId) {
+        const query = `DELETE FROM regular_receipt WHERE regular_receipt_id = $1`;
+        await pool.query(query, [currentRegularId]);
+      } else{
+        console.warn(`No regular_receipt_id found for counter: ${counter}`);
+      }
+
+    } catch (error) {
+      console.error("Query Error - deleteRegular: ", error);
+    }
+  }
+
+  static async deletePriority(counter: string) {}
+
+  static async deleteOpenAccount(counter: string) {}
 }

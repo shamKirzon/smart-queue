@@ -25,7 +25,7 @@ const { width, height } = Dimensions.get("window");
 
 const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const { getCounterStatus, fetchCounterStatus, setToInuse } =
+  const { getCounterStatus, fetchCounterStatus, setToInuse,  } =
     useWebSocket(WS_URL);
 
   useEffect(() => {
