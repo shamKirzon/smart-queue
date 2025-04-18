@@ -1,8 +1,10 @@
-//shammy WS.URL
-const WS_URL = "ws://192.168.0.41:5000"
+import Constants from 'expo-constants';
 
-//rinz WS.URL
-//const WS_URL = "ws://192.168.100.162:5000"
+const manifest = Constants.manifest ?? Constants.expoConfig;
+const debuggerHost = manifest?.hostUri ?? ''; 
+const PORT = 5000;
 
+const ip = debuggerHost.split(':')[0];
+const WS_URL = `ws://${ip}:${PORT}`;
 
-export default WS_URL; 
+export default WS_URL;

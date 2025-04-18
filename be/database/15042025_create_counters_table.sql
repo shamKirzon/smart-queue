@@ -12,4 +12,16 @@ CREATE TABLE counters (
     open_account_receipt_id UUID,
     FOREIGN KEY (regular_receipt_id) REFERENCES regular_receipt(regular_receipt_id) ON DELETE SET NULL ,
     FOREIGN KEY (priority_receipt_id) REFERENCES priority_receipt(priority_receipt_id) ON DELETE SET NULL,
-    FOREIGN KEY (open_account_receipt_id) REFERENCES open_account_receipt(open_account_receipt_id) ON DELETE SET NULL);
+    FOREIGN KEY (open_account_receipt_id) REFERENCES open_account_receipt(open_account_receipt_id) ON DELETE SET NULL)
+
+
+-- INSERT THESE: 
+
+INSERT INTO counters(counter_name)
+VALUES
+    ('counter_1'), 
+    ('counter_2'), 
+    ('counter_3'), 
+    ('counter_4'), 
+    ('counter_A1'), 
+    ('counter_P1')

@@ -53,9 +53,32 @@ export class TellerRepository {
 
     if (isRegular) {
       this.deleteRegular(counter);
-    } 
+    }
   }
 
+  static async fetchInuseRegularCounter() {
+    try {
+      const query = `SELECT counter_name 
+      FROM counters
+      WHERE status = 'inuse'`;
+
+      const rawData = await pool.query(query);
+      const inuseRegularCounters = rawData.rows
+
+      if(inuseRegularCounters.length >0){
+        const inuseCountersName = inuseRegularCounters.map(counter => counter.counter_name)
+        return inuseCountersName;
+
+      }else{
+        return[] 
+      }
+
+    } catch (error) {
+      console.error('fetchInusRegular - cant fetch counter inuse', error)
+    }
+  }
+
+  // deleting functions
   static async deleteRegular(counter: string) {
     try {
       const queryCurrentRegularCustomer = `SELECT regular_receipt_id 
@@ -72,10 +95,12 @@ export class TellerRepository {
       if (currentRegularId) {
         const query = `DELETE FROM regular_receipt WHERE regular_receipt_id = $1`;
         await pool.query(query, [currentRegularId]);
-      } else{
+
+        // queueRepository -> updates the queue
+        // ->
+      } else {
         console.warn(`No regular_receipt_id found for counter: ${counter}`);
       }
-
     } catch (error) {
       console.error("Query Error - deleteRegular: ", error);
     }
