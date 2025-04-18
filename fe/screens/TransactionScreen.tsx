@@ -37,12 +37,19 @@ import Transactionbg1 from "../assets/backgrounds/transactionscreenbg1.svg";
 import Stand from "../assets/backgrounds/stand-background.svg";
 import Footerbg from "../assets/backgrounds/rectangle-background.svg";
 
+import { RootStackParamLists } from "../types/types";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamLists, 'ReceiptScreen'>;
+
+
 const { width, height } = Dimensions.get("window");
 const textM = width * 0.050;
 const textL = width * 0.08;
 
 interface TransactionProps {
-  navigation: any,
+  navigation: NavigationProp;
   updateCustomerInfo: (CustomerInfo: receiptProps) => void;
 }
 
@@ -94,27 +101,21 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   const [queueNumber, setQueueNumber] = useState(1);
   const isConfirmDisabled = selectedCustomerType === null || selectedTransactionTypes.length === 0;
 
-  const openModal = () => {
-    setModalVisible(true);
-  };
 
-  const closeModal = () => {
-    setModalVisible(false);
-  };
 
   const handleProceed = () => {
     const formattedQueueNumber = queueNumber.toString().padStart(3, "0");
 
-    // Navigate to receipt screen
-    navigation.navigate("ReceiptScreen", {
-      transaction: selectedTransactionTypes.join(", "),
-      customerType: selectedCustomerType || "",
-      queueNumber: formattedQueueNumber,
-      date: currentDate,
-      time: currentTime,
-    });
+    const receiptData: RootStackParamLists['ReceiptScreen'] = {
+        transaction: selectedTransactionTypes.join(", "),
+        customerType: selectedCustomerType || "",
+        queueNumber: formattedQueueNumber,
+        date: currentDate,
+        time: currentTime,
+    };
 
-    // Reset selections and increment queue number
+    navigation.navigate("ReceiptScreen", receiptData);
+
     setQueueNumber(queueNumber + 1);
     setSelectedCustomerType(null);
     setSelectedTransactionTypes([]);
@@ -147,6 +148,13 @@ const TransactionScreen: React.FC<TransactionProps> = ({
     }
   };
 
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
   // Array mapping for customer types
   const customerTypes = [
     {
@@ -701,7 +709,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                       fontFamily: "Poppins-Semi-Bold" 
                     }}
                   >
-                    Proceed
+                    Print
                   </Text>
                 </TouchableOpacity>
               </View>
