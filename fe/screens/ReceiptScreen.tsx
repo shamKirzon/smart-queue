@@ -33,7 +33,7 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
 
   const currentFormattedDate = format(new Date(), "EEE, MMM dd, yyyy");
   const currentTime = format(new Date(), "h:mm:ss a");
-  const formattedDateTime = `${currentFormattedDate} • ${currentTime}`; 
+  const formattedDateTime = `${currentFormattedDate} • ${currentTime}`;
 
   const generateQueueNumber = () => {
     globalQueueCounter = globalQueueCounter + 1;
@@ -120,29 +120,29 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-      <HomeBackground 
+      <HomeBackground
         style={{
           position: 'absolute',
           width: '100%',
           height: '100%'
         }}
       />
-      
+
       <View style={{ flex: 1, alignItems: 'center', width: '100%' }}>
         <View style={{ marginTop: 60, marginBottom: 40 }}>
-          <Text style={{ 
-            color: 'white', 
-            fontWeight: 'bold', 
-            fontSize: 24, 
+          <Text style={{
+            color: 'white',
+            fontWeight: 'bold',
+            fontSize: 24,
             textAlign: 'center',
             opacity: isPrinting ? 1 : 0.7,
           }}>
             {isPrinting ? 'Printing your queue receipt...' : 'Receipt Printed'}
           </Text>
           {!isPrinting && (
-            <Text style={{ 
+            <Text style={{
               color: 'white',
-              fontSize: 16, 
+              fontSize: 16,
               textAlign: 'center',
               marginTop: 8,
             }}>
@@ -151,15 +151,15 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
           )}
         </View>
 
-        <View style={{ 
-          width: 320, 
-          height: 64, 
-          backgroundColor: '#4B5563', 
-          borderTopLeftRadius: 8, 
-          borderTopRightRadius: 8, 
-          position: 'relative', 
-          shadowColor: '#000', 
-          shadowOpacity: 0.2, 
+        <View style={{
+          width: 320,
+          height: 64,
+          backgroundColor: '#4B5563',
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+          position: 'relative',
+          shadowColor: '#000',
+          shadowOpacity: 0.2,
           shadowRadius: 4,
           shadowOffset: { width: 0, height: 2 },
           elevation: 5
@@ -168,38 +168,38 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
             <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#6B7280', marginRight: 8 }} />
             <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#6B7280' }} />
           </View>
-          
-          <Animated.View 
-            style={{ 
-              width: 10, 
-              height: 10, 
-              borderRadius: 5, 
-              backgroundColor: '#10B981', 
-              position: 'absolute', 
-              top: 16, 
+
+          <Animated.View
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: '#10B981',
+              position: 'absolute',
+              top: 16,
               right: 20,
-              opacity: printerLightOpacity 
+              opacity: printerLightOpacity
             }}
           />
-          
-          <Animated.View style={{ 
-            width: printerSlotWidth, 
-            height: 4, 
-            backgroundColor: '#1F2937', 
-            position: 'absolute', 
-            bottom: 4, 
-            alignSelf: 'center' 
+
+          <Animated.View style={{
+            width: printerSlotWidth,
+            height: 4,
+            backgroundColor: '#1F2937',
+            position: 'absolute',
+            bottom: 4,
+            alignSelf: 'center'
           }} />
         </View>
 
         <View style={{ width: 320, height: 450, overflow: 'hidden' }}>
-          <AnimatedView 
+          <AnimatedView
             style={{
-              width: '100%', 
-              backgroundColor: 'white', 
-              borderBottomLeftRadius: 8, 
-              borderBottomRightRadius: 8, 
-              padding: 20, 
+              width: '100%',
+              backgroundColor: 'white',
+              borderBottomLeftRadius: 8,
+              borderBottomRightRadius: 8,
+              padding: 20,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.25,
@@ -246,14 +246,14 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({ route, navigation }) => {
         </View>
 
         <View style={{ position: 'absolute', bottom: 0, width: '100%', height: 192 }}>
-          <View style={{ 
-            width: '100%', 
-            height: 192, 
-            opacity: 0.2, 
-            backgroundColor: 'white', 
+          <View style={{
+            width: '100%',
+            height: 192,
+            opacity: 0.2,
+            backgroundColor: 'white',
             borderTopLeftRadius: 100,
             borderTopRightRadius: 100,
-            transform: [{ scaleX: 1.5 }, { translateY: 96 }] 
+            transform: [{ scaleX: 1.5 }, { translateY: 96 }]
           }} />
         </View>
       </View>
