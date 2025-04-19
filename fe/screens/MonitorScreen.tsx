@@ -46,10 +46,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
           paddingVertical: 12,
           paddingHorizontal: 30,
           borderRadius: 10,
-          marginBottom: 20,
+          marginTop: 10,
         }}>
           <Text style={{
-            fontSize: 28,
+            fontSize: 40,
             fontWeight: "bold",
             color: "#E53935"
           }}>NOW SERVING</Text>
@@ -80,7 +80,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
               alignItems: "center",
             }}>
               <View style={{
-                backgroundColor: "#E53935",
+                backgroundColor: "#D64F5A",
                 borderRadius: 10,
                 paddingVertical: 8,
                 paddingHorizontal: 10,
@@ -91,9 +91,9 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 1</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                {"005".split('').map((digit, index) => (
+                {"000".split('').map((digit, index) => (
                   <Text key={index} style={{
-                    color: "#E53935",
+                    color: "#D64F5A",
                     fontSize: 65,
                     fontWeight: "bold",
                     textShadowColor: "rgba(0, 0, 0, 0.25)",
@@ -106,7 +106,6 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
               </View>
             </View>
 
-            {/* Repeat Counter 2, 3, 4 the same way as Counter 1 */}
             {/* Counter 2 */}
             <View style={{
               backgroundColor: "#FFFFFF",
@@ -116,7 +115,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
               alignItems: "center",
             }}>
               <View style={{
-                backgroundColor: "#E53935",
+                backgroundColor: "#D64F5A",
                 borderRadius: 10,
                 paddingVertical: 8,
                 paddingHorizontal: 10,
@@ -127,9 +126,9 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 2</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                {"005".split('').map((digit, index) => (
+                {"000".split('').map((digit, index) => (
                   <Text key={index} style={{
-                    color: "#E53935",
+                    color: "#D64F5A",
                     fontSize: 65,
                     fontWeight: "bold",
                     textShadowColor: "rgba(0, 0, 0, 0.25)",
@@ -151,7 +150,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
               alignItems: "center",
             }}>
               <View style={{
-                backgroundColor: "#E53935",
+                backgroundColor: "#D64F5A",
                 borderRadius: 10,
                 paddingVertical: 8,
                 paddingHorizontal: 10,
@@ -162,9 +161,9 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 3</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                {"005".split('').map((digit, index) => (
+                {"000".split('').map((digit, index) => (
                   <Text key={index} style={{
-                    color: "#E53935",
+                    color: "#D64F5A",
                     fontSize: 65,
                     fontWeight: "bold",
                     textShadowColor: "rgba(0, 0, 0, 0.25)",
@@ -186,7 +185,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
               alignItems: "center",
             }}>
               <View style={{
-                backgroundColor: "#E53935",
+                backgroundColor: "#D64F5A",
                 borderRadius: 10,
                 paddingVertical: 8,
                 paddingHorizontal: 10,
@@ -197,9 +196,9 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 4</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                {"005".split('').map((digit, index) => (
+                {"000".split('').map((digit, index) => (
                   <Text key={index} style={{
-                    color: "#E53935",
+                    color: "#D64F5A",
                     fontSize: 65,
                     fontWeight: "bold",
                     textShadowColor: "rgba(0, 0, 0, 0.25)",
@@ -248,7 +247,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 25 }}>Counter A1</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                {"005".split('').map((digit, index) => (
+                {"000".split('').map((digit, index) => (
                   <Text key={index} style={{
                     color: "#FFFFFF",
                     fontSize: 65,
@@ -283,7 +282,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 25 }}>PRIORITY</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
-                {"005".split('').map((digit, index) => (
+                {"000".split('').map((digit, index) => (
                   <Text key={index} style={{
                     color: "#FFFFFF",
                     fontSize: 65,
