@@ -55,7 +55,7 @@ export function setupWebSocket(server: Server) {
         })
       } else if(data.type === "teller-next-fe"){
         await TellerRepository.tellerNext(data.counter)
-        await TellerService.assignRegularReceipt()
+        //await TellerService.assignRegularReceipt()
       }
     });
 
