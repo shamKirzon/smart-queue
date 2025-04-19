@@ -11,60 +11,10 @@ interface MonitorScreenProps {
   navigation: any
 }
 
+
+//rendercounterBox soon.. for cleaning
+
 const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
-  
-  //counter boxes
-  const renderCounterBox = (title: string, number: string) => (
-    <View style={{
-      backgroundColor: "#FFFFFF",
-      borderRadius: 15,
-      width: "48%",
-      padding: 10,
-      alignItems: "center",
-    }}>
-      {/* Title bar */}
-      <View style={{
-        backgroundColor: "#E53935",
-        borderRadius: 10,
-        paddingVertical: 8,
-        paddingHorizontal: 10,
-        marginTop: 5,
-        marginBottom: 10,
-        alignItems: "center",
-      }}>
-        <Text style={{
-          color: "#FFFFFF",
-          fontWeight: "bold",
-          fontSize: 25,
-        }}>{title}</Text>
-      </View>
-
-      {/* Number display */}
-      <View style={{
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        marginBottom: 10,
-      }}>
-        {number.split('').map((digit, index) => (
-          <Text
-            key={index}
-            style={{
-              color: "#E53935",
-              fontSize: 65,
-              fontWeight: "bold",
-              textShadowColor: "rgba(0, 0, 0, 0.25)",
-              textShadowOffset: { width: 0, height: 2 },
-              textShadowRadius: 4,
-            }}
-          >
-            {digit}
-          </Text>
-        ))}
-      </View>
-    </View>
-  );
-
   return (
     <View style={{ flex: 1, position: 'relative' }}>
       <Background
@@ -91,7 +41,6 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        {/* NOW SERVING header */}
         <View style={{
           backgroundColor: "#FFFFFF",
           paddingVertical: 12,
@@ -106,17 +55,15 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
           }}>NOW SERVING</Text>
         </View>
 
-        <View
-          style={{
-            marginTop: height * 0.03,
-            alignItems: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.33)",
-            width: width * 0.84,
-            borderRadius: 20,
-            paddingVertical: 20,
-          }}
-        >
-          {/* First row - Counter 1, 2, 3, and 4 */}
+        {/* First row - Counter 1 to 4 */}
+        <View style={{
+          marginTop: height * 0.03,
+          alignItems: "center",
+          backgroundColor: "rgba(255, 255, 255, 0.33)",
+          width: width * 0.84,
+          borderRadius: 20,
+          paddingVertical: 20,
+        }}>
           <View style={{
             flexDirection: "row",
             flexWrap: "wrap",
@@ -124,31 +71,232 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
             width: "90%",
             gap: 10,
           }}>
-            {renderCounterBox("Counter 1", "005")}
-            {renderCounterBox("Counter 2", "005")}
-            {renderCounterBox("Counter 3", "005")}
-            {renderCounterBox("Counter 4", "005")}
+            {/* Counter 1 */}
+            <View style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 15,
+              width: "48%",
+              padding: 10,
+              alignItems: "center",
+            }}>
+              <View style={{
+                backgroundColor: "#E53935",
+                borderRadius: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                marginTop: 5,
+                marginBottom: 10,
+                alignItems: "center",
+              }}>
+                <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 1</Text>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                {"005".split('').map((digit, index) => (
+                  <Text key={index} style={{
+                    color: "#E53935",
+                    fontSize: 65,
+                    fontWeight: "bold",
+                    textShadowColor: "rgba(0, 0, 0, 0.25)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    {digit}
+                  </Text>
+                ))}
+              </View>
+            </View>
+
+            {/* Repeat Counter 2, 3, 4 the same way as Counter 1 */}
+            {/* Counter 2 */}
+            <View style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 15,
+              width: "48%",
+              padding: 10,
+              alignItems: "center",
+            }}>
+              <View style={{
+                backgroundColor: "#E53935",
+                borderRadius: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                marginTop: 5,
+                marginBottom: 10,
+                alignItems: "center",
+              }}>
+                <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 2</Text>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                {"005".split('').map((digit, index) => (
+                  <Text key={index} style={{
+                    color: "#E53935",
+                    fontSize: 65,
+                    fontWeight: "bold",
+                    textShadowColor: "rgba(0, 0, 0, 0.25)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    {digit}
+                  </Text>
+                ))}
+              </View>
+            </View>
+
+            {/* Counter 3 */}
+            <View style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 15,
+              width: "48%",
+              padding: 10,
+              alignItems: "center",
+            }}>
+              <View style={{
+                backgroundColor: "#E53935",
+                borderRadius: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                marginTop: 5,
+                marginBottom: 10,
+                alignItems: "center",
+              }}>
+                <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 3</Text>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                {"005".split('').map((digit, index) => (
+                  <Text key={index} style={{
+                    color: "#E53935",
+                    fontSize: 65,
+                    fontWeight: "bold",
+                    textShadowColor: "rgba(0, 0, 0, 0.25)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    {digit}
+                  </Text>
+                ))}
+              </View>
+            </View>
+
+            {/* Counter 4 */}
+            <View style={{
+              backgroundColor: "#FFFFFF",
+              borderRadius: 15,
+              width: "48%",
+              padding: 10,
+              alignItems: "center",
+            }}>
+              <View style={{
+                backgroundColor: "#E53935",
+                borderRadius: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                marginTop: 5,
+                marginBottom: 10,
+                alignItems: "center",
+              }}>
+                <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 25 }}>Counter 4</Text>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                {"005".split('').map((digit, index) => (
+                  <Text key={index} style={{
+                    color: "#E53935",
+                    fontSize: 65,
+                    fontWeight: "bold",
+                    textShadowColor: "rgba(0, 0, 0, 0.25)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    {digit}
+                  </Text>
+                ))}
+              </View>
+            </View>
           </View>
         </View>
 
-        <View
-          style={{
-            marginTop: height * 0.03,
-            alignItems: "center",
-            backgroundColor: "rgba(255, 255, 255, 0.33)",
-            width: width * 0.84,
-            borderRadius: 20,
-            paddingVertical: 20,
-          }}
-        >
-          {/* Third row - Counter A1 & PRIORITY */}
+        {/* Counter A1 and PRIORITY section */}
+        <View style={{
+          marginTop: height * 0.03,
+          alignItems: "center",
+          backgroundColor: "rgba(255, 255, 255, 0.33)",
+          width: width * 0.84,
+          borderRadius: 20,
+          paddingVertical: 20,
+        }}>
           <View style={{
             flexDirection: "row",
             justifyContent: "space-between",
             width: "90%",
           }}>
-            {renderCounterBox("Counter A1", "005")}
-            {renderCounterBox("PRIORITY", "005")}
+            {/* Counter A1 */}
+            <View style={{
+              backgroundColor: "#D64F5A",
+              borderRadius: 15,
+              width: "48%",
+              padding: 10,
+              alignItems: "center",
+            }}>
+              <View style={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                marginTop: 5,
+                marginBottom: 10,
+                alignItems: "center",
+              }}>
+                <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 25 }}>Counter A1</Text>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                {"005".split('').map((digit, index) => (
+                  <Text key={index} style={{
+                    color: "#FFFFFF",
+                    fontSize: 65,
+                    fontWeight: "bold",
+                    textShadowColor: "rgba(0, 0, 0, 0.25)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    {digit}
+                  </Text>
+                ))}
+              </View>
+            </View>
+
+            {/* PRIORITY */}
+            <View style={{
+              backgroundColor: "#D64F5A",
+              borderRadius: 15,
+              width: "48%",
+              padding: 10,
+              alignItems: "center",
+            }}>
+              <View style={{
+                backgroundColor: "#FFFFFF",
+                borderRadius: 10,
+                paddingVertical: 8,
+                paddingHorizontal: 10,
+                marginTop: 5,
+                marginBottom: 10,
+                alignItems: "center",
+              }}>
+                <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 25 }}>PRIORITY</Text>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginBottom: 10 }}>
+                {"005".split('').map((digit, index) => (
+                  <Text key={index} style={{
+                    color: "#FFFFFF",
+                    fontSize: 65,
+                    fontWeight: "bold",
+                    textShadowColor: "rgba(0, 0, 0, 0.25)",
+                    textShadowOffset: { width: 0, height: 2 },
+                    textShadowRadius: 4,
+                  }}>
+                    {digit}
+                  </Text>
+                ))}
+              </View>
+            </View>
           </View>
         </View>
       </View>
