@@ -5,6 +5,7 @@ import { QueueService } from "../queue/queue.service";
 import { ReceiptRepository } from "./receipt.repository";
 
 export class ReceiptService {
+  
   static async assignRegularReceipt() {
     const inuseRegularCounters =
       await TellerRepository.fetchInuseRegularCounter();

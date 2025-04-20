@@ -1,30 +1,15 @@
-import { View, Text } from "react-native";
+import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 
 const useWebSocket = (url: string) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const [currentRQNum, setCurrentRegularQueueNum] = useState<string|null>(null);
-  const ws = useRef<WebSocket | null>(null);
+  const [currentRQNum, setCurrentRegularQueueNum] = useState<string|null>();
+  const ws = useRef<WebSocket | null>(null)
 
-
-  // MY CONCERN IS: 
-  // HINDI KO MAIPASA NANG MAAYOS SA TELLERSCREEN KASI HINDI MAILAGAY NANG MAAYOS YUNG TRUE VALUE
-  // NIYANG STRING SA HOOKSTATE NATIN. 
-
-  // USE EFFECT TO UPDATE THE HOOKS,
-  // IF THE HOOKS ARE UPDATED ALREADY, USE THAT IN OUR TELLER SCREEN. 
-
-
-  // ASYNCH KASI NANGYAYARI DIYAN EH SO DI SIYA BASTA BASTA NAKUKUHA YUNG LATEST
-
-
-  // ISIPIN DIN ANG FLOW FROM THE ROOT
- 
   useEffect(()=>{
-    console.log("useState: ", currentRQNum)
-  },[currentRQNum])
-
-
+    console.log("latest queue number:", currentRQNum)
+  }, [currentRQNum])
+  
   useEffect(() => {
     if (ws.current) return;
 
@@ -41,8 +26,9 @@ const useWebSocket = (url: string) => {
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
       } else if (data.type === "assign-regular-receipt-be") {
-        setCurrentRegularQueueNum(data.currentRegularQueueNum)
-        console.log("raw backend: ", data.currentRegularQueueNum )
+        const currentregular = data.currentRegularQueueNum
+        setCurrentRegularQueueNum(currentregular)
+      
       }
     };
 
@@ -50,7 +36,7 @@ const useWebSocket = (url: string) => {
       console.error("WebSocket error: ", error);
 
     ws.current.onclose = () => {
-      console.log("🔌 Disconnected from WebSocket");
+      console.log("Disconnected from WebSocket");
       ws.current = null;
     };
 
@@ -105,6 +91,8 @@ const useWebSocket = (url: string) => {
     }
   };
 
+
+
   
 
 
@@ -115,7 +103,7 @@ const useWebSocket = (url: string) => {
     setToInuse,
     tellerNext,
     assignRegularReceipt,
-    currentRQNum
+    currentRQNum,
   };
 };
 

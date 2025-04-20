@@ -63,7 +63,7 @@ export function setupWebSocket(server: Server) {
         await ReceiptService.assignRegularReceipt()
         const currentRegularQueueNum = await QueueService.getCurrentRegularQueueNum(data.counter)
 
-        ws.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
+        ws?.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
       }
     });
 

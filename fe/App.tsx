@@ -5,7 +5,6 @@ import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import useWebSocket from "./websocket/useWebSocket";
 import TransactionScreen from "./screens/TransactionScreen";
 import ReceiptScreen from "./screens/ReceiptScreen";
 import HomeScreen from "./screens/HomeScreen";
@@ -17,6 +16,7 @@ import TellerScreen from "./screens/TellerScreen";
 import { RootStackParamLists } from "./types/types";
 import { receiptProps } from "./types/receiptProps";
 import WS_URL from "./constant/constant";
+import { WebSocketProvider } from "./websocket/WebSocketProvider";
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
@@ -24,8 +24,6 @@ const { width, height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator<RootStackParamLists>();
 
 const App = () => {
-  useWebSocket(WS_URL);
-
   const [fontsLoaded] = useFonts({
     RobotoMono: require("./assets/fonts/RobotoMono-Regular.ttf"),
     "RobotoMono-Bold": require("./assets/fonts/RobotoMono-Bold.ttf"),
@@ -49,7 +47,8 @@ const App = () => {
   });
 
   return (
-    <SafeAreaProvider className="flex-1 ">
+   <WebSocketProvider >
+     <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="TellerHomeScreen"
@@ -100,6 +99,7 @@ const App = () => {
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
+   </WebSocketProvider>
   );
 };
 

@@ -16,6 +16,7 @@ import TellerCounterDisable from "../assets/icons/teller-counter-disable.svg";
 import TellerCounterEnable from "../assets/icons/teller-counter-enable.svg";
 import useWebSocket from "../websocket/useWebSocket";
 import WS_URL from "../constant/constant";
+import { useWebSocketsApp } from "../websocket/WebSocketProvider";
 
 interface TellerHomeScreen {
   navigation: any;
@@ -26,7 +27,7 @@ const { width, height } = Dimensions.get("window");
 const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const { getCounterStatus, setToInuse, assignRegularReceipt } =
-    useWebSocket(WS_URL);
+    useWebSocketsApp();
 
   useEffect(() => {
     if (getCounterStatus()) {

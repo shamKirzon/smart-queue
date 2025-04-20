@@ -16,6 +16,7 @@ import Lock from "../assets/icons/lock.svg";
 import ExitModal from "../assets/icons/exit-modal.svg";
 import useWebSocket from "../websocket/useWebSocket";
 import WS_URL from "../constant/constant";
+import { useWebSocketsApp } from "../websocket/WebSocketProvider";
 
 type TellerScreenRouteProp = RouteProp<RootStackParamLists, "TellerScreen">;
 type TellerScreenNavigationProp = NativeStackNavigationProp<
@@ -33,13 +34,7 @@ const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
-  const { setToAvailable, tellerNext, currentRQNum} = useWebSocket(WS_URL);
-
-  useEffect(() => {
-    console.log("Teller screen received currentRQNum:", currentRQNum);
-  }, [currentRQNum]);
-  
-
+  const { setToAvailable, tellerNext, currentRQNum } = useWebSocketsApp();
 
   const modalContent = (): JSX.Element => {
     return (
@@ -242,7 +237,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
               color: "rgba(213, 0, 0, 0.74)",
             }}
           >
-          {currentRQNum}
+         {currentRQNum}
           </Text>
           {/* TEXT - "on going "  */}
           <Text

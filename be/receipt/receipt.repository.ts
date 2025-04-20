@@ -23,6 +23,8 @@ export class ReceiptRepository {
     
     const client = await pool.connect(); 
 
+
+    // bug: narread ng query natin yung dalawang counter it must be 1 counter lang 
     const query1 = `UPDATE counters 
                     SET regular_receipt_id = $1
                     WHERE counter_name = $2`
