@@ -1,4 +1,5 @@
 import pool from "../database/connection";
+import { ReceiptService } from "../receipt/receipt.service";
 import { TellerService } from "./teller.service";
 
 export class TellerRepository {
@@ -95,9 +96,8 @@ export class TellerRepository {
       if (currentRegularId) {
         const query = `DELETE FROM regular_receipt WHERE regular_receipt_id = $1`;
         await pool.query(query, [currentRegularId]);
+        ReceiptService.assignRegularReceipt()
 
-        // queueRepository -> updates the queue
-        // ->
       } else {
         console.warn(`No regular_receipt_id found for counter: ${counter}`);
       }

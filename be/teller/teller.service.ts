@@ -2,7 +2,7 @@ import pool from "../database/connection";
 import { TellerRepository } from "./teller.repository";
 
 export class TellerService {
-  static  regularCounters = ["counter_1", "counter_2", "counter_3", "counter_4"];
+  public static regularCounters = ["counter_1", "counter_2", "counter_3", "counter_4"];
   
 
   static formattedCounter(counter: string):string {
@@ -13,6 +13,9 @@ export class TellerService {
     const formattedCounterString = this.formattedCounter(counter)
     return this.regularCounters.includes(formattedCounterString)
   }
+
+
+  
 
   
 

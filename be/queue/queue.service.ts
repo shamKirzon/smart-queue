@@ -4,37 +4,10 @@ import { TellerService } from "../teller/teller.service";
 import { QueueRepository } from "./queue.repository";
 
 export class QueueService{
-    static async assignRegularReceipt() {
-        const inuseRegularCounters = await TellerRepository.fetchInuseRegularCounter(); 
-    
-        // check if the fetched counters are contain our regular Counters: 
-        if(inuseRegularCounters?.some(counter => TellerService.regularCounters.includes(counter))){
-    
-        for(let counter of inuseRegularCounters){
-            const customer = await QueueService.assignRegularReceipt(); 
+    static async getCurrentRegularQueueNum(counter: string):Promise<string>  {
 
-            if(!counter){
-                console.log(`no waiting customer to assign for ${counter}`)
-                continue; 
-            }
-
-            // await QueueRepository.assignCustomerToCounter(counter, customer)
-        }
-      
-          try{
-    
-            
-          }catch(error) {
-              console.error("tellerService_assignRegularReceipt cant perform logic side", error)
-          }
-    
-    
-    
-    
-    
-        }else{
-          return 
-        }
-    
+        counter = TellerService.formattedCounter(counter)
+        const queueNum  = await QueueRepository.getRegQueueNum(counter)
+        return queueNum; 
       }
 }

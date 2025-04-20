@@ -25,7 +25,7 @@ const { width, height } = Dimensions.get("window");
 
 const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const { getCounterStatus, fetchCounterStatus, setToInuse,  } =
+  const { getCounterStatus, setToInuse, assignRegularReceipt } =
     useWebSocket(WS_URL);
 
   useEffect(() => {
@@ -199,6 +199,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => {
                   setToInuse(counter);
+                  assignRegularReceipt(counter)
                   navigation.navigate("TellerScreen", { counterName: counter });
                 }}
                 style={{ flexDirection: "row", alignItems: "center" }}

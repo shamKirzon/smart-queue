@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Dimensions } from "react-native";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import TellerBottomBackground from "../assets/backgrounds/teller-bottom-background.svg";
@@ -33,7 +33,13 @@ const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
-  const { getCounterStatus, setToAvailable, tellerNext } = useWebSocket(WS_URL);
+  const { setToAvailable, tellerNext, currentRQNum} = useWebSocket(WS_URL);
+
+  useEffect(() => {
+    console.log("Teller screen received currentRQNum:", currentRQNum);
+  }, [currentRQNum]);
+  
+
 
   const modalContent = (): JSX.Element => {
     return (
@@ -48,7 +54,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
             lineHeight: width * 0.074 + 1,
           }}
         >
-          Warning!
+          Warning
         </Text>
 
         <Text
@@ -236,7 +242,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
               color: "rgba(213, 0, 0, 0.74)",
             }}
           >
-            003
+          {currentRQNum}
           </Text>
           {/* TEXT - "on going "  */}
           <Text

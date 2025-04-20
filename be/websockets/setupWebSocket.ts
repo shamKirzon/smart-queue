@@ -2,6 +2,9 @@ import { WebSocket, WebSocketServer } from "ws";
 import { Server } from "http";
 import { TellerService } from "../teller/teller.service";
 import { TellerRepository } from "../teller/teller.repository";
+import { ReceiptService } from "../receipt/receipt.service";
+import { QueueRepository } from "../queue/queue.repository";
+import { QueueService } from "../queue/queue.service";
 
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
@@ -55,7 +58,12 @@ export function setupWebSocket(server: Server) {
         })
       } else if(data.type === "teller-next-fe"){
         await TellerRepository.tellerNext(data.counter)
-        await TellerService.assignRegularReceipt()
+        await ReceiptService.assignRegularReceipt()
+      }else if(data.type === "assign-regular-receipt-fe"){
+        await ReceiptService.assignRegularReceipt()
+        const currentRegularQueueNum = await QueueService.getCurrentRegularQueueNum(data.counter)
+
+        ws.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
       }
     });
 

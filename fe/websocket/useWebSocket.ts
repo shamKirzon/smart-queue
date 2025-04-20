@@ -1,91 +1,122 @@
 import { View, Text } from "react-native";
 import { useRef, useEffect, useState } from "react";
 
-
-type CounterStatus = {
-  counter_name: string, 
-  status: string
-}
-
 const useWebSocket = (url: string) => {
-  const [status, setStatus ] = useState<{[key: string]: string}>({})
+  const [status, setStatus] = useState<{ [key: string]: string }>({});
+  const [currentRQNum, setCurrentRegularQueueNum] = useState<string|null>(null);
   const ws = useRef<WebSocket | null>(null);
+
+
+  // MY CONCERN IS: 
+  // HINDI KO MAIPASA NANG MAAYOS SA TELLERSCREEN KASI HINDI MAILAGAY NANG MAAYOS YUNG TRUE VALUE
+  // NIYANG STRING SA HOOKSTATE NATIN. 
+
+  // USE EFFECT TO UPDATE THE HOOKS,
+  // IF THE HOOKS ARE UPDATED ALREADY, USE THAT IN OUR TELLER SCREEN. 
+
+
+  // ASYNCH KASI NANGYAYARI DIYAN EH SO DI SIYA BASTA BASTA NAKUKUHA YUNG LATEST
+
+
+  // ISIPIN DIN ANG FLOW FROM THE ROOT
+ 
+  useEffect(()=>{
+    console.log("useState: ", currentRQNum)
+  },[currentRQNum])
+
 
   useEffect(() => {
     if (ws.current) return;
 
     ws.current = new WebSocket(url);
 
-    // on open
     ws.current.onopen = () => {
-      console.log("Connected to websocket");
-      fetchCounterStatus()
+      console.log("Connected to WebSocket");
+      fetchCounterStatus();
     };
 
-    // incoming messages from backend (ws.send)
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
+      } else if (data.type === "assign-regular-receipt-be") {
+        setCurrentRegularQueueNum(data.currentRegularQueueNum)
+        console.log("raw backend: ", data.currentRegularQueueNum )
       }
     };
 
-    ws.current.onerror = (error) => console.error("Websocket error: ", error);
+    ws.current.onerror = (error) =>
+      console.error("WebSocket error: ", error);
+
     ws.current.onclose = () => {
-      console.log("disconnected to websocket");
+      console.log("🔌 Disconnected from WebSocket");
       ws.current = null;
     };
 
     return () => {
       ws.current?.close();
     };
-  }, []); // ensuring our websocket initiliazes once
+  }, []);
 
- 
 
   // FUNCTIONS
   const fetchCounterStatus = () => {
-    if (ws.current?.readyState == WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({ type: "get-counter-status" }));
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "get-counter-status" }));
     }
   };
 
   const setToAvailable = (counter: string) => {
-    if (ws.current?.readyState == WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({ type: "set-counter-available", counter: counter}));
-    }
-  };
-  
-  const setToInuse = (counter: string ) => {
-    if (ws.current?.readyState == WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({ type: "set-counter-inuse" , counter: counter}));
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "set-counter-available", counter }));
     }
   };
 
-  const setCounterStatus = (data: {counter_name: string, status: string}[]) => {
+  const setToInuse = (counter: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "set-counter-inuse", counter }));
+    }
+  };
+
+  const setCounterStatus = (data: { counter_name: string; status: string }[]) => {
     const counterStatusMap: { [key: string]: string } = {};
-  
+
     data.forEach(({ counter_name, status }) => {
       counterStatusMap[counter_name] = status;
     });
 
-    setStatus(counterStatusMap)
-    
+    setStatus(counterStatusMap);
   };
 
   const getCounterStatus = () => {
-  
-    return status; 
-  }
+    return status;
+  };
 
-  const tellerNext = (counter: string) => {
-    if (ws.current?.readyState == WebSocket.OPEN) {
-      ws.current?.send(JSON.stringify({ type: "teller-next-fe", counter: counter}));
+  const assignRegularReceipt = (counter: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "assign-regular-receipt-fe", counter }));
     }
   };
+
+  const tellerNext = (counter: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "teller-next-fe", counter }));
+    }
+  };
+
   
-  return { fetchCounterStatus, getCounterStatus, setToAvailable, setToInuse, tellerNext};
+
+
+  return {
+    fetchCounterStatus,
+    getCounterStatus,
+    setToAvailable,
+    setToInuse,
+    tellerNext,
+    assignRegularReceipt,
+    currentRQNum
+  };
 };
 
 export default useWebSocket;
