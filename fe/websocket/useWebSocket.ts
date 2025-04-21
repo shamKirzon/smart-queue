@@ -3,13 +3,13 @@ import { useRef, useEffect, useState } from "react";
 
 const useWebSocket = (url: string) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const [currentRQNum, setCurrentRegularQueueNum] = useState<string|null>();
-  const ws = useRef<WebSocket | null>(null)
+  const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
+  const ws = useRef<WebSocket | null>(null);
 
-  useEffect(()=>{
-    console.log("latest queue number:", currentRQNum)
-  }, [currentRQNum])
-  
+  useEffect(() => {
+    console.log("latest queue number:", currentRQNum);
+  }, [currentRQNum]);
+
   useEffect(() => {
     if (ws.current) return;
 
@@ -26,14 +26,12 @@ const useWebSocket = (url: string) => {
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
       } else if (data.type === "assign-regular-receipt-be") {
-        const currentregular = data.currentRegularQueueNum
-        setCurrentRegularQueueNum(currentregular)
-      
+        const currentregular = data.currentRegularQueueNum;
+        setCurrentRegularQueueNum(currentregular);
       }
     };
 
-    ws.current.onerror = (error) =>
-      console.error("WebSocket error: ", error);
+    ws.current.onerror = (error) => console.error("WebSocket error: ", error);
 
     ws.current.onclose = () => {
       console.log("Disconnected from WebSocket");
@@ -45,7 +43,6 @@ const useWebSocket = (url: string) => {
     };
   }, []);
 
-
   // FUNCTIONS
   const fetchCounterStatus = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
@@ -55,7 +52,9 @@ const useWebSocket = (url: string) => {
 
   const setToAvailable = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ type: "set-counter-available", counter }));
+      ws.current.send(
+        JSON.stringify({ type: "set-counter-available", counter })
+      );
     }
   };
 
@@ -65,7 +64,9 @@ const useWebSocket = (url: string) => {
     }
   };
 
-  const setCounterStatus = (data: { counter_name: string; status: string }[]) => {
+  const setCounterStatus = (
+    data: { counter_name: string; status: string }[]
+  ) => {
     const counterStatusMap: { [key: string]: string } = {};
 
     data.forEach(({ counter_name, status }) => {
@@ -81,7 +82,9 @@ const useWebSocket = (url: string) => {
 
   const assignRegularReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ type: "assign-regular-receipt-fe", counter }));
+      ws.current.send(
+        JSON.stringify({ type: "assign-regular-receipt-fe", counter })
+      );
     }
   };
 
@@ -91,10 +94,13 @@ const useWebSocket = (url: string) => {
     }
   };
 
-
-
-  
-
+  const insertData = () => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(
+        JSON.stringify({ type: "insert-data", dataReceipt: { name: "shams", age: 90} })
+      );
+    }
+  };
 
   return {
     fetchCounterStatus,
@@ -104,6 +110,7 @@ const useWebSocket = (url: string) => {
     tellerNext,
     assignRegularReceipt,
     currentRQNum,
+    insertData
   };
 };
 

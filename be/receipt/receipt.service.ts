@@ -17,24 +17,55 @@ export class ReceiptService {
       )
     ) {
 
+      const queueNumbers = new Map()
       // to not limit the counter sequentially, runs at the same time.
+      // await Promise.all(
+      //   inuseRegularCounters.map(async (counter) => {
+
+      //     if (!queueNumbers.has(counter)) {
+      //       const customer =
+      //         await ReceiptRepository.getNextRegularCustomerWithLock();
+      //       const customerId = customer.rows[0]?.regular_receipt_id;
+
+      //       if (customerId) {
+      //         queueNumbers.set(counter, customerId);
+      //         await ReceiptRepository.assignCustomerToCounter(customerId, counter);
+      //       } else {
+      //         console.log(`No waiting customer to assign for ${counter}`);
+      //       }
+      //     }
+          
+      //   })
+      // );
+
       await Promise.all(
         inuseRegularCounters.map(async (counter) => {
-          let customer =
-            await ReceiptRepository.getNextRegularCustomerWithLock();
-        
-            customer = customer.rows[0].regular_receipt_id; 
-
-          if (!counter) {
-            console.log(`no waiting customer to assign for ${counter}`);
-            return;
+          if (!queueNumbers.has(counter)) {
+            const { client, customer } = await ReceiptRepository.getNextRegularCustomerWithLock();
+            const customerId = customer.rows[0]?.regular_receipt_id;
+      
+            if (customerId) {
+              try {
+                queueNumbers.set(counter, customerId);
+                await ReceiptRepository.assignCustomerToCounter(customerId, counter, client);
+                await client.query('COMMIT');
+              } catch (error) {
+                await client.query('ROLLBACK');
+                console.error('Failed to assign customer:', error);
+              } finally {
+                client.release();
+              }
+            } else {
+              console.log(`No waiting customer to assign for ${counter}`);
+              await client.query('ROLLBACK');
+              client.release();
+            }
           }
-
-          await ReceiptRepository.assignCustomerToCounter(customer, counter)
         })
+      );
+      
 
        
-      );
 
       
 

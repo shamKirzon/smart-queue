@@ -39,6 +39,7 @@ import Footerbg from "../assets/backgrounds/rectangle-background.svg";
 
 import { RootStackParamLists } from "../types/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useWebSocketsApp } from '../websocket/WebSocketProvider';
 
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamLists, 'ReceiptScreen'>;
@@ -47,6 +48,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamLists, 'ReceiptScr
 const { width, height } = Dimensions.get("window");
 const textM = width * 0.050;
 const textL = width * 0.08;
+
 
 interface TransactionProps {
   navigation: NavigationProp;
@@ -93,6 +95,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   updateCustomerInfo,
 }) => {
+  const {insertData} = useWebSocketsApp()
   const currentDate = format(new Date(), "MM/dd/yyyy").toString();
   const currentTime = format(new Date(), "hh:mm a").toString();
   const [selectedCustomerType, setSelectedCustomerType] = useState<string | null>(null);
@@ -100,6 +103,8 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [queueNumber, setQueueNumber] = useState(1);
   const isConfirmDisabled = selectedCustomerType === null || selectedTransactionTypes.length === 0;
+
+
 
 
 
@@ -114,6 +119,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
         time: currentTime,
     };
 
+    {insertData()}
     navigation.navigate("ReceiptScreen", receiptData);
 
     setQueueNumber(queueNumber + 1);

@@ -57,13 +57,20 @@ export function setupWebSocket(server: Server) {
           }
         })
       } else if(data.type === "teller-next-fe"){
-        await TellerRepository.tellerNext(data.counter)
-        await ReceiptService.assignRegularReceipt()
+        // await TellerRepository.tellerNext(data.counter)
+        // await ReceiptService.assignRegularReceipt()
+
+
       }else if(data.type === "assign-regular-receipt-fe"){
         await ReceiptService.assignRegularReceipt()
         const currentRegularQueueNum = await QueueService.getCurrentRegularQueueNum(data.counter)
 
         ws?.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
+      }
+      else if(data.type === 'insert-data'){
+        console.log(data.dataReceipt.name)
+        console.log(data.dataReceipt.age)
+
       }
     });
 

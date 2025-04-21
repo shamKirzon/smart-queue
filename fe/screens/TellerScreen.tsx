@@ -35,6 +35,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
   const { setToAvailable, tellerNext, currentRQNum } = useWebSocketsApp();
+  // useWebSocket(link)
 
   const modalContent = (): JSX.Element => {
     return (
