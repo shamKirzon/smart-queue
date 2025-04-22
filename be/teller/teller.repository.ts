@@ -96,7 +96,6 @@ export class TellerRepository {
       if (currentRegularId) {
         const query = `DELETE FROM regular_receipt WHERE regular_receipt_id = $1`;
         await pool.query(query, [currentRegularId]);
-        ReceiptService.assignRegularReceipt()
 
       } else {
         console.warn(`No regular_receipt_id found for counter: ${counter}`);

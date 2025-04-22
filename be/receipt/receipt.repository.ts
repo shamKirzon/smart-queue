@@ -9,19 +9,22 @@ export class ReceiptRepository {
   //   const query1 = ` SELECT * FROM regular_receipt
   //                                 WHERE status = 'waiting'
   //                                 ORDER BY queue_number ASC
-  //                                 LIMIT 1 
+  //                                 LIMIT 1
   //                                 FOR UPDATE SKIP LOCKED`;
 
   //   const customer = await pool.query(query1);
   //   return customer;
   // }
 
-  static async getNextRegularCustomerWithLock(): Promise<{ client: PoolClient, customer: any }> {
+  static async getNextRegularCustomerWithLock(): Promise<{
+    client: PoolClient;
+    customer: any;
+  }> {
     const client = await pool.connect();
-  
+
     try {
-      await client.query('BEGIN');
-  
+      await client.query("BEGIN");
+
       const result = await client.query(`
         SELECT * FROM regular_receipt
         WHERE status = 'waiting'
@@ -29,55 +32,43 @@ export class ReceiptRepository {
         LIMIT 1
         FOR UPDATE SKIP LOCKED
       `);
-  
+
       return { client, customer: result };
     } catch (err) {
-      await client.query('ROLLBACK');
+      await client.query("ROLLBACK");
       client.release();
       throw err;
     }
   }
-  
 
-  // static async assignCustomerToCounter(
-  //   customer: QueryResult<any>,
-  //   counter: string
-  // ) {
-    
-  //   const client = await pool.connect(); 
+  static async assignCustomerToCounter(
+    customerId: QueryResult<any>,
+    counter: string,
+    client: PoolClient
+  ) {
+    // bug: narread ng query natin yung dalawang counter it must be 1 counter lang
+    const query1 = `UPDATE counters 
+                    SET regular_receipt_id = $1
+                    WHERE counter_name = $2`;
 
+    const value1 = [customerId, counter];
 
-  //   // bug: narread ng query natin yung dalawang counter it must be 1 counter lang 
-  //   const query1 = `UPDATE counters 
-  //                   SET regular_receipt_id = $1
-  //                   WHERE counter_name = $2`
+    const query2 = `UPDATE regular_receipt
+                    SET status = 'in_progress'
+                    WHERE regular_receipt_id = $1`;
+    const value2 = [customerId];
 
-  //   const value1 = [customer, counter]; 
-
-
-  //   const query2 = `UPDATE regular_receipt
-  //                   SET status = 'in_progress'
-  //                   WHERE regular_receipt_id = $1`
-  //   const value2 =  [customer]; 
-
-  //  try{
-  //   await client.query('BEGIN')
-  //   await client.query(query1, value1)
-  //   await client.query(query2, value2)
-  //   await client.query('COMMIT')
-  //  }catch(error){
-  //   console.error('receiptRepository.assignCustomerToCounter - cant perform query: ', error)
-  //  }
-   
-  // }
-
-  static async assignCustomerToCounter(customerId: number, counter: string, client: PoolClient) {
-    await client.query(
-      `UPDATE regular_receipt SET status = 'serving', assigned_counter = $1 WHERE regular_receipt_id = $2`,
-      [counter, customerId]
-    );
+    try {
+      await client.query("BEGIN");
+      await client.query(query1, value1);
+      await client.query(query2, value2);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error(
+        "receiptRepository.assignCustomerToCounter - cant perform query: ",
+        error
+      );
+    }
   }
-  
-
-  
 }

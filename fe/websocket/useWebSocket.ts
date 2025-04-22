@@ -83,7 +83,7 @@ const useWebSocket = (url: string) => {
   const assignRegularReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
-        JSON.stringify({ type: "assign-regular-receipt-fe", counter })
+        JSON.stringify({ type: "assign-regular-receipt-fe", counter: counter })
       );
     }
   };
