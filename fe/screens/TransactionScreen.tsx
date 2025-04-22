@@ -173,10 +173,10 @@ const TransactionScreen: React.FC<TransactionProps> = ({
     if (type === "Open Account") {
       if (alreadySelected) {
         setSelectedTransactionTypes([]);
-        setSelectedCustomerType(null); // Reset customer type when deselected
+        setSelectedCustomerType(null);
       } else {
         setSelectedTransactionTypes(["Open Account"]);
-        setSelectedCustomerType("Open Account"); // Set customer type to "Open Account"
+        setSelectedCustomerType("Open Account");
       }
     } else {
       if (selectedTransactionTypes.includes("Open Account")) {
