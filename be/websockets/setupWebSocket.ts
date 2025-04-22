@@ -8,7 +8,7 @@ import { QueueService } from "../queue/queue.service";
 
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
-  const tellerService = new TellerService();
+
   let clientCounter = 0;
 
   wss.on("connection", (ws: WebSocket) => {
@@ -30,47 +30,51 @@ export function setupWebSocket(server: Server) {
       } else if (data.type === "set-counter-available") {
         await TellerRepository.setCounterAvailable(data.counter);
         const counterStatus = await TellerRepository.getCounterStatus();
-        
+
         wss.clients.forEach((client) => {
-          if(client.readyState === WebSocket.OPEN){
+          if (client.readyState === WebSocket.OPEN) {
             client.send(
               JSON.stringify({
-                type: "set-counter-status", 
-                data: counterStatus
+                type: "set-counter-status",
+                data: counterStatus,
               })
-            )
+            );
           }
-        })
-
+        });
       } else if (data.type === "set-counter-inuse") {
         await TellerRepository.setCounterInuse(data.counter);
         const counterStatus = await TellerRepository.getCounterStatus();
 
         wss.clients.forEach((client) => {
-          if(client.readyState === WebSocket.OPEN){
+          if (client.readyState === WebSocket.OPEN) {
             client.send(
               JSON.stringify({
-                type: "set-counter-status", 
-                data: counterStatus
+                type: "set-counter-status",
+                data: counterStatus,
               })
-            )
+            );
           }
-        })
-      } else if(data.type === "teller-next-fe"){
-        // await TellerRepository.tellerNext(data.counter)
-        // await ReceiptService.assignRegularReceipt()
+        });
+      } else if (data.type === "teller-next-fe") {
+        const queueNum = await TellerRepository.tellerNext(data.counter);
+        console.log("teller-next-fe - queue_number: ", queueNum);
+        ws?.send(
+          JSON.stringify({
+            type: "assign-regular-receipt-be",
+            currentRegularQueueNum: queueNum,
+          })
+        );
+      } else if (data.type === "assign-regular-receipt-fe") {
+        await ReceiptService.assignRegularReceipt(data.counter);
+        const currentRegularQueueNum =
+          await QueueService.getCurrentRegularQueueNum(data.counter);
 
-
-      }else if(data.type === "assign-regular-receipt-fe"){
-        await ReceiptService.assignRegularReceipt(data.counter)
-        const currentRegularQueueNum = await QueueService.getCurrentRegularQueueNum(data.counter)
-
-        ws?.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
-      }
-      else if(data.type === 'insert-data'){
-        console.log(data.dataReceipt.name)
-        console.log(data.dataReceipt.age)
-
+        ws?.send(
+          JSON.stringify({
+            type: "assign-regular-receipt-be",
+            currentRegularQueueNum: currentRegularQueueNum,
+          })
+        );
       }
     });
 
