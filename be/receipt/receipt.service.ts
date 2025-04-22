@@ -80,4 +80,86 @@ export class ReceiptService {
       );
     }
   }
+
+  static async createRegularReceipt(
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ): Promise<void> {
+    if (customerType !== "Regular") {
+      console.warn("Customer type is not 'Regular'. Skipping insertion.");
+      return;
+    }
+
+    try {
+      await ReceiptRepository.insertRegularReceipt(
+        transaction,
+        customerType,
+        queueNumber,
+        date,
+        time
+      );
+    } catch (error) {
+      console.error("Error creating regular receipt:", error);
+      throw error;
+    }
+  }
+
+  static async createPriorityReceipt(
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ): Promise<void> {
+    if (customerType !== "Priority") {
+      console.warn("Customer type is not 'Priority'. Skipping insertion.");
+      return;
+    }
+
+    try {
+      await ReceiptRepository.insertPriorityReceipt(
+        transaction,
+        customerType,
+        queueNumber,
+        date,
+        time
+      );
+    } catch (error) {
+      console.error("Error creating Priority receipt:", error);
+      throw error;
+    }
+  }
+
+  static async  createOpenAccountReceipt(
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ): Promise<void> {
+    if (customerType !== "Open Account") {
+      console.warn("Customer type is not 'Open Account'. Skipping insertion.");
+      return;
+    }
+
+    try {
+      await ReceiptRepository.insertOpenAccounteceipt(
+        transaction,
+        customerType,
+        queueNumber,
+        date,
+        time
+      );
+    } catch (error) {
+      console.error("Error creating Open Account receipt:", error);
+      throw error;
+    }
+  }
+
+
+
+
 }

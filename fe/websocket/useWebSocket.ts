@@ -94,13 +94,66 @@ const useWebSocket = (url: string) => {
     }
   };
 
-  const insertData = () => {
+  //regular
+  const insertvaluesregular = (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
+      //if() (customerType === "Regular") {
+      console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
       ws.current.send(
-        JSON.stringify({ type: "insert-data", dataReceipt: { name: "shams", age: 90} })
+        JSON.stringify({ 
+          type: "insert-data-regular", 
+          dataReceipt: {
+            transaction,
+            customerType,
+            queueNumber,
+            date,
+            time
+          } 
+        })
       );
     }
   };
+
+  //priority
+  const insertvaluespriority= (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
+      ws.current.send(
+        JSON.stringify({ 
+          type: "insert-data-priority", 
+          dataReceipt: {
+            transaction,
+            customerType,
+            queueNumber,
+            date,
+            time
+          } 
+        })
+      );
+    }
+  };
+
+  //open account
+  const insertvaluesopenaccount= (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
+      ws.current.send(
+        JSON.stringify({ 
+          type: "insert-data-openaccount", 
+          dataReceipt: {
+            transaction,
+            customerType,
+            queueNumber,
+            date,
+            time
+          } 
+        })
+      );
+    }
+  };
+  
+
+
 
   return {
     fetchCounterStatus,
@@ -110,7 +163,9 @@ const useWebSocket = (url: string) => {
     tellerNext,
     assignRegularReceipt,
     currentRQNum,
-    insertData
+    insertvaluesregular,
+    insertvaluespriority,
+    insertvaluesopenaccount,
   };
 };
 
