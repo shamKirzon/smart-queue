@@ -95,34 +95,73 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   updateCustomerInfo,
 }) => {
-  const {insertData} = useWebSocketsApp()
+
+  const {insertvaluesregular} = useWebSocketsApp()
+  const {insertvaluespriority} = useWebSocketsApp()
+  const {insertvaluesopenaccount} = useWebSocketsApp()
   const currentDate = format(new Date(), "MM/dd/yyyy").toString();
   const currentTime = format(new Date(), "hh:mm a").toString();
   const [selectedCustomerType, setSelectedCustomerType] = useState<string | null>(null);
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [queueNumber, setQueueNumber] = useState(1);
-  const isConfirmDisabled = selectedCustomerType === null || selectedTransactionTypes.length === 0;
 
-
-
-
+  //for diff queue numbers
+  const [regularQueue, setRegularQueue] = useState(1);
+  const [priorityQueue, setPriorityQueue] = useState(1);
+  const [openAccountQueue, setOpenAccountQueue] = useState(1);
+  
+  const isConfirmDisabled = 
+    selectedCustomerType === null || 
+    (selectedTransactionTypes.length === 0 && !selectedTransactionTypes.includes("Open Account"));
 
   const handleProceed = () => {
-    const formattedQueueNumber = queueNumber.toString().padStart(3, "0");
+    let queueNumber = "";
+    if (selectedCustomerType === "Priority") {
+      queueNumber = priorityQueue.toString().padStart(3, "0");
+      setPriorityQueue(priorityQueue + 1);
+    } else if (selectedTransactionTypes.includes("Open Account")) {
+      queueNumber = openAccountQueue.toString().padStart(3, "0");
+      setOpenAccountQueue(openAccountQueue + 1);
+      setSelectedCustomerType("Open Account"); // Set customer type to "Open Account"
+    } else {
+      queueNumber = regularQueue.toString().padStart(3, "0");
+      setRegularQueue(regularQueue + 1);
+    }
 
     const receiptData: RootStackParamLists['ReceiptScreen'] = {
-        transaction: selectedTransactionTypes.join(", "),
-        customerType: selectedCustomerType || "",
-        queueNumber: formattedQueueNumber,
-        date: currentDate,
-        time: currentTime,
+      transaction: selectedTransactionTypes.join(", "),
+      customerType: selectedCustomerType || "",
+      queueNumber: queueNumber,
+      date: currentDate,
+      time: currentTime,
     };
 
-    {insertData()}
+    insertvaluesregular(
+      selectedTransactionTypes, 
+      selectedCustomerType || "", 
+      queueNumber, 
+      currentDate, 
+      currentTime
+    );
+
+    insertvaluespriority(
+      selectedTransactionTypes, 
+      selectedCustomerType || "", 
+      queueNumber, 
+      currentDate, 
+      currentTime
+    );
+
+    insertvaluesopenaccount(
+      selectedTransactionTypes, 
+      selectedCustomerType || "", 
+      queueNumber, 
+      currentDate, 
+      currentTime
+    );
+
     navigation.navigate("ReceiptScreen", receiptData);
 
-    setQueueNumber(queueNumber + 1);
     setSelectedCustomerType(null);
     setSelectedTransactionTypes([]);
     setModalVisible(false);
@@ -134,8 +173,10 @@ const TransactionScreen: React.FC<TransactionProps> = ({
     if (type === "Open Account") {
       if (alreadySelected) {
         setSelectedTransactionTypes([]);
+        setSelectedCustomerType(null); // Reset customer type when deselected
       } else {
         setSelectedTransactionTypes(["Open Account"]);
+        setSelectedCustomerType("Open Account"); // Set customer type to "Open Account"
       }
     } else {
       if (selectedTransactionTypes.includes("Open Account")) {
@@ -348,9 +389,9 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           </Text>
 
           <View
-            style={{ 
-              flexDirection: "row", 
-              justifyContent: "space-evenly", 
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-evenly",
               width: "100%",
             }}
           >
@@ -360,6 +401,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 onPress={() => setSelectedCustomerType((prev) => 
                   (prev === type.text ? null : type.text)
                 )}
+                disabled={selectedTransactionTypes.includes("Open Account")} // Disable if "Open Account" is selected
                 style={{
                   flex: 1,
                   maxWidth: "40%",
@@ -371,15 +413,16 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   backgroundColor: selectedCustomerType === type.text ? "#BC1823" : "#FFFFFF",
                   borderColor: "#BC1823",
                   borderWidth: 1,
+                  opacity: selectedTransactionTypes.includes("Open Account") ? 0.5 : 1, // Reduce opacity if disabled
                 }}
               >
                 {selectedCustomerType === type.text ? type.selectedIcon : type.icon}
-                <Text 
-                  style={{ 
-                    fontSize: width * 0.05, 
-                    color: selectedCustomerType === type.text ? "white" : "#BC1823", 
+                <Text
+                  style={{
+                    fontSize: width * 0.05,
+                    color: selectedCustomerType === type.text ? "white" : "#BC1823",
                     textAlign: "center",
-                    fontFamily: "Poppins-Medium", 
+                    fontFamily: "Poppins-Medium",
                   }}
                 >
                   {type.text}
@@ -636,7 +679,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 fontFamily: "Poppins-Regular",
                 height: "13%",
                 width: "60%",
-                borderRadius: 40,
+                borderRadius: 15,
                 backgroundColor: 'rgba(255, 255, 255, 0.4)',
                 textAlign: "center",
                 lineHeight: height * 0.05,
@@ -645,6 +688,8 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   ? "Priority Customer"
                   : selectedCustomerType === "Regular"
                   ? "Regular Customer"
+                  : selectedCustomerType === "Open Account"
+                  ? "Open Account Customer"
                   : "None"}
               </Text>
             </View>

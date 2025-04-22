@@ -69,13 +69,80 @@ export function setupWebSocket(server: Server) {
         const currentRegularQueueNum =
           await QueueService.getCurrentRegularQueueNum(data.counter);
 
-        ws?.send(
-          JSON.stringify({
-            type: "assign-regular-receipt-be",
-            currentRegularQueueNum: currentRegularQueueNum,
-          })
-        );
+        ws?.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
       }
+
+      //REGULAR STARTS HERE
+      else if(data.type === 'insert-data-regular'){
+        
+        console.log("Received data from frontend:", data.dataReceipt);
+
+        const { transaction, customerType, queueNumber, date, time } =
+          data.dataReceipt;
+
+        if (customerType === "Regular") {
+          try {
+            await ReceiptService.createRegularReceipt(
+              transaction,
+              customerType,
+              queueNumber,
+              date,
+              time
+            );
+            console.log("Regular receipt processed successfully.");
+          } catch (error) {
+            console.error("Error processing regular receipt:", error);
+          }
+        }
+      }
+      //PRIORITY STARTS HERE
+      else if(data.type === 'insert-data-priority'){
+        
+        console.log("Received data from frontend:", data.dataReceipt);
+
+        const { transaction, customerType, queueNumber, date, time } =
+          data.dataReceipt;
+
+        if (customerType === "Priority") {
+          try {
+            await ReceiptService.createPriorityReceipt(
+              transaction,
+              customerType,
+              queueNumber,
+              date,
+              time
+            );
+            console.log("priority receipt processed successfully.");
+          } catch (error) {
+            console.error("Error processing priority receipt:", error);
+          }
+        } 
+      }
+
+      //OPENACCOUNT STARTS HERE
+      else if(data.type === 'insert-data-openaccount'){
+        console.log("Received data from frontend:", data.dataReceipt);
+
+        const { transaction, customerType, queueNumber, date, time } =
+          data.dataReceipt;
+
+        if (customerType === "Open Account") {
+          try {
+            await ReceiptService.createOpenAccountReceipt(
+              transaction,
+              customerType,
+              queueNumber,
+              date,
+              time
+            );
+            console.log("Open Account receipt processed successfully.");
+          } catch (error) {
+            console.error("Error processing Open Account receipt:", error);
+          }
+        }
+      }
+
+
     });
 
     ws.on("close", () => console.log(`Client ${clientCounter} disconnected`));

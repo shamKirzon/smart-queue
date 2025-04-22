@@ -71,4 +71,76 @@ export class ReceiptRepository {
       );
     }
   }
+
+  //receipt creation
+  static async insertRegularReceipt(
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ): Promise<void> {
+    const query = `
+      INSERT INTO regular_receipt (regular_receipt_id, transaction, queue_number, date, time, status)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
+    `;
+
+    const values = [transaction, queueNumber, date, time];
+
+    try {
+      await pool.query(query, values);
+      console.log("Regular receipt inserted successfully.");
+    } catch (error) {
+      console.error("Error inserting regular receipt:", error);
+      throw error;
+    }
+  }
+  //Priority creation
+  static async insertPriorityReceipt(
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ): Promise<void> {
+    const query = `
+      INSERT INTO priority_receipt (priority_receipt_id, transaction, queue_number, date, time, status)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
+    `;
+
+    const values = [transaction, queueNumber, date, time];
+
+    try {
+      await pool.query(query, values);
+      console.log("priority receipt inserted successfully.");
+    } catch (error) {
+      console.error("Error inserting priority receipt:", error);
+      throw error;
+    }
+  }
+  //Open Account creation
+  static async insertOpenAccounteceipt(
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ): Promise<void> {
+    const query = `
+      INSERT INTO open_account_receipt (open_account_receipt_id, transaction, queue_number, date, time, status)
+      VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
+    `;
+
+    const values = [transaction, queueNumber, date, time];
+
+    try {
+      await pool.query(query, values);
+      console.log("Open Account receipt inserted successfully.");
+    } catch (error) {
+      console.error("Error inserting Open Account receipt:", error);
+      throw error;
+    }
+  }
+
+
 }
