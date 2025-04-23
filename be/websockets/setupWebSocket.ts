@@ -9,25 +9,60 @@ import { QueueService } from "../queue/queue.service";
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
 
+  // Centralized queue numbers
+  const queueNumbers: { Regular: number; Priority: number; OpenAccount: number } = {
+    Regular: 1,
+    Priority: 1,
+    OpenAccount: 1,
+  };
+
   let clientCounter = 0;
 
   wss.on("connection", (ws: WebSocket) => {
     clientCounter++;
     console.log(`Client ${clientCounter} connected`);
 
-    // incoming messages
+
+    // incoming messages from frontend
     ws.on("message", async (message) => {
       console.log(`received: `, message.toString());
 
       const data = JSON.parse(message.toString());
 
-      if (data.type === "get-counter-status") {
+      // Handle request for the next queue number
+      if (data.type === "get-next-queue-number") {
+        const customerType = data.customerType as keyof typeof queueNumbers; // Explicitly type customerType
+
+        if (queueNumbers[customerType] !== undefined) {
+          const nextQueueNumber = queueNumbers[customerType].toString().padStart(3, "0");
+          queueNumbers[customerType] += 1;
+
+          ws.send(
+            JSON.stringify({
+              type: "next-queue-number",
+              customerType,
+              queueNumber: nextQueueNumber,
+            })
+          );
+        } else {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              message: `Invalid customer type: ${customerType}`,
+            })
+          );
+        }
+      }
+      
+      else if (data.type === "get-counter-status") {
         const counterStatus = await TellerRepository.getCounterStatus();
 
         ws.send(
           JSON.stringify({ type: "set-counter-status", data: counterStatus })
         );
-      } else if (data.type === "set-counter-available") {
+      } 
+      
+      else if (data.type === "set-counter-available") {
         await TellerRepository.setCounterAvailable(data.counter);
         const counterStatus = await TellerRepository.getCounterStatus();
 

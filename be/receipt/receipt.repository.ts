@@ -142,5 +142,23 @@ export class ReceiptRepository {
     }
   }
 
+  // Delete all value receipts
+  //for testing purposes only baka magamit in the future makapaglagay ng reset button
+  static async deleteAllReceipts(): Promise<void> {
+    const query = `
+      DELETE FROM regular_receipt;
+      DELETE FROM priority_receipt;
+      DELETE FROM open_account_receipt;
+    `;
+
+    try {
+      await pool.query(query);
+      console.log("All receipts deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting all receipts:", error);
+      throw error;
+    }
+  }
+
 
 }
