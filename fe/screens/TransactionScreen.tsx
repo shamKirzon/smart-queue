@@ -95,76 +95,61 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   updateCustomerInfo,
 }) => {
-
-  const {insertvaluesregular} = useWebSocketsApp()
-  const {insertvaluespriority} = useWebSocketsApp()
-  const {insertvaluesopenaccount} = useWebSocketsApp()
+  const { sendMessage, onMessage, insertvaluesregular, insertvaluespriority, insertvaluesopenaccount } = useWebSocketsApp();
   const currentDate = format(new Date(), "MM/dd/yyyy").toString();
   const currentTime = format(new Date(), "hh:mm a").toString();
   const [selectedCustomerType, setSelectedCustomerType] = useState<string | null>(null);
   const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
-  //for diff queue numbers
-  const [regularQueue, setRegularQueue] = useState(1);
-  const [priorityQueue, setPriorityQueue] = useState(1);
-  const [openAccountQueue, setOpenAccountQueue] = useState(1);
-  
   const isConfirmDisabled = 
     selectedCustomerType === null || 
     (selectedTransactionTypes.length === 0 && !selectedTransactionTypes.includes("Open Account"));
 
+
   const handleProceed = () => {
-    let queueNumber = "";
-    if (selectedCustomerType === "Priority") {
-      queueNumber = priorityQueue.toString().padStart(3, "0");
-      setPriorityQueue(priorityQueue + 1);
-    } else if (selectedTransactionTypes.includes("Open Account")) {
-      queueNumber = openAccountQueue.toString().padStart(3, "0");
-      setOpenAccountQueue(openAccountQueue + 1);
-      setSelectedCustomerType("Open Account"); // Set customer type to "Open Account"
-    } else {
-      queueNumber = regularQueue.toString().padStart(3, "0");
-      setRegularQueue(regularQueue + 1);
+    const customerType = selectedTransactionTypes.includes("Open Account")
+      ? "OpenAccount"
+      : selectedCustomerType;
+
+    //request for next queue number
+    if (customerType) {
+      sendMessage({
+        type: "get-next-queue-number",
+        customerType,
+      });
+
+      // Listen for the response
+      onMessage((response) => {
+        // Check if the response is for the next queue number
+        if (response.type === "next-queue-number" && response.customerType === customerType) {
+          const queueNumber = response.queueNumber;
+          // Update the customer info with the queue number
+          const receiptData: RootStackParamLists['ReceiptScreen'] = {
+            transaction: selectedTransactionTypes.join(", "),
+            customerType: customerType || "",
+            queueNumber: queueNumber,
+            date: currentDate,
+            time: currentTime,
+          };
+
+          // Send data to backend
+          if (customerType === "Regular") {
+            insertvaluesregular(selectedTransactionTypes, customerType, queueNumber, currentDate, currentTime);
+          } else if (customerType === "Priority") {
+            insertvaluespriority(selectedTransactionTypes, customerType, queueNumber, currentDate, currentTime);
+          } else if (customerType === "OpenAccount") {
+            insertvaluesopenaccount(selectedTransactionTypes, customerType, queueNumber, currentDate, currentTime);
+          }
+
+          navigation.navigate("ReceiptScreen", receiptData);
+
+          setSelectedCustomerType(null);
+          setSelectedTransactionTypes([]);
+          setModalVisible(false);
+        }
+      });
     }
-
-    const receiptData: RootStackParamLists['ReceiptScreen'] = {
-      transaction: selectedTransactionTypes.join(", "),
-      customerType: selectedCustomerType || "",
-      queueNumber: queueNumber,
-      date: currentDate,
-      time: currentTime,
-    };
-
-    insertvaluesregular(
-      selectedTransactionTypes, 
-      selectedCustomerType || "", 
-      queueNumber, 
-      currentDate, 
-      currentTime
-    );
-
-    insertvaluespriority(
-      selectedTransactionTypes, 
-      selectedCustomerType || "", 
-      queueNumber, 
-      currentDate, 
-      currentTime
-    );
-
-    insertvaluesopenaccount(
-      selectedTransactionTypes, 
-      selectedCustomerType || "", 
-      queueNumber, 
-      currentDate, 
-      currentTime
-    );
-
-    navigation.navigate("ReceiptScreen", receiptData);
-
-    setSelectedCustomerType(null);
-    setSelectedTransactionTypes([]);
-    setModalVisible(false);
   };
 
   const selectingTransactionType = (type: string) => {

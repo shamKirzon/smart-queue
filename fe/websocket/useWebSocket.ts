@@ -6,6 +6,22 @@ const useWebSocket = (url: string) => {
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
   const ws = useRef<WebSocket | null>(null);
 
+  
+  const sendMessage = (message: object) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify(message));
+    }
+  };
+
+  const onMessage = (callback: (data: any) => void) => {
+    if (ws.current) {
+      ws.current.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        callback(data);
+      };
+    }
+  };
+
   useEffect(() => {
     console.log("latest queue number:", currentRQNum);
   }, [currentRQNum]);
@@ -172,6 +188,8 @@ const useWebSocket = (url: string) => {
     insertvaluesregular,
     insertvaluespriority,
     insertvaluesopenaccount,
+    sendMessage,
+    onMessage,
     logout, 
   };
 };
