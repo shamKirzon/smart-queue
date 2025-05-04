@@ -5,6 +5,7 @@ import { QueueService } from "../queue/queue.service";
 import { ReceiptRepository } from "./receipt.repository";
 
 export class ReceiptService {
+  
   static async assignRegularReceipt(counter: string) {
     counter = TellerService.formattedCounter(counter);
     if (TellerService.regularCounters.includes(counter)) {

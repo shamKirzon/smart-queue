@@ -12,10 +12,6 @@ import { useState } from "react";
 import { Modal } from "react-native";
 import Lock from "../assets/icons/lock.svg";
 
-// sample from modals
-import ExitModal from "../assets/icons/exit-modal.svg";
-import useWebSocket from "../websocket/useWebSocket";
-import WS_URL from "../constant/constant";
 import { useWebSocketsApp } from "../websocket/WebSocketProvider";
 
 type TellerScreenRouteProp = RouteProp<RootStackParamLists, "TellerScreen">;
@@ -34,8 +30,9 @@ const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
-  const { setToAvailable, tellerNext, currentRQNum } = useWebSocketsApp();
-  // useWebSocket(link)
+  const { setToAvailable, tellerNext, currentRQNum, logout} = useWebSocketsApp();
+  const [numberOfServes, setNumberOfServes] = useState(0);
+  
 
   const modalContent = (): JSX.Element => {
     return (
@@ -103,6 +100,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                   } else if (row === "Yes, Proceed") {
                     setToAvailable(counterName);
                     navigation.navigate("TellerHomeScreen");
+                    logout(counterName)
                     setModalVisible(false);
                   }
                 }
@@ -123,6 +121,14 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
         </View>
       </View>
     );
+  };
+
+  const handleNext = (currentRQNum: string|null|undefined) => {
+    // additional validation as long as the backend returns rq numbers.
+
+    if (currentRQNum) {
+      setNumberOfServes(numberOfServes + 1);
+    }
   };
 
   return (
@@ -189,7 +195,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
           marginTop: height * 0.08,
           paddingLeft: width * 0.08,
         }}
-        onPress={() => setModalVisible(true)}
+        onPress={() => {setModalVisible(true) }}
       >
         <LogoutTellerScreen />
       </TouchableOpacity>
@@ -238,7 +244,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
               color: "rgba(213, 0, 0, 0.74)",
             }}
           >
-         {currentRQNum}
+            {currentRQNum}
           </Text>
           {/* TEXT - "on going "  */}
           <Text
@@ -269,7 +275,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                 lineHeight: width * 0.08 + 3,
               }}
             >
-              10
+              {numberOfServes}
             </Text>
 
             <Text
@@ -286,8 +292,10 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
           {/* Next*/}
           <View style={{ alignItems: "flex-end", width: width * 0.7 }}>
             <TouchableOpacity
-
-            onPress={() => tellerNext(counterName)}
+              onPress={() => {
+                tellerNext(counterName);
+                handleNext(currentRQNum);
+              }}
               style={{
                 marginTop: height * 0.05,
                 width: width * 0.4,

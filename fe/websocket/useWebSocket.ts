@@ -93,11 +93,17 @@ const useWebSocket = (url: string) => {
       ws.current.send(JSON.stringify({ type: "teller-next-fe", counter }));
     }
   };
+  
+  const logout = (counter: string)=> {
+    if(ws.current?.readyState ===WebSocket.OPEN){
+      ws.current.send(JSON.stringify({type: "logout", counter: counter}))
+    }
+  }
 
   //regular
   const insertvaluesregular = (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      //if() (customerType === "Regular") {
+     
       console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
       ws.current.send(
         JSON.stringify({ 
@@ -166,6 +172,7 @@ const useWebSocket = (url: string) => {
     insertvaluesregular,
     insertvaluespriority,
     insertvaluesopenaccount,
+    logout, 
   };
 };
 

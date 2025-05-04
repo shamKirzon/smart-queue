@@ -5,6 +5,7 @@ import { TellerRepository } from "../teller/teller.repository";
 import { ReceiptService } from "../receipt/receipt.service";
 import { QueueRepository } from "../queue/queue.repository";
 import { QueueService } from "../queue/queue.service";
+import { ReceiptRepository } from "../receipt/receipt.repository";
 
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
@@ -70,6 +71,8 @@ export function setupWebSocket(server: Server) {
           await QueueService.getCurrentRegularQueueNum(data.counter);
 
         ws?.send(JSON.stringify({type: 'assign-regular-receipt-be', currentRegularQueueNum: currentRegularQueueNum}))
+      } else if(data.type === "logout"){
+        await ReceiptRepository.logout(data.counter); 
       }
 
       //REGULAR STARTS HERE
