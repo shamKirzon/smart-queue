@@ -2,19 +2,7 @@ import { PoolClient, QueryResult } from "pg";
 import pool from "../database/connection";
 
 export class ReceiptRepository {
-  // customerType !== 'regular' &&& 'priority' ? setOpenAccountReceipt() : return.
-  // same as the other...
 
-  // static async getNextRegularCustomerWithLock(): Promise<QueryResult<any>> {
-  //   const query1 = ` SELECT * FROM regular_receipt
-  //                                 WHERE status = 'waiting'
-  //                                 ORDER BY queue_number ASC
-  //                                 LIMIT 1
-  //                                 FOR UPDATE SKIP LOCKED`;
-
-  //   const customer = await pool.query(query1);
-  //   return customer;
-  // }
 
   static async getNextRegularCustomerWithLock(): Promise<{
     client: PoolClient;
@@ -141,6 +129,7 @@ export class ReceiptRepository {
     }
   }
 
+  // logout
   static async logout(counter: string) {
     counter = counter.toLowerCase().replace(" ", "_"); 
     console.log(counter)
