@@ -37,7 +37,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     "",
     "",
   ]);
-  const inputRef = useRef<(TextInput | null)[]>([]);
+  const inputRef = useRef<(TextInput | null )[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
 
   function handleEnterPin(pin: string, index: number) {
@@ -191,7 +191,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   returnKeyType="done"
                   autoCorrect={false}
                   autoComplete="off"
-                  ref={(ref) => (inputRef.current[index] = ref)}
+                  ref={(ref) => {inputRef.current[index] = ref}}
                   onChangeText={(pin) => {
                     handleEnterPin(pin, index);
                   }}

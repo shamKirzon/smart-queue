@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import TellerBackground from "../assets/backgrounds/teller-background.svg"; // issue here, merong white pixel na line (issue: background itself na)
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import TellerBottomBackground from "../assets/backgrounds/teller-bottom-background.svg";
@@ -26,9 +26,10 @@ const { width, height } = Dimensions.get("window");
 
 const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const { getCounterStatus, setToInuse, assignRegularReceipt } =
+  const { getCounterStatus, setToInuse, assignRegularReceipt, assignOpenAccountReceipt, assignPriorityReceipt } =
     useWebSocketsApp();
 
+    const regularCounters = ['Counter 1','Counter 2', 'Counter 3', 'Counter 4'];
   useEffect(() => {
     if (getCounterStatus()) {
       setStatus(getCounterStatus());
@@ -40,6 +41,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
       status: string,
       counter: string
     ): JSX.Element | null => {
+
       const counterTransaction = () => {
         let transactionText = "";
         if (counter !== "Counter A1" && counter !== "Counter P1") {
@@ -200,7 +202,14 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
               <TouchableOpacity
                 onPress={() => {
                   setToInuse(counter);
-                  assignRegularReceipt(counter)
+                  if(regularCounters.includes(counter)){
+                    assignRegularReceipt(counter)
+                  } else if(counter === 'Counter A1'){
+                    assignOpenAccountReceipt(counter)
+                  }else if(counter === 'Counter P1'){
+                    assignPriorityReceipt(counter)
+                  }
+                  
                   navigation.navigate("TellerScreen", { counterName: counter });
                 }}
                 style={{ flexDirection: "row", alignItems: "center" }}

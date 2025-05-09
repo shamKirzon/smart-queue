@@ -1,6 +1,7 @@
 import pool from "../database/connection";
 import { QueueService } from "./queue.service";
 import { QueryResult } from "pg";
+import { TellerService } from "../teller/teller.service";
 
 export class QueueRepository {
   static async getRegQueueNum(counter: string): Promise<any> {
@@ -21,6 +22,36 @@ export class QueueRepository {
     console.log("queueRepository. getRegQueueNUm: queueNumber: ", queueNumber);
 
     await client.query("COMMIT");
+
+    return queueNumber;
+  }
+
+  static async getOpenAccountQueueNum(counter: string): Promise<any> {
+    
+     counter = TellerService.formattedCounter(counter);
+     console.log(counter)
+    const client = await pool.connect();
+
+    await client.query("BEGIN");
+
+    const queryOpenId = `SELECT open_account_receipt_id FROM counters
+                              WHERE counter_name = $1`;
+    const rawOpenId = await client.query(queryOpenId, [counter]);
+    const openAccountId = rawOpenId?.rows[0]?.open_account_receipt_id;
+
+    const queryQueueNumber = `SELECT * FROM open_account_receipt
+                                WHERE open_account_receipt_id = $1`;
+    const rawQueueNumber = await client.query(queryQueueNumber, [
+      openAccountId,
+    ]);
+    const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
+
+    await client.query("COMMIT");
+
+    console.log(
+      "queueRepository. getOpenAccountQueueNUm: queueNumber: ",
+      queueNumber
+    );
 
     return queueNumber;
   }

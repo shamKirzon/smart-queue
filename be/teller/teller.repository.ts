@@ -51,17 +51,21 @@ export class TellerRepository {
 
   static async tellerNext(counter: string) {
     const client = await pool.connect();
-    counter = TellerService.formattedCounter(counter);
-    const isRegular = TellerService.isRegularCounter(counter);
+    try {
+      counter = TellerService.formattedCounter(counter);
+      const isRegular = TellerService.isRegularCounter(counter);
 
-    if (isRegular) {
-      return this.deleteRegular(counter, client);
-    } else if (counter === "counter_A1") {
-      return this.deleteOpenAccount(counter, client);
-    } else if (counter === "counter_P1") {
-      return this.deletePriority(counter, client);
-    } else {
-      return;
+      if (isRegular) {
+        return this.deleteRegular(counter, client);
+      } else if (counter === "counter_A1") {
+        return this.deleteOpenAccount(counter, client);
+      } else if (counter === "counter_P1") {
+        return this.deletePriority(counter, client);
+      } else {
+        return;
+      }
+    } finally {
+      client.release();
     }
   }
 
@@ -118,11 +122,12 @@ export class TellerRepository {
       } else {
         await client.query("ROLLBACK");
         console.warn(`No regular_receipt_id found for counter: ${counter}`);
-        client.release();
       }
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("Query Error - deleteRegular: ", error);
+    }finally{
+      client.release(); 
     }
   }
 
@@ -132,27 +137,29 @@ export class TellerRepository {
   ): Promise<string | undefined> {
     try {
       await client.query("BEGIN");
-      const queryCurrentRegularCustomer = `SELECT open_account_receipt_id 
+      const queryCurrentOpenCustomer = `SELECT open_account_receipt_id 
                                     FROM counters 
                                     WHERE counter_name = $1`;
 
-      const currentRegularIdResult = await client.query(
-        queryCurrentRegularCustomer,
+      const currentOpenAccountIdResult = await client.query(
+        queryCurrentOpenCustomer,
         [counter]
       );
       await client.query("COMMIT");
 
       const currentOpenAccountId =
-        currentRegularIdResult.rows[0]?.open_account_receipt_id;
+        currentOpenAccountIdResult.rows[0]?.open_account_receipt_id
 
       if (currentOpenAccountId) {
         await client.query("BEGIN");
         const query = `DELETE FROM open_account_receipt WHERE open_account_receipt_id= $1`;
         await client.query(query, [currentOpenAccountId]);
         await client.query("COMMIT");
-        console.log(`deleted successfully, queue number: ${currentOpenAccountId}`);
-        await ReceiptService.assignRegularReceipt(counter);
-        return await QueueService.getCurrentRegularQueueNum(counter);
+        console.log(
+          `deleted successfully, queue number: ${currentOpenAccountId}`
+        );
+        await ReceiptService.assignOpenAccountReceipt(counter);
+        return await QueueService.getCurrentOpenAccountQueueNum(counter);
       } else {
         await client.query("ROLLBACK");
         console.warn(`No regular_receipt_id found for counter: ${counter}`);

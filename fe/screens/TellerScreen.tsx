@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import React, { JSX, useEffect } from "react";
 import { Dimensions } from "react-native";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import TellerBottomBackground from "../assets/backgrounds/teller-bottom-background.svg";
@@ -30,9 +30,15 @@ const { width, height } = Dimensions.get("window");
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { counterName } = route.params;
-  const { setToAvailable, tellerNext, currentRQNum, logout} = useWebSocketsApp();
+  const {
+    setToAvailable,
+    tellerNext,
+    currentRQNum,
+    currentOAQNum,
+    currentPQNum,
+    logout,
+  } = useWebSocketsApp();
   const [numberOfServes, setNumberOfServes] = useState(0);
-  
 
   const modalContent = (): JSX.Element => {
     return (
@@ -100,7 +106,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                   } else if (row === "Yes, Proceed") {
                     setToAvailable(counterName);
                     navigation.navigate("TellerHomeScreen");
-                    logout(counterName)
+                    logout(counterName);
                     setModalVisible(false);
                   }
                 }
@@ -123,12 +129,46 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     );
   };
 
-  const handleNext = (currentRQNum: string|null|undefined) => {
+   const regularCounters = [
+      "Counter 1",
+      "Counter 2",
+      "Counter 3",
+      "Counter 4",
+    ];
+  const handleNextRegular = (currentRQNum: string | null | undefined) => {
     // additional validation as long as the backend returns rq numbers.
 
     if (currentRQNum) {
       setNumberOfServes(numberOfServes + 1);
     }
+  };
+
+  const handleNextOpenAccount = (currentOAQNum: string | null | undefined) => {
+    // additional validation as long as the backend returns rq numbers.
+    if (currentOAQNum) {
+      setNumberOfServes(numberOfServes + 1);
+    }
+  };
+
+  const handleNextPriority = (currentPQNum: string | null | undefined) => {
+    // additional validation as long as the backend returns rq numbers.
+    if (currentPQNum) {
+      setNumberOfServes(numberOfServes + 1);
+    }
+  };
+
+  const displayQueueNumber = (counter: string):string|null|undefined => {
+    let queueNumber;
+
+    if (regularCounters.includes(counter)) {
+      queueNumber = currentRQNum;
+    } else if (counter === "Counter A1") {
+      queueNumber = currentOAQNum;
+    } else if (counter === "Counter P1") {
+      queueNumber = currentPQNum;
+    }
+
+    return queueNumber;
   };
 
   return (
@@ -195,7 +235,9 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
           marginTop: height * 0.08,
           paddingLeft: width * 0.08,
         }}
-        onPress={() => {setModalVisible(true) }}
+        onPress={() => {
+          setModalVisible(true);
+        }}
       >
         <LogoutTellerScreen />
       </TouchableOpacity>
@@ -244,7 +286,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
               color: "rgba(213, 0, 0, 0.74)",
             }}
           >
-            {currentRQNum}
+            {displayQueueNumber(counterName)}
           </Text>
           {/* TEXT - "on going "  */}
           <Text
@@ -294,7 +336,13 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 tellerNext(counterName);
-                handleNext(currentRQNum);
+                if (regularCounters.includes(counterName)) {
+                  handleNextRegular(currentRQNum);
+                } else if (counterName === "Counter A1") {
+                  handleNextOpenAccount(currentOAQNum);
+                } else if (counterName === "Counter P1") {
+                  handleNextOpenAccount(currentPQNum);
+                }
               }}
               style={{
                 marginTop: height * 0.05,

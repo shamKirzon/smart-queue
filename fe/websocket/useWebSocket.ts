@@ -4,6 +4,8 @@ import { useRef, useEffect, useState } from "react";
 const useWebSocket = (url: string) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
+  const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<string | null>();
+  const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
   const ws = useRef<WebSocket | null>(null);
 
   
@@ -39,11 +41,33 @@ const useWebSocket = (url: string) => {
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
+
+      
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
-      } else if (data.type === "assign-regular-receipt-be") {
+      }
+      else if (data.type === "teller-next-regular-be") {
+        setCurrentRegularQueueNum(data.currentQueueNumber); 
+      }
+      else if (data.type === "teller-next-open-account-be") {
+        setCurrentOpenAccountQueueNum(data.currentQueueNumber); 
+      }
+      else if (data.type === "teller-next-priority-be") {
+        setCurrentPriorityQueueNum(data.currentQueueNumber); 
+      }
+      // fetching current queue number (without next logic)
+      else if (data.type === "assign-regular-receipt-be") {
         const currentregular = data.currentRegularQueueNum;
         setCurrentRegularQueueNum(currentregular);
+        
+      }
+      else if (data.type === "assign-open-account-receipt-be") {
+        const currentId = data.currentOpenAccountQueueNum;
+        setCurrentOpenAccountQueueNum(currentId);
+      }
+      else if (data.type === "assign-priority-account-receipt-be") {
+        const currentId = data.setCurrentPriorityQueueNum;
+        setCurrentPriorityQueueNum(currentId);
       }
     };
 
@@ -58,6 +82,13 @@ const useWebSocket = (url: string) => {
       ws.current?.close();
     };
   }, []);
+
+
+  // TESTING VARIABLES PART : 
+
+useEffect(() => {
+  console.log('this is my open account current queue number: ', currentOAQNum)
+},[currentOAQNum])
 
   // FUNCTIONS
   const fetchCounterStatus = () => {
@@ -97,6 +128,21 @@ const useWebSocket = (url: string) => {
   };
 
   const assignRegularReceipt = (counter: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(
+        JSON.stringify({ type: "assign-regular-receipt-fe", counter: counter })
+      );
+    }
+  };
+    const assignOpenAccountReceipt= (counter: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(
+        JSON.stringify({ type: "assign-open-account-receipt-fe", counter: counter })
+      );
+    }
+  };
+
+    const assignPriorityReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
         JSON.stringify({ type: "assign-regular-receipt-fe", counter: counter })
@@ -184,7 +230,11 @@ const useWebSocket = (url: string) => {
     setToInuse,
     tellerNext,
     assignRegularReceipt,
+    assignOpenAccountReceipt, 
+    assignPriorityReceipt,
     currentRQNum,
+    currentOAQNum, 
+    currentPQNum,
     insertvaluesregular,
     insertvaluespriority,
     insertvaluesopenaccount,

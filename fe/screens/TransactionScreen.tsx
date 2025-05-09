@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { JSX, useState } from 'react';
 import { View, Text, Dimensions, TouchableOpacity, Modal } from 'react-native';
 import { receiptProps } from '../types/receiptProps';
 import { format } from 'date-fns';
