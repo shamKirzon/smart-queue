@@ -58,6 +58,31 @@ export class ReceiptRepository {
     }
   }
 
+  static async getNextPriorityCustomerWithLock(): Promise<{
+    client: PoolClient;
+    customer: any;
+  }> {
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      const result = await client.query(`
+        SELECT * FROM priority_receipt
+        WHERE status = 'waiting'
+        ORDER BY queue_number ASC
+      `);
+
+      return { client, customer: result };
+    } catch (err) {
+      await client.query("ROLLBACK");
+      client.release();
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   // ASSIGN
   static async assignCustomerToCounterRegular(
     customerId: QueryResult<any>,
@@ -113,6 +138,36 @@ export class ReceiptRepository {
       await client.query("ROLLBACK");
       console.error(
         "receiptRepository.assignCustomerToCounterOpenAccount - cant perform query: ",
+        error
+      );
+    }
+  }
+
+  static async assignCustomerToCounterPriority(
+    customerId: QueryResult<any>,
+    counter: string,
+    client: PoolClient
+  ) {
+    const query1 = `UPDATE counters 
+                    SET priority_receipt_id = $1
+                    WHERE counter_name = $2`;
+
+    const value1 = [customerId, counter];
+
+    const query2 = `UPDATE priority_receipt
+                    SET status = 'in_progress'
+                    WHERE priority_receipt_id = $1`;
+    const value2 = [customerId];
+
+    try {
+      await client.query("BEGIN");
+      await client.query(query1, value1);
+      await client.query(query2, value2);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error(
+        "receiptRepository.assignCustomerToCounterPriority - cant perform query: ",
         error
       );
     }

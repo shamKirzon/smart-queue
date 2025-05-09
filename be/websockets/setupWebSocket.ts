@@ -101,7 +101,7 @@ export function setupWebSocket(server: Server) {
         ];
         const queueNum = await TellerRepository.tellerNext(data.counter);
         console.log("teller-next-fe - queue_number: ", queueNum);
-        console.log("counter format as my basis: ", data.counter)
+        console.log("counter format as my basis: ", data.counter);
 
         if (regularCounters.includes(data.counter)) {
           ws?.send(
@@ -110,26 +110,21 @@ export function setupWebSocket(server: Server) {
               currentQueueNumber: queueNum,
             })
           );
-        }
-        else if(data.counter === 'Counter A1'){
-            ws?.send(
+        } else if (data.counter === "Counter A1") {
+          ws?.send(
             JSON.stringify({
               type: "teller-next-open-account-be",
               currentQueueNumber: queueNum,
             })
           );
-
-        } else if(data.counter === 'Counter P1'){
-            ws?.send(
+        } else if (data.counter === "Counter P1") {
+          ws?.send(
             JSON.stringify({
               type: "teller-next-priority-be",
               currentQueueNumber: queueNum,
             })
           );
         }
-
-
-
       } // LOGOUT
       else if (data.type === "logout") {
         await ReceiptRepository.logout(data.counter);
@@ -164,6 +159,21 @@ export function setupWebSocket(server: Server) {
           JSON.stringify({
             type: "assign-open-account-receipt-be",
             currentOpenAccountQueueNum: currentOpenAccountQueueNum,
+          })
+        );
+      } else if (data.type === "assign-priority-receipt-fe") {
+        await ReceiptService.assignPriorityReceipt(data.counter);
+        const currentPriorityQueueNum =
+          await QueueService.getCurrentPriorityQueueNum(data.counter);
+        console.log(
+          "backend priority queue number: ",
+          currentPriorityQueueNum
+        );
+
+        ws?.send(
+          JSON.stringify({
+            type: "assign-priority-receipt-be",
+            currentPriorityQueueNum: currentPriorityQueueNum,
           })
         );
       }

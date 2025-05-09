@@ -75,6 +75,35 @@ export class ReceiptService {
       }
   }
 
+  static async assignPriorityReceipt(counter: string) {
+    counter = TellerService.formattedCounter(counter);
+    
+      const { client, customer } =
+        await ReceiptRepository.getNextPriorityCustomerWithLock();
+      const customerId = customer.rows[0]?.priority_receipt_id
+
+      // testing part:
+      console.log(
+        `receiptService - assignPriorityReceipt - counter: ${counter} fetched uuid: ${customerId}`
+      );
+
+      if (customerId) {
+        try {
+          await ReceiptRepository.assignCustomerToCounterPriority(
+            customerId,
+            counter,
+            client
+          );
+        } catch (error) {
+          await client.query("ROLLBACK");
+          console.error("Failed to assign customer:", error);
+          client.release(); 
+        } 
+      } else {
+        console.log(`No waiting customer to assign for ${counter}`);
+      }
+  }
+
 
   // CREATE:
   static async createRegularReceipt(

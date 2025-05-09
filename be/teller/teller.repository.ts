@@ -61,7 +61,7 @@ export class TellerRepository {
         return this.deleteOpenAccount(counter, client);
       } else if (counter === "counter_P1") {
         return this.deletePriority(counter, client);
-      } else {
+      } else {        
         return;
       }
     } finally {
@@ -162,7 +162,7 @@ export class TellerRepository {
         return await QueueService.getCurrentOpenAccountQueueNum(counter);
       } else {
         await client.query("ROLLBACK");
-        console.warn(`No regular_receipt_id found for counter: ${counter}`);
+        console.warn(`No open_account_receipt_id found for counter: ${counter}`);
         client.release();
       }
     } catch (error) {
@@ -175,6 +175,37 @@ export class TellerRepository {
     counter: string,
     client: PoolClient
   ): Promise<string | undefined> {
-    return;
+    try {
+      await client.query("BEGIN");
+      const queryCurrentPriorityCustomer = `SELECT priority_receipt_id 
+                                    FROM counters 
+                                    WHERE counter_name = $1`;
+
+      const currentOpenAccountIdResult = await client.query(
+        queryCurrentPriorityCustomer,
+        [counter]
+      );
+      await client.query("COMMIT");
+
+      const currentPriorityId = currentOpenAccountIdResult.rows[0]?.priority_receipt_id
+
+      if (currentPriorityId) {
+        await client.query("BEGIN");
+        const query = `DELETE FROM priority_receipt WHERE priority_receipt_id= $1`;
+        await client.query(query, [currentPriorityId]);
+        await client.query("COMMIT");
+        console.log(
+          `deleted successfully, queue number: ${currentPriorityId}`
+        );
+        await ReceiptService.assignPriorityReceipt(counter);
+        return await QueueService.getCurrentPriorityQueueNum(counter);
+      } else {
+        await client.query("ROLLBACK");
+        console.warn(`No priority_receipt_id found for counter: ${counter}`);
+      }
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Query Error - deleteRegular: ", error);
+    }
   }
 }

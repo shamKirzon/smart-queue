@@ -55,4 +55,34 @@ export class QueueRepository {
 
     return queueNumber;
   }
+
+   static async getPriorityQueueNum(counter: string): Promise<any> {
+    
+     counter = TellerService.formattedCounter(counter);
+     console.log(counter)
+    const client = await pool.connect();
+
+    await client.query("BEGIN");
+
+    const queryPriorityId = `SELECT priority_receipt_id FROM counters
+                              WHERE counter_name = $1`;
+    const rawPriorityId = await client.query(queryPriorityId, [counter]);
+    const openAccountId = rawPriorityId?.rows[0]?.priority_receipt_id;
+
+    const queryQueueNumber = `SELECT * FROM priority_receipt
+                                WHERE priority_receipt_id = $1`;
+    const rawQueueNumber = await client.query(queryQueueNumber, [
+      openAccountId,
+    ]);
+    const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
+
+    await client.query("COMMIT");
+
+    console.log(
+      "queueRepository. getPriorityQueueNUm: queueNumber: ",
+      queueNumber
+    );
+
+    return queueNumber;
+  }
 }

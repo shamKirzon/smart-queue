@@ -65,8 +65,8 @@ const useWebSocket = (url: string) => {
         const currentId = data.currentOpenAccountQueueNum;
         setCurrentOpenAccountQueueNum(currentId);
       }
-      else if (data.type === "assign-priority-account-receipt-be") {
-        const currentId = data.setCurrentPriorityQueueNum;
+      else if (data.type === "assign-priority-receipt-be") {
+        const currentId = data.currentPriorityQueueNum;
         setCurrentPriorityQueueNum(currentId);
       }
     };
@@ -145,7 +145,7 @@ useEffect(() => {
     const assignPriorityReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
-        JSON.stringify({ type: "assign-regular-receipt-fe", counter: counter })
+        JSON.stringify({ type: "assign-priority-receipt-fe", counter: counter })
       );
     }
   };
