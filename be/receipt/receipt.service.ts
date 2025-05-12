@@ -3,10 +3,10 @@ import { TellerService } from "../teller/teller.service";
 
 import { QueueService } from "../queue/queue.service";
 import { ReceiptRepository } from "./receipt.repository";
+import pool from "../database/connection";
 
 export class ReceiptService {
-
-  // ASSIGN: 
+  // ASSIGN:
   static async assignRegularReceipt(counter: string) {
     counter = TellerService.formattedCounter(counter);
     if (TellerService.regularCounters.includes(counter)) {
@@ -29,7 +29,7 @@ export class ReceiptService {
         } catch (error) {
           await client.query("ROLLBACK");
           console.error("Failed to assign customer:", error);
-        } 
+        }
       } else {
         console.log(`No waiting customer to assign for ${counter}`);
         await client.query("ROLLBACK");
@@ -47,11 +47,16 @@ export class ReceiptService {
   }
 
   static async assignOpenAccountReceipt(counter: string) {
+    const client = await pool.connect();
     counter = TellerService.formattedCounter(counter);
-    
-      const { client, customer } =
-        await ReceiptRepository.getNextOpenAccountCustomerWithLock();
-      const customerId = customer.rows[0]?.open_account_receipt_id
+
+    try {
+      await client.query("BEGIN");
+
+      const { customer } = await ReceiptRepository.getNextOpenAccountCustomer(
+        client
+      );
+      const customerId = customer.rows[0]?.open_account_receipt_id;
 
       // testing part:
       console.log(
@@ -59,28 +64,35 @@ export class ReceiptService {
       );
 
       if (customerId) {
-        try {
-          await ReceiptRepository.assignCustomerToCounterOpenAccount(
-            customerId,
-            counter,
-            client
-          );
-        } catch (error) {
-          await client.query("ROLLBACK");
-          console.error("Failed to assign customer:", error);
-          client.release(); 
-        } 
+        await ReceiptRepository.assignCustomerToCounterOpenAccount(
+          customerId,
+          counter,
+          client
+        );
+        await client.query("COMMIT");
       } else {
         console.log(`No waiting customer to assign for ${counter}`);
+        await client.query("ROLLBACK");
+        return;
       }
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Failed to assign customer:", error);
+    } finally {
+      client.release();
+    }
   }
 
   static async assignPriorityReceipt(counter: string) {
+    const client = await pool.connect();
     counter = TellerService.formattedCounter(counter);
-    
-      const { client, customer } =
-        await ReceiptRepository.getNextPriorityCustomerWithLock();
-      const customerId = customer.rows[0]?.priority_receipt_id
+
+    try {
+      await client.query("BEGIN");
+      const { customer } = await ReceiptRepository.getNextPriorityCustomer(
+        client
+      );
+      const customerId = customer.rows[0]?.priority_receipt_id;
 
       // testing part:
       console.log(
@@ -88,22 +100,24 @@ export class ReceiptService {
       );
 
       if (customerId) {
-        try {
-          await ReceiptRepository.assignCustomerToCounterPriority(
-            customerId,
-            counter,
-            client
-          );
-        } catch (error) {
-          await client.query("ROLLBACK");
-          console.error("Failed to assign customer:", error);
-          client.release(); 
-        } 
+        await ReceiptRepository.assignCustomerToCounterPriority(
+          customerId,
+          counter,
+          client
+        );
+        await client.query("COMMIT")
       } else {
         console.log(`No waiting customer to assign for ${counter}`);
+        await client.query("ROLLBACK")
+        return;
       }
+    }catch (error) {
+      client.query("ROLLBACK");
+      console.error("Failed to assign customer:", error);
+    } finally {
+      client.release();
+    }
   }
-
 
   // CREATE:
   static async createRegularReceipt(
@@ -158,7 +172,7 @@ export class ReceiptService {
     }
   }
 
-  static async  createOpenAccountReceipt(
+  static async createOpenAccountReceipt(
     transaction: string[],
     customerType: string,
     queueNumber: string,
@@ -183,8 +197,4 @@ export class ReceiptService {
       throw error;
     }
   }
-
-
-
-
 }

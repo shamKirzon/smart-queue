@@ -1,6 +1,6 @@
 import pool from "../database/connection";
 import { QueueService } from "./queue.service";
-import { QueryResult } from "pg";
+import { PoolClient, QueryResult } from "pg";
 import { TellerService } from "../teller/teller.service";
 
 export class QueueRepository {
@@ -26,13 +26,11 @@ export class QueueRepository {
     return queueNumber;
   }
 
-  static async getOpenAccountQueueNum(counter: string): Promise<any> {
+  static async getOpenAccountQueueNum(counter: string, client: PoolClient): Promise<any> {
     
      counter = TellerService.formattedCounter(counter);
-     console.log(counter)
-    const client = await pool.connect();
-
-    await client.query("BEGIN");
+     console.log("getOpenAccountQueueNum() ", counter)
+  
 
     const queryOpenId = `SELECT open_account_receipt_id FROM counters
                               WHERE counter_name = $1`;
@@ -44,25 +42,15 @@ export class QueueRepository {
     const rawQueueNumber = await client.query(queryQueueNumber, [
       openAccountId,
     ]);
-    const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
 
-    await client.query("COMMIT");
-
-    console.log(
-      "queueRepository. getOpenAccountQueueNUm: queueNumber: ",
-      queueNumber
-    );
-
-    return queueNumber;
+   return {rawQueueNumber};
   }
 
-   static async getPriorityQueueNum(counter: string): Promise<any> {
+   static async getPriorityQueueNum(counter: string, client: PoolClient): Promise<any> {
     
      counter = TellerService.formattedCounter(counter);
      console.log(counter)
-    const client = await pool.connect();
 
-    await client.query("BEGIN");
 
     const queryPriorityId = `SELECT priority_receipt_id FROM counters
                               WHERE counter_name = $1`;
@@ -74,15 +62,8 @@ export class QueueRepository {
     const rawQueueNumber = await client.query(queryQueueNumber, [
       openAccountId,
     ]);
-    const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
+   
 
-    await client.query("COMMIT");
-
-    console.log(
-      "queueRepository. getPriorityQueueNUm: queueNumber: ",
-      queueNumber
-    );
-
-    return queueNumber;
+    return {rawQueueNumber};
   }
 }

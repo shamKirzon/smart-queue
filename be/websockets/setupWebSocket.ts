@@ -145,7 +145,7 @@ export function setupWebSocket(server: Server) {
         );
       }
 
-      // ASSIGN OPEN ACCOUNT RECEIPT
+      // ASSIGN OPEN ACCOUNT RECEIPT (modified backend)
       else if (data.type === "assign-open-account-receipt-fe") {
         await ReceiptService.assignOpenAccountReceipt(data.counter);
         const currentOpenAccountQueueNum =
@@ -161,7 +161,10 @@ export function setupWebSocket(server: Server) {
             currentOpenAccountQueueNum: currentOpenAccountQueueNum,
           })
         );
-      } else if (data.type === "assign-priority-receipt-fe") {
+      }
+
+       // ASSIGN PRIORITY RECEIPT
+      else if (data.type === "assign-priority-receipt-fe") {
         await ReceiptService.assignPriorityReceipt(data.counter);
         const currentPriorityQueueNum =
           await QueueService.getCurrentPriorityQueueNum(data.counter);

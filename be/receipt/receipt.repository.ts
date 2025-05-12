@@ -1,4 +1,4 @@
-import { PoolClient, QueryResult } from "pg";
+import { Pool, PoolClient, QueryResult } from "pg";
 import pool from "../database/connection";
 import { TellerService } from "../teller/teller.service";
 
@@ -31,56 +31,30 @@ export class ReceiptRepository {
     }
   }
 
-  static async getNextOpenAccountCustomerWithLock(): Promise<{
-    client: PoolClient;
+  static async getNextOpenAccountCustomer(client: PoolClient): Promise<{
     customer: any;
   }> {
-    const client = await pool.connect();
-
-    try {
-      await client.query("BEGIN");
-
-      const result = await client.query(`
+    const result = await client.query(`
         SELECT * FROM open_account_receipt
         WHERE status = 'waiting'
         ORDER BY queue_number ASC
-        LIMIT 1
-        FOR UPDATE SKIP LOCKED
+        LIMIT 1; 
       `);
 
-      return { client, customer: result };
-    } catch (err) {
-      await client.query("ROLLBACK");
-      client.release();
-      throw err;
-    } finally {
-      client.release();
-    }
+    return { customer: result };
   }
 
-  static async getNextPriorityCustomerWithLock(): Promise<{
-    client: PoolClient;
+  static async getNextPriorityCustomer(client: PoolClient): Promise<{
     customer: any;
   }> {
-    const client = await pool.connect();
-
-    try {
-      await client.query("BEGIN");
-
-      const result = await client.query(`
+    const result = await client.query(`
         SELECT * FROM priority_receipt
         WHERE status = 'waiting'
         ORDER BY queue_number ASC
+        LIMIT 1 
       `);
 
-      return { client, customer: result };
-    } catch (err) {
-      await client.query("ROLLBACK");
-      client.release();
-      throw err;
-    } finally {
-      client.release();
-    }
+    return { customer: result };
   }
 
   // ASSIGN
@@ -111,7 +85,7 @@ export class ReceiptRepository {
         "receiptRepository.assignCustomerToCounterRegular - cant perform query: ",
         error
       );
-    } 
+    }
   }
   static async assignCustomerToCounterOpenAccount(
     customerId: QueryResult<any>,
@@ -130,16 +104,14 @@ export class ReceiptRepository {
     const value2 = [customerId];
 
     try {
-      await client.query("BEGIN");
       await client.query(query1, value1);
       await client.query(query2, value2);
-      await client.query("COMMIT");
     } catch (error) {
-      await client.query("ROLLBACK");
       console.error(
         "receiptRepository.assignCustomerToCounterOpenAccount - cant perform query: ",
         error
       );
+      throw error;
     }
   }
 
@@ -160,16 +132,14 @@ export class ReceiptRepository {
     const value2 = [customerId];
 
     try {
-      await client.query("BEGIN");
       await client.query(query1, value1);
       await client.query(query2, value2);
-      await client.query("COMMIT");
     } catch (error) {
-      await client.query("ROLLBACK");
       console.error(
         "receiptRepository.assignCustomerToCounterPriority - cant perform query: ",
         error
       );
+      throw error;
     }
   }
 
@@ -245,9 +215,14 @@ export class ReceiptRepository {
 
   // LOGOUT
   static async logout(counter: string) {
-     const  regularCounters = ["counter_1", "counter_2", "counter_3", "counter_4"];
+    const regularCounters = [
+      "counter_1",
+      "counter_2",
+      "counter_3",
+      "counter_4",
+    ];
     counter = TellerService.formattedCounter(counter);
-    console.log("THIS IS FROM LOGOUT!! COUNTER: ", counter)
+    console.log("THIS IS FROM LOGOUT!! COUNTER: ", counter);
 
     const client = await pool.connect();
 
@@ -286,7 +261,7 @@ export class ReceiptRepository {
         client.release();
       }
     } else if (counter === "counter_A1") {
-       try {
+      try {
         await client.query("BEGIN");
 
         const result = await client.query(
@@ -320,8 +295,39 @@ export class ReceiptRepository {
         client.release();
       }
     } else if (counter === "counter_P1") {
-     // ayos na to,pumapasok na
-    }
+      try {
+        await client.query("BEGIN");
 
+        const result = await client.query(
+          `SELECT priority_receipt_id FROM counters WHERE counter_name = $1`,
+          [counter]
+        );
+
+        const currentPriorityId = result.rows[0]?.priority_receipt_id;
+
+        if (!currentPriorityId) {
+          throw new Error(
+            `No regular_receipt_id found for counter: ${counter}`
+          );
+        }
+
+        await client.query(
+          `UPDATE priority_receipt SET status = 'waiting' WHERE priority_receipt_id = $1`,
+          [currentPriorityId]
+        );
+
+        await client.query(
+          `UPDATE counters SET status = 'available', priority_receipt_id = null WHERE counter_name = $1`,
+          [counter]
+        );
+
+        await client.query("COMMIT");
+      } catch (error) {
+        console.log("receiptRepository - logout() ", error);
+        await client.query("ROLLBACK");
+      } finally {
+        client.release();
+      }
+    }
   }
 }

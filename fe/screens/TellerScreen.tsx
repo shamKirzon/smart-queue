@@ -135,37 +135,27 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       "Counter 3",
       "Counter 4",
     ];
-  const handleNextRegular = (currentRQNum: string | null | undefined) => {
+  const handleNumberOfServes = (currentQueueNumber: string | null | undefined) => {
     // additional validation as long as the backend returns rq numbers.
 
-    if (currentRQNum) {
+    if (currentQueueNumber) {
       setNumberOfServes(numberOfServes + 1);
     }
   };
 
-  const handleNextOpenAccount = (currentOAQNum: string | null | undefined) => {
-    // additional validation as long as the backend returns rq numbers.
-    if (currentOAQNum) {
-      setNumberOfServes(numberOfServes + 1);
-    }
-  };
-
-  const handleNextPriority = (currentPQNum: string | null | undefined) => {
-    // additional validation as long as the backend returns rq numbers.
-    if (currentPQNum) {
-      setNumberOfServes(numberOfServes + 1);
-    }
-  };
+ 
 
   const displayQueueNumber = (counter: string):string|null|undefined => {
     let queueNumber;
 
-    if (regularCounters.includes(counter)) {
+    if (regularCounters.includes(counter) && currentRQNum) {
       queueNumber = currentRQNum;
-    } else if (counter === "Counter A1") {
+    } else if (counter === "Counter A1" && currentOAQNum) {
       queueNumber = currentOAQNum;
-    } else if (counter === "Counter P1") {
+    } else if (counter === "Counter P1" && currentPQNum) {
       queueNumber = currentPQNum;
+    } else {
+      queueNumber = "000"
     }
 
     return queueNumber;
@@ -337,11 +327,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
               onPress={() => {
                 tellerNext(counterName);
                 if (regularCounters.includes(counterName)) {
-                  handleNextRegular(currentRQNum);
+                  handleNumberOfServes(currentRQNum);
                 } else if (counterName === "Counter A1") {
-                  handleNextOpenAccount(currentOAQNum);
+                  handleNumberOfServes(currentOAQNum);
                 } else if (counterName === "Counter P1") {
-                  handleNextOpenAccount(currentPQNum);
+                  handleNumberOfServes(currentPQNum);
                 }
               }}
               style={{

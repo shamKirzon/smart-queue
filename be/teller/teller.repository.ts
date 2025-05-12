@@ -49,7 +49,7 @@ export class TellerRepository {
     }
   }
 
-  static async tellerNext(counter: string) {
+  static async tellerNext(counter: string): Promise<string | undefined> {
     const client = await pool.connect();
     try {
       counter = TellerService.formattedCounter(counter);
@@ -131,65 +131,105 @@ export class TellerRepository {
     }
   }
 
+  // static async deleteOpenAccount(
+  //   counter: string,
+  //   client: PoolClient
+  // ): Promise<string | undefined> {
+  //   try {
+  //     await client.query("BEGIN");
+  //     const queryCurrentOpenCustomer = `SELECT open_account_receipt_id 
+  //                                   FROM counters 
+  //                                   WHERE counter_name = $1`;
+
+  //     const currentOpenAccountIdResult = await client.query(
+  //       queryCurrentOpenCustomer,
+  //       [counter]
+  //     );
+  //     await client.query("COMMIT");
+
+  //     const currentOpenAccountId =
+  //       currentOpenAccountIdResult.rows[0]?.open_account_receipt_id
+
+  //     if (currentOpenAccountId) {
+  //       await client.query("BEGIN");
+  //       const query = `DELETE FROM open_account_receipt WHERE open_account_receipt_id= $1`;
+  //       await client.query(query, [currentOpenAccountId]);
+  //       await client.query("COMMIT");
+  //       console.log(
+  //         `deleted successfully, queue number: ${currentOpenAccountId}`
+  //       );
+  //       await ReceiptService.assignOpenAccountReceipt(counter);
+  //       return await QueueService.getCurrentOpenAccountQueueNum(counter);
+  //     } else {
+  //       await client.query("ROLLBACK");
+  //       console.warn(`No open_account_receipt_id found for counter: ${counter}`);
+  //       client.release(); 
+  //     }
+  //   } catch (error) {
+  //     await client.query("ROLLBACK");
+  //     console.error("Query Error - deleteRegular: ", error);
+  //   }
+  // }
+
   static async deleteOpenAccount(
-    counter: string,
-    client: PoolClient
-  ): Promise<string | undefined> {
-    try {
-      await client.query("BEGIN");
-      const queryCurrentOpenCustomer = `SELECT open_account_receipt_id 
-                                    FROM counters 
-                                    WHERE counter_name = $1`;
+  counter: string,
+  client: PoolClient
+): Promise<string | undefined> {
+  try {
+    const queryCurrentOpenCustomer = `
+      SELECT open_account_receipt_id 
+      FROM counters 
+      WHERE counter_name = $1
+    `;
+    const currentOpenAccountIdResult = await client.query(queryCurrentOpenCustomer, [counter]);
 
-      const currentOpenAccountIdResult = await client.query(
-        queryCurrentOpenCustomer,
-        [counter]
-      );
-      await client.query("COMMIT");
+    const currentOpenAccountId = currentOpenAccountIdResult.rows[0]?.open_account_receipt_id;
 
-      const currentOpenAccountId =
-        currentOpenAccountIdResult.rows[0]?.open_account_receipt_id
-
-      if (currentOpenAccountId) {
-        await client.query("BEGIN");
-        const query = `DELETE FROM open_account_receipt WHERE open_account_receipt_id= $1`;
-        await client.query(query, [currentOpenAccountId]);
-        await client.query("COMMIT");
-        console.log(
-          `deleted successfully, queue number: ${currentOpenAccountId}`
-        );
-        await ReceiptService.assignOpenAccountReceipt(counter);
-        return await QueueService.getCurrentOpenAccountQueueNum(counter);
-      } else {
-        await client.query("ROLLBACK");
-        console.warn(`No open_account_receipt_id found for counter: ${counter}`);
-        client.release();
-      }
-    } catch (error) {
-      await client.query("ROLLBACK");
-      console.error("Query Error - deleteRegular: ", error);
+    if (!currentOpenAccountId) {
+      console.warn(`No open_account_receipt_id found for counter: ${counter}`);
+      return;
     }
+
+    await client.query("BEGIN");
+    const deleteQuery = `
+      DELETE FROM open_account_receipt 
+      WHERE open_account_receipt_id = $1
+    `;
+    await client.query(deleteQuery, [currentOpenAccountId]);
+    await client.query("COMMIT");
+
+    console.log(`Deleted successfully, queue number: ${currentOpenAccountId}`);
+
+    await ReceiptService.assignOpenAccountReceipt(counter);
+    return await QueueService.getCurrentOpenAccountQueueNum(counter);
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Query Error - deleteOpenAccount:", error);
+    return;
   }
+}
+
 
   static async deletePriority(
     counter: string,
     client: PoolClient
   ): Promise<string | undefined> {
     try {
-      await client.query("BEGIN");
       const queryCurrentPriorityCustomer = `SELECT priority_receipt_id 
                                     FROM counters 
                                     WHERE counter_name = $1`;
 
-      const currentOpenAccountIdResult = await client.query(
+      const currentPriorityIdResult = await client.query(
         queryCurrentPriorityCustomer,
         [counter]
       );
-      await client.query("COMMIT");
+      const currentPriorityId = currentPriorityIdResult.rows[0]?.priority_receipt_id
 
-      const currentPriorityId = currentOpenAccountIdResult.rows[0]?.priority_receipt_id
+      if(!currentPriorityId){
+       console.warn(`No open_account_receipt_id found for counter: ${counter}`);
+       return; 
+      }
 
-      if (currentPriorityId) {
         await client.query("BEGIN");
         const query = `DELETE FROM priority_receipt WHERE priority_receipt_id= $1`;
         await client.query(query, [currentPriorityId]);
@@ -197,15 +237,14 @@ export class TellerRepository {
         console.log(
           `deleted successfully, queue number: ${currentPriorityId}`
         );
+
         await ReceiptService.assignPriorityReceipt(counter);
         return await QueueService.getCurrentPriorityQueueNum(counter);
-      } else {
-        await client.query("ROLLBACK");
-        console.warn(`No priority_receipt_id found for counter: ${counter}`);
-      }
+     
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("Query Error - deleteRegular: ", error);
+      return; 
     }
   }
 }
