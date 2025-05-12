@@ -233,7 +233,7 @@ export function setupWebSocket(server: Server) {
         const { transaction, customerType, queueNumber, date, time } =
           data.dataReceipt;
 
-        if (customerType === "Open Account") {
+        if (customerType === "OpenAccount") {
           try {
             await ReceiptService.createOpenAccountReceipt(
               transaction,

@@ -190,7 +190,7 @@ export class ReceiptRepository {
     }
   }
 
-  static async insertOpenAccounteceipt(
+  static async insertOpenAccountReceipt(
     transaction: string[],
     customerType: string,
     queueNumber: string,

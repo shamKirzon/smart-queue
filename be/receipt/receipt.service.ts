@@ -179,13 +179,13 @@ export class ReceiptService {
     date: string,
     time: string
   ): Promise<void> {
-    if (customerType !== "Open Account") {
+    if (customerType !== "OpenAccount") {
       console.warn("Customer type is not 'Open Account'. Skipping insertion.");
       return;
     }
 
     try {
-      await ReceiptRepository.insertOpenAccounteceipt(
+      await ReceiptRepository.insertOpenAccountReceipt(
         transaction,
         customerType,
         queueNumber,
