@@ -13,6 +13,7 @@ import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import { RootStackParamLists } from "../types/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useWebSocketsApp } from "../websocket/WebSocketProvider";
 
 
 const { width, height } = Dimensions.get("window");
@@ -30,13 +31,14 @@ interface ReceiptScreenProps{
 
 const ReceiptScreen: React.FC<ReceiptScreenProps> = ({route, navigation}) => {
   const [receiptPrinted, setReceiptPrinted] = useState(false);
-  
+  const {testingTrigger} = useWebSocketsApp(); 
   const { transaction, customerType, queueNumber, date, time } = route.params;
 
   console.log("Route params:", route.params);
   console.log("Transaction:", transaction);
   console.log("Customer Type:", customerType);
   console.log("Queue Number:", queueNumber);
+  
 
   const receiptAnimation = useRef(new Animated.Value(-500)).current;
   const receiptOpacity = useRef(new Animated.Value(0)).current;
@@ -122,6 +124,7 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({route, navigation}) => {
     <TouchableWithoutFeedback
       onPress={() => {
         if (receiptPrinted) {
+          testingTrigger(); 
           navigation.goBack();
         }
       }}

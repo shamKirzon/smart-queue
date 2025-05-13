@@ -51,7 +51,7 @@ const App = () => {
      <SafeAreaProvider className="flex-1 ">
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="TellerHomeScreen"
+          initialRouteName="WelcomeScreen"
           screenOptions={{
             headerShown: false,
             animation: "none",

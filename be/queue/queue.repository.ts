@@ -4,33 +4,29 @@ import { PoolClient, QueryResult } from "pg";
 import { TellerService } from "../teller/teller.service";
 
 export class QueueRepository {
-  static async getRegQueueNum(counter: string): Promise<any> {
-    const client = await pool.connect();
+  static async getRegQueueNum(
+    counter: string,
+    client: PoolClient
+  ): Promise<any> {
+    counter = TellerService.formattedCounter(counter);
+    console.log("getRegQueueNum() ", counter);
 
-    await client.query("BEGIN");
-
-    const queryRegularId = `SELECT regular_receipt_id FROM counters
-                              WHERE counter_name = $1`;
-    const rawRegularId = await client.query(queryRegularId, [counter]);
+    const rawRegularId = await client.query(`SELECT regular_receipt_id FROM counters
+                              WHERE counter_name = $1`, [counter]);
     const regularId = rawRegularId?.rows[0]?.regular_receipt_id;
+    
+    const rawQueueNumber = await client.query(`SELECT * FROM regular_receipt
+                                WHERE regular_receipt_id = $1`, [regularId]);
 
-    const queryQueueNumber = `SELECT * FROM regular_receipt
-                                WHERE regular_receipt_id = $1`;
-    const rawQueueNumber = await client.query(queryQueueNumber, [regularId]);
-    const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
-
-    console.log("queueRepository. getRegQueueNUm: queueNumber: ", queueNumber);
-
-    await client.query("COMMIT");
-
-    return queueNumber;
+    return { rawQueueNumber };
   }
 
-  static async getOpenAccountQueueNum(counter: string, client: PoolClient): Promise<any> {
-    
-     counter = TellerService.formattedCounter(counter);
-     console.log("getOpenAccountQueueNum() ", counter)
-  
+  static async getOpenAccountQueueNum(
+    counter: string,
+    client: PoolClient
+  ): Promise<any> {
+    counter = TellerService.formattedCounter(counter);
+    console.log("getOpenAccountQueueNum() ", counter);
 
     const queryOpenId = `SELECT open_account_receipt_id FROM counters
                               WHERE counter_name = $1`;
@@ -43,14 +39,15 @@ export class QueueRepository {
       openAccountId,
     ]);
 
-   return {rawQueueNumber};
+    return { rawQueueNumber };
   }
 
-   static async getPriorityQueueNum(counter: string, client: PoolClient): Promise<any> {
-    
-     counter = TellerService.formattedCounter(counter);
-     console.log(counter)
-
+  static async getPriorityQueueNum(
+    counter: string,
+    client: PoolClient
+  ): Promise<any> {
+    counter = TellerService.formattedCounter(counter);
+    console.log(counter);
 
     const queryPriorityId = `SELECT priority_receipt_id FROM counters
                               WHERE counter_name = $1`;
@@ -62,8 +59,7 @@ export class QueueRepository {
     const rawQueueNumber = await client.query(queryQueueNumber, [
       openAccountId,
     ]);
-   
 
-    return {rawQueueNumber};
+    return { rawQueueNumber };
   }
 }

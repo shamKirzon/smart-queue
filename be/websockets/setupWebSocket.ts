@@ -145,7 +145,7 @@ export function setupWebSocket(server: Server) {
         );
       }
 
-      // ASSIGN OPEN ACCOUNT RECEIPT (modified backend)
+      // ASSIGN OPEN ACCOUNT RECEIPT
       else if (data.type === "assign-open-account-receipt-fe") {
         await ReceiptService.assignOpenAccountReceipt(data.counter);
         const currentOpenAccountQueueNum =
@@ -163,15 +163,12 @@ export function setupWebSocket(server: Server) {
         );
       }
 
-       // ASSIGN PRIORITY RECEIPT
+      // ASSIGN PRIORITY RECEIPT
       else if (data.type === "assign-priority-receipt-fe") {
         await ReceiptService.assignPriorityReceipt(data.counter);
         const currentPriorityQueueNum =
           await QueueService.getCurrentPriorityQueueNum(data.counter);
-        console.log(
-          "backend priority queue number: ",
-          currentPriorityQueueNum
-        );
+        console.log("backend priority queue number: ", currentPriorityQueueNum);
 
         ws?.send(
           JSON.stringify({
@@ -189,20 +186,31 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "Regular") {
-          try {
-            await ReceiptService.createRegularReceipt(
-              transaction,
-              customerType,
-              queueNumber,
-              date,
-              time
-            );
-            console.log("Regular receipt processed successfully.");
-          } catch (error) {
-            console.error("Error processing regular receipt:", error);
-          }
+          const trigger = await ReceiptService.createRegularReceipt(
+            transaction,
+            customerType,
+            queueNumber,
+            date,
+            time
+          );
+
+          console.log(
+            "Regular receipt processed successfully.",
+            typeof trigger,
+            trigger
+          );
+          console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
+
+          ws?.send(
+            JSON.stringify({
+              type: "first-regular-insert-be",
+              response: trigger,
+            })
+          );
+          
         }
       }
+
       //PRIORITY STARTS HERE
       else if (data.type === "insert-data-priority") {
         console.log("Received data from frontend:", data.dataReceipt);

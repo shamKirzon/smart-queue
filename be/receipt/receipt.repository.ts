@@ -4,16 +4,10 @@ import { TellerService } from "../teller/teller.service";
 
 export class ReceiptRepository {
   // GET WITH LOCK
-  static async getNextRegularCustomerWithLock(): Promise<{
-    client: PoolClient;
+  static async getNextRegularCustomerWithLock(client: PoolClient): Promise<{
     customer: any;
   }> {
-    const client = await pool.connect();
-
-    try {
-      await client.query("BEGIN");
-
-      const result = await client.query(`
+    const result = await client.query(`
         SELECT * FROM regular_receipt
         WHERE status = 'waiting'
         ORDER BY queue_number ASC
@@ -21,14 +15,7 @@ export class ReceiptRepository {
         FOR UPDATE SKIP LOCKED
       `);
 
-      return { client, customer: result };
-    } catch (err) {
-      await client.query("ROLLBACK");
-      client.release();
-      throw err;
-    } finally {
-      client.release();
-    }
+    return { customer: result };
   }
 
   static async getNextOpenAccountCustomer(client: PoolClient): Promise<{
@@ -150,17 +137,26 @@ export class ReceiptRepository {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<void> {
-    const query = `
+  ): Promise<string | undefined> {
+    const query1 = `
       INSERT INTO regular_receipt (regular_receipt_id, transaction, queue_number, date, time, status)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
     `;
-
     const values = [transaction, queueNumber, date, time];
-
+    
     try {
-      await pool.query(query, values);
-      console.log("Regular receipt inserted successfully.");
+      await pool.query(query1, values);
+       console.log("Regular receipt inserted successfully.");
+
+       // shami additional logic: 
+       const firstData =  await pool.query(`SELECT * FROM regular_receipt
+                    ORDER BY queue_number ASC`); 
+
+      if(firstData.rows[0].queue_number === queueNumber)  {
+        return "first row triggers"
+      } else{
+        return
+      }
     } catch (error) {
       console.error("Error inserting regular receipt:", error);
       throw error;

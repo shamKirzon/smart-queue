@@ -4,10 +4,26 @@ import { TellerService } from "../teller/teller.service";
 import { QueueRepository } from "./queue.repository";
 
 export class QueueService {
-  static async getCurrentRegularQueueNum(counter: string): Promise<string> {
+  static async getCurrentRegularQueueNum(counter: string): Promise<any> {
     counter = TellerService.formattedCounter(counter);
-    const queueNum = await QueueRepository.getRegQueueNum(counter);
-    return queueNum;
+    const client = await pool.connect();
+
+    try {
+      client.query("BEGIN");
+      const { rawQueueNumber } = await QueueRepository.getRegQueueNum(
+        counter,
+        client
+      );
+      const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
+      await client.query("COMMIT");
+
+      return queueNumber;
+
+    } catch (error) {
+      client.query("ROLLBACK");
+    } finally {
+      client.release();
+    }
   }
 
   static async getCurrentOpenAccountQueueNum(counter: string): Promise<any> {
@@ -23,12 +39,14 @@ export class QueueService {
       );
       const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
 
-     await client.query("COMMIT");
+      await client.query("COMMIT");
 
-      return queueNumber ? queueNumber : "000"; 
-
+      return queueNumber ;
     } catch (error) {
-      console.log("queueService - getCurrentOpenAccountQueueNum(), - can't get the queueNumber of open account", error)
+      console.log(
+        "queueService - getCurrentOpenAccountQueueNum(), - can't get the queueNumber of open account",
+        error
+      );
     } finally {
       client.release();
     }
@@ -39,21 +57,22 @@ export class QueueService {
     const client = await pool.connect();
 
     try {
-     await client.query("BEGIN");
-      
+      await client.query("BEGIN");
+
       const { rawQueueNumber } = await QueueRepository.getPriorityQueueNum(
         counter,
         client
       );
       const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
 
-     await client.query("COMMIT");
+      await client.query("COMMIT");
 
-      return queueNumber ? queueNumber : "000"; 
-
+      return queueNumber ;
     } catch (error) {
-      console.log("queueService - getCurrentOpenAccountQueueNum(), - can't get the queueNumber of open account", error)
-      
+      console.log(
+        "queueService - getCurrentOpenAccountQueueNum(), - can't get the queueNumber of open account",
+        error
+      );
     } finally {
       client.release();
     }

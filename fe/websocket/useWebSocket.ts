@@ -4,11 +4,13 @@ import { useRef, useEffect, useState } from "react";
 const useWebSocket = (url: string) => {
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
-  const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<string | null>();
+  const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<
+    string | null
+  >();
   const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
+  const [firstRowTrigger, setFirstRowTrigger] = useState<string | null>();
   const ws = useRef<WebSocket | null>(null);
 
-  
   const sendMessage = (message: object) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(message));
@@ -24,13 +26,12 @@ const useWebSocket = (url: string) => {
     }
   };
 
-  useEffect(() => {
-    console.log("latest queue number:", currentRQNum);
-  }, [currentRQNum]);
+  // useEffect(() => {
+  //   console.log("latest queue number:", currentRQNum);
+  // }, [currentRQNum]);
 
   useEffect(() => {
     if (ws.current) return;
-
     ws.current = new WebSocket(url);
 
     ws.current.onopen = () => {
@@ -41,31 +42,34 @@ const useWebSocket = (url: string) => {
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-
-      
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
       }
+      
+      else if(data.type ==="first-regular-insert-be"){
+      //  setFirstRowTrigger(data.response)
+      //  console.log("nagtrigger, ", data.response)
+      // if nareceive na to, meron na nasimulang code sa part ng tellerScreen. modify nalang
+
+      console.log("TRIGGER RECEIVED: ", data.response);
+      }
+
+
       else if (data.type === "teller-next-regular-be") {
-        setCurrentRegularQueueNum(data.currentQueueNumber); 
-      }
-      else if (data.type === "teller-next-open-account-be") {
-        setCurrentOpenAccountQueueNum(data.currentQueueNumber); 
-      }
-      else if (data.type === "teller-next-priority-be") {
-        setCurrentPriorityQueueNum(data.currentQueueNumber); 
+        setCurrentRegularQueueNum(data.currentQueueNumber);
+      } else if (data.type === "teller-next-open-account-be") {
+        setCurrentOpenAccountQueueNum(data.currentQueueNumber);
+      } else if (data.type === "teller-next-priority-be") {
+        setCurrentPriorityQueueNum(data.currentQueueNumber);
       }
       // fetching current queue number (without next logic)
       else if (data.type === "assign-regular-receipt-be") {
         const currentregular = data.currentRegularQueueNum;
         setCurrentRegularQueueNum(currentregular);
-        
-      }
-      else if (data.type === "assign-open-account-receipt-be") {
+      } else if (data.type === "assign-open-account-receipt-be") {
         const currentId = data.currentOpenAccountQueueNum;
         setCurrentOpenAccountQueueNum(currentId);
-      }
-      else if (data.type === "assign-priority-receipt-be") {
+      } else if (data.type === "assign-priority-receipt-be") {
         const currentId = data.currentPriorityQueueNum;
         setCurrentPriorityQueueNum(currentId);
       }
@@ -83,14 +87,25 @@ const useWebSocket = (url: string) => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   console.log(
+  //     "this is my open account current queue number: ",
+  //     currentOAQNum
+  //   );
+  // }, [currentOAQNum]);
 
-  // TESTING VARIABLES PART : 
-
-useEffect(() => {
-  console.log('this is my open account current queue number: ', currentOAQNum)
-},[currentOAQNum])
+  // useEffect(() => {
+  //   console.log("NAG TRIGGER ANG AKING FIRST ROW BROW ", firstRowTrigger);
+  // }, [firstRowTrigger]);
 
   // FUNCTIONS
+   const testingTrigger = () => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "testing-trigger" }));
+    }
+  };
+
+
   const fetchCounterStatus = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify({ type: "get-counter-status" }));
@@ -134,15 +149,18 @@ useEffect(() => {
       );
     }
   };
-    const assignOpenAccountReceipt= (counter: string) => {
+  const assignOpenAccountReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
-        JSON.stringify({ type: "assign-open-account-receipt-fe", counter: counter })
+        JSON.stringify({
+          type: "assign-open-account-receipt-fe",
+          counter: counter,
+        })
       );
     }
   };
 
-    const assignPriorityReceipt = (counter: string) => {
+  const assignPriorityReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
         JSON.stringify({ type: "assign-priority-receipt-fe", counter: counter })
@@ -155,73 +173,107 @@ useEffect(() => {
       ws.current.send(JSON.stringify({ type: "teller-next-fe", counter }));
     }
   };
-  
-  const logout = (counter: string)=> {
-    if(ws.current?.readyState ===WebSocket.OPEN){
-      ws.current.send(JSON.stringify({type: "logout", counter: counter}))
+
+  const logout = (counter: string) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "logout", counter: counter }));
     }
-  }
+  };
 
   //regular
-  const insertvaluesregular = (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
+  const insertvaluesregular = (
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-     
-      console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
+      console.log("Sending data to WebSocket:", {
+        transaction,
+        customerType,
+        queueNumber,
+        date,
+        time,
+      });
       ws.current.send(
-        JSON.stringify({ 
-          type: "insert-data-regular", 
+        JSON.stringify({
+          type: "insert-data-regular",
           dataReceipt: {
             transaction,
             customerType,
             queueNumber,
             date,
-            time
-          } 
+            time,
+          },
         })
       );
     }
   };
+ 
+
 
   //priority
-  const insertvaluespriority= (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
+  const insertvaluespriority = (
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
+      console.log("Sending data to WebSocket:", {
+        transaction,
+        customerType,
+        queueNumber,
+        date,
+        time,
+      });
       ws.current.send(
-        JSON.stringify({ 
-          type: "insert-data-priority", 
+        JSON.stringify({
+          type: "insert-data-priority",
           dataReceipt: {
             transaction,
             customerType,
             queueNumber,
             date,
-            time
-          } 
+            time,
+          },
         })
       );
     }
   };
 
   //open account
-  const insertvaluesopenaccount= (transaction: string[], customerType: string, queueNumber: string, date: string, time: string) => {
+  const insertvaluesopenaccount = (
+    transaction: string[],
+    customerType: string,
+    queueNumber: string,
+    date: string,
+    time: string
+  ) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
-      console.log("Sending data to WebSocket:", { transaction, customerType, queueNumber, date, time });
+      console.log("Sending data to WebSocket:", {
+        transaction,
+        customerType,
+        queueNumber,
+        date,
+        time,
+      });
       ws.current.send(
-        JSON.stringify({ 
-          type: "insert-data-openaccount", 
+        JSON.stringify({
+          type: "insert-data-openaccount",
           dataReceipt: {
             transaction,
             customerType,
             queueNumber,
             date,
-            time
-          } 
+            time,
+          },
         })
       );
     }
   };
-  
-
-
 
   return {
     fetchCounterStatus,
@@ -230,17 +282,19 @@ useEffect(() => {
     setToInuse,
     tellerNext,
     assignRegularReceipt,
-    assignOpenAccountReceipt, 
+    assignOpenAccountReceipt,
     assignPriorityReceipt,
     currentRQNum,
-    currentOAQNum, 
+    currentOAQNum,
     currentPQNum,
     insertvaluesregular,
     insertvaluespriority,
     insertvaluesopenaccount,
     sendMessage,
     onMessage,
-    logout, 
+    logout,
+    testingTrigger, 
+    firstRowTrigger, 
   };
 };
 

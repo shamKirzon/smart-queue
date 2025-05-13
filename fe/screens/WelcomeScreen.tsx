@@ -3,6 +3,7 @@ import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import Logo from "../assets/icons/logo.svg";
 import StartBackground from "../assets/backgrounds/start-background.svg";
 import { useFonts } from "expo-font";
+import { useWebSocketsApp, WebSocketProvider } from "../websocket/WebSocketProvider";
 
 const { width, height } = Dimensions.get("window");
 const textM = width * 0.1;
@@ -17,6 +18,8 @@ interface WelcomeScreenProps {
 }
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
+
+  const {testingTrigger} = useWebSocketsApp(); 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <StartBackground
@@ -86,7 +89,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
       </View>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("HomeScreen")}
+        onPress={() => {navigation.navigate("HomeScreen")}}
         style={{
           width: width * 0.5,
           height: height * 0.07,

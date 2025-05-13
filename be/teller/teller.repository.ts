@@ -61,7 +61,7 @@ export class TellerRepository {
         return this.deleteOpenAccount(counter, client);
       } else if (counter === "counter_P1") {
         return this.deletePriority(counter, client);
-      } else {        
+      } else {
         return;
       }
     } finally {
@@ -97,7 +97,6 @@ export class TellerRepository {
     client: PoolClient
   ): Promise<string | undefined> {
     try {
-      await client.query("BEGIN");
       const queryCurrentRegularCustomer = `SELECT regular_receipt_id 
                                     FROM counters 
                                     WHERE counter_name = $1`;
@@ -106,29 +105,29 @@ export class TellerRepository {
         queryCurrentRegularCustomer,
         [counter]
       );
-      await client.query("COMMIT");
 
       const currentRegularId =
         currentRegularIdResult.rows[0]?.regular_receipt_id;
 
-      if (currentRegularId) {
-        await client.query("BEGIN");
-        const query = `DELETE FROM regular_receipt WHERE regular_receipt_id = $1`;
-        await client.query(query, [currentRegularId]);
-        await client.query("COMMIT");
-        console.log(`deleted successfully, queue number: ${currentRegularId}`);
-        await ReceiptService.assignRegularReceipt(counter);
-        return await QueueService.getCurrentRegularQueueNum(counter);
-      } else {
-        await client.query("ROLLBACK");
-        console.warn(`No regular_receipt_id found for counter: ${counter}`);
+      if (!currentRegularId) {
+        console.warn(
+          `No regular_receipt_id found for counter: ${counter}`
+        );
+        return;
       }
+
+      await client.query("BEGIN");
+      const query = `DELETE FROM regular_receipt WHERE regular_receipt_id = $1`;
+      await client.query(query, [currentRegularId]);
+      await client.query("COMMIT");
+      console.log(`deleted successfully, queue number: ${currentRegularId}`);
+
+      await ReceiptService.assignRegularReceipt(counter);
+      return await QueueService.getCurrentRegularQueueNum(counter);
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("Query Error - deleteRegular: ", error);
-    }finally{
-      client.release(); 
-    }
+    } 
   }
 
   // static async deleteOpenAccount(
@@ -137,8 +136,8 @@ export class TellerRepository {
   // ): Promise<string | undefined> {
   //   try {
   //     await client.query("BEGIN");
-  //     const queryCurrentOpenCustomer = `SELECT open_account_receipt_id 
-  //                                   FROM counters 
+  //     const queryCurrentOpenCustomer = `SELECT open_account_receipt_id
+  //                                   FROM counters
   //                                   WHERE counter_name = $1`;
 
   //     const currentOpenAccountIdResult = await client.query(
@@ -163,7 +162,7 @@ export class TellerRepository {
   //     } else {
   //       await client.query("ROLLBACK");
   //       console.warn(`No open_account_receipt_id found for counter: ${counter}`);
-  //       client.release(); 
+  //       client.release();
   //     }
   //   } catch (error) {
   //     await client.query("ROLLBACK");
@@ -172,43 +171,50 @@ export class TellerRepository {
   // }
 
   static async deleteOpenAccount(
-  counter: string,
-  client: PoolClient
-): Promise<string | undefined> {
-  try {
-    const queryCurrentOpenCustomer = `
+    counter: string,
+    client: PoolClient
+  ): Promise<string | undefined> {
+    try {
+      const queryCurrentOpenCustomer = `
       SELECT open_account_receipt_id 
       FROM counters 
       WHERE counter_name = $1
     `;
-    const currentOpenAccountIdResult = await client.query(queryCurrentOpenCustomer, [counter]);
+      const currentOpenAccountIdResult = await client.query(
+        queryCurrentOpenCustomer,
+        [counter]
+      );
 
-    const currentOpenAccountId = currentOpenAccountIdResult.rows[0]?.open_account_receipt_id;
+      const currentOpenAccountId =
+        currentOpenAccountIdResult.rows[0]?.open_account_receipt_id;
 
-    if (!currentOpenAccountId) {
-      console.warn(`No open_account_receipt_id found for counter: ${counter}`);
-      return;
-    }
+      if (!currentOpenAccountId) {
+        console.warn(
+          `No open_account_receipt_id found for counter: ${counter}`
+        );
+        return;
+      }
 
-    await client.query("BEGIN");
-    const deleteQuery = `
+      await client.query("BEGIN");
+      const deleteQuery = `
       DELETE FROM open_account_receipt 
       WHERE open_account_receipt_id = $1
     `;
-    await client.query(deleteQuery, [currentOpenAccountId]);
-    await client.query("COMMIT");
+      await client.query(deleteQuery, [currentOpenAccountId]);
+      await client.query("COMMIT");
 
-    console.log(`Deleted successfully, queue number: ${currentOpenAccountId}`);
+      console.log(
+        `Deleted successfully, queue number: ${currentOpenAccountId}`
+      );
 
-    await ReceiptService.assignOpenAccountReceipt(counter);
-    return await QueueService.getCurrentOpenAccountQueueNum(counter);
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("Query Error - deleteOpenAccount:", error);
-    return;
+      await ReceiptService.assignOpenAccountReceipt(counter);
+      return await QueueService.getCurrentOpenAccountQueueNum(counter);
+    } catch (error) {
+      await client.query("ROLLBACK");
+      console.error("Query Error - deleteOpenAccount:", error);
+      return;
+    }
   }
-}
-
 
   static async deletePriority(
     counter: string,
@@ -223,28 +229,28 @@ export class TellerRepository {
         queryCurrentPriorityCustomer,
         [counter]
       );
-      const currentPriorityId = currentPriorityIdResult.rows[0]?.priority_receipt_id
+      const currentPriorityId =
+        currentPriorityIdResult.rows[0]?.priority_receipt_id;
 
-      if(!currentPriorityId){
-       console.warn(`No open_account_receipt_id found for counter: ${counter}`);
-       return; 
+      if (!currentPriorityId) {
+        console.warn(
+          `No open_account_receipt_id found for counter: ${counter}`
+        );
+        return;
       }
 
-        await client.query("BEGIN");
-        const query = `DELETE FROM priority_receipt WHERE priority_receipt_id= $1`;
-        await client.query(query, [currentPriorityId]);
-        await client.query("COMMIT");
-        console.log(
-          `deleted successfully, queue number: ${currentPriorityId}`
-        );
+      await client.query("BEGIN");
+      const query = `DELETE FROM priority_receipt WHERE priority_receipt_id= $1`;
+      await client.query(query, [currentPriorityId]);
+      await client.query("COMMIT");
+      console.log(`deleted successfully, queue number: ${currentPriorityId}`);
 
-        await ReceiptService.assignPriorityReceipt(counter);
-        return await QueueService.getCurrentPriorityQueueNum(counter);
-     
+      await ReceiptService.assignPriorityReceipt(counter);
+      return await QueueService.getCurrentPriorityQueueNum(counter);
     } catch (error) {
       await client.query("ROLLBACK");
       console.error("Query Error - deleteRegular: ", error);
-      return; 
+      return;
     }
   }
 }

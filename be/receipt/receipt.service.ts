@@ -7,11 +7,16 @@ import pool from "../database/connection";
 
 export class ReceiptService {
   // ASSIGN:
-  static async assignRegularReceipt(counter: string) {
+  static async assignRegularReceipt(counter: string): Promise<any> {
+    const client = await pool.connect();
     counter = TellerService.formattedCounter(counter);
-    if (TellerService.regularCounters.includes(counter)) {
-      const { client, customer } =
-        await ReceiptRepository.getNextRegularCustomerWithLock();
+
+   try{
+     if (TellerService.regularCounters.includes(counter)) {
+      await client.query("BEGIN");
+      const { customer } =
+        await ReceiptRepository.getNextRegularCustomerWithLock(client);
+
       const customerId = customer.rows[0]?.regular_receipt_id;
 
       // testing part:
@@ -20,30 +25,25 @@ export class ReceiptService {
       );
 
       if (customerId) {
-        try {
-          await ReceiptRepository.assignCustomerToCounterRegular(
-            customerId,
-            counter,
-            client
-          );
-        } catch (error) {
-          await client.query("ROLLBACK");
-          console.error("Failed to assign customer:", error);
-        }
+        await ReceiptRepository.assignCustomerToCounterRegular(
+          customerId,
+          counter,
+          client
+        );
+        await client.query("COMMIT");
       } else {
         console.log(`No waiting customer to assign for ${counter}`);
         await client.query("ROLLBACK");
-        client.release();
+        return; 
       }
     }
-
-    try {
-    } catch (error) {
-      console.error(
-        "tellerService_assignRegularReceipt cant perform logic side",
-        error
-      );
-    }
+   }catch(error){
+      client.query("ROLLBACK"); 
+      console.log("Failed to assign customer", error)
+   }finally{
+    client.release(); 
+   }
+  
   }
 
   static async assignOpenAccountReceipt(counter: string) {
@@ -105,13 +105,13 @@ export class ReceiptService {
           counter,
           client
         );
-        await client.query("COMMIT")
+        await client.query("COMMIT");
       } else {
         console.log(`No waiting customer to assign for ${counter}`);
-        await client.query("ROLLBACK")
+        await client.query("ROLLBACK");
         return;
       }
-    }catch (error) {
+    } catch (error) {
       client.query("ROLLBACK");
       console.error("Failed to assign customer:", error);
     } finally {
@@ -126,20 +126,22 @@ export class ReceiptService {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<void> {
+  ): Promise<string | undefined> {
     if (customerType !== "Regular") {
       console.warn("Customer type is not 'Regular'. Skipping insertion.");
       return;
     }
 
     try {
-      await ReceiptRepository.insertRegularReceipt(
+      const trigger = await ReceiptRepository.insertRegularReceipt(
         transaction,
         customerType,
         queueNumber,
         date,
         time
       );
+
+      return trigger;  
     } catch (error) {
       console.error("Error creating regular receipt:", error);
       throw error;

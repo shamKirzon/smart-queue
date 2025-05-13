@@ -13,6 +13,8 @@ export class TellerService {
     const formattedCounterString = this.formattedCounter(counter)
     return this.regularCounters.includes(formattedCounterString)
   }
+  
+
 
 
   

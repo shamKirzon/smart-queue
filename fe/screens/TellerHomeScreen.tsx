@@ -30,6 +30,7 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
     useWebSocketsApp();
 
     const regularCounters = ['Counter 1','Counter 2', 'Counter 3', 'Counter 4'];
+    // realtime updates
   useEffect(() => {
     if (getCounterStatus()) {
       setStatus(getCounterStatus());

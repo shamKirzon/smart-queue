@@ -29,6 +29,7 @@ const { width, height } = Dimensions.get("window");
 
 const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [queueNumberStart, setQueueNumberStart] = useState(false);
   const { counterName } = route.params;
   const {
     setToAvailable,
@@ -37,6 +38,8 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     currentOAQNum,
     currentPQNum,
     logout,
+    firstRowTrigger,
+    assignRegularReceipt,
   } = useWebSocketsApp();
   const [numberOfServes, setNumberOfServes] = useState(0);
 
@@ -129,23 +132,40 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     );
   };
 
-   const regularCounters = [
-      "Counter 1",
-      "Counter 2",
-      "Counter 3",
-      "Counter 4",
-    ];
-  const handleNumberOfServes = (currentQueueNumber: string | null | undefined) => {
-    // additional validation as long as the backend returns rq numbers.
-
+  const regularCounters = ["Counter 1", "Counter 2", "Counter 3", "Counter 4"];
+  const handleNumberOfServes = (
+    currentQueueNumber: string | undefined | null
+  ) => {
     if (currentQueueNumber) {
       setNumberOfServes(numberOfServes + 1);
+      setQueueNumberStart(true);
+      console.log("INCREMENTED: ", currentQueueNumber);
+    } else {
+      return;
     }
   };
 
- 
+  // CORRECT INCREMENTATION OF SERVES BASED ON UPDATED QUEUE NUMBER | TYPE
+  useEffect(() => {
+    if (queueNumberStart) {
+      if (regularCounters.includes(counterName)) {
+        handleNumberOfServes(currentRQNum);
+      } else if (counterName === "Counter A1") {
+        handleNumberOfServes(currentOAQNum);
+      } else if (counterName === "Counter P1") {
+        handleNumberOfServes(currentPQNum);
+      }
+    } else {
+      return;
+    }
+  }, [currentOAQNum, currentPQNum, currentRQNum]);
 
-  const displayQueueNumber = (counter: string):string|null|undefined => {
+  // RERENDER OF FIRSTROW
+  useEffect(() => {
+    assignRegularReceipt(counterName);
+  }, [firstRowTrigger]);
+
+  const displayQueueNumber = (counter: string): string | null | undefined => {
     let queueNumber;
 
     if (regularCounters.includes(counter) && currentRQNum) {
@@ -155,7 +175,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     } else if (counter === "Counter P1" && currentPQNum) {
       queueNumber = currentPQNum;
     } else {
-      queueNumber = "000"
+      queueNumber = "...";
     }
 
     return queueNumber;
@@ -326,13 +346,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 tellerNext(counterName);
-                if (regularCounters.includes(counterName)) {
-                  handleNumberOfServes(currentRQNum);
-                } else if (counterName === "Counter A1") {
-                  handleNumberOfServes(currentOAQNum);
-                } else if (counterName === "Counter P1") {
-                  handleNumberOfServes(currentPQNum);
-                }
+                setQueueNumberStart(true);
               }}
               style={{
                 marginTop: height * 0.05,
