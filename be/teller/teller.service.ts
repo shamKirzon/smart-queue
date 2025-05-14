@@ -5,7 +5,7 @@ export class TellerService {
   public static regularCounters = ["counter_1", "counter_2", "counter_3", "counter_4"];
   
 
-  static formattedCounter(counter: string):string {
+  static formattedCounter(counter: string ):string {
     return counter.replace(/^Counter/i, "counter").replace(/\s+/g, "_");
   }
 

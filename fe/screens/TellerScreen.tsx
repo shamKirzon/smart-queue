@@ -162,6 +162,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
 
   // RERENDER OF FIRSTROW
   useEffect(() => {
+    console.log("TellerScreen - 'UPDATED SUCCESFULLY' ", firstRowTrigger)
     assignRegularReceipt(counterName);
   }, [firstRowTrigger]);
 

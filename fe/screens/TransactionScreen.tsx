@@ -815,6 +815,30 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     Print
                   </Text>
                 </TouchableOpacity>
+
+                {/* testing part ni shami */}
+                <TouchableOpacity
+                  onPress={() => {
+                    testingTrigger()
+                  }}
+                  style={{
+                    backgroundColor: "#D94A5A",
+                    padding: 10,
+                    borderRadius: 15,
+                    width: "45%",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: "#FFFF",
+                      fontSize: 17,
+                      fontFamily: "Poppins-Semi-Bold",
+                    }}
+                  >
+                    TESTING TRIGGER
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>

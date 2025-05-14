@@ -1,6 +1,7 @@
 import { Pool, PoolClient, QueryResult } from "pg";
 import pool from "../database/connection";
 import { TellerService } from "../teller/teller.service";
+import { ReceiptService } from "./receipt.service";
 
 export class ReceiptRepository {
   // GET WITH LOCK

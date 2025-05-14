@@ -211,6 +211,24 @@ export function setupWebSocket(server: Server) {
         }
       }
 
+      // TESTING - TRIGGER FOR REGULAR: 
+      else if (data.type === "testing-trigger") {
+      
+        const trigger = "TRIGGER"; 
+        
+          console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
+
+          ws?.send(
+            JSON.stringify({
+              type: "first-regular-insert-be",
+              response: trigger,
+            })
+          );
+          
+        }
+      
+
+
       //PRIORITY STARTS HERE
       else if (data.type === "insert-data-priority") {
         console.log("Received data from frontend:", data.dataReceipt);

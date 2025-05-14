@@ -47,11 +47,11 @@ const useWebSocket = (url: string) => {
       }
       
       else if(data.type ==="first-regular-insert-be"){
-      //  setFirstRowTrigger(data.response)
+       setFirstRowTrigger(data.response)
       //  console.log("nagtrigger, ", data.response)
       // if nareceive na to, meron na nasimulang code sa part ng tellerScreen. modify nalang
 
-      console.log("TRIGGER RECEIVED: ", data.response);
+      console.log("FRONTEND - TRIGGER RECEIVED: ", data.response);
       }
 
 
