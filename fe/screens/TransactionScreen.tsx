@@ -791,6 +791,8 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   >
                     Edit
                   </Text>
+
+                  
                 </TouchableOpacity>
 
                 <TouchableOpacity

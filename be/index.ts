@@ -11,7 +11,7 @@ const server = http.createServer(app)
 
 setupWebSocket(server)
 app.use(express.json()); 
-app.use(cors())
+app.use(cors()) 
 
 server.listen(PORT, () => {
     console.log(`Server is running on localhost: ${PORT}`)

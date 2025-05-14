@@ -186,6 +186,7 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "Regular") {
+          // trigger = ""first row triggers""
           const trigger = await ReceiptService.createRegularReceipt(
             transaction,
             customerType,

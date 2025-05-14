@@ -467,3 +467,8 @@ const TellerHomeScreen: React.FC<TellerHomeScreen> = ({ navigation }) => {
 };
 
 export default TellerHomeScreen;
+
+
+
+
+

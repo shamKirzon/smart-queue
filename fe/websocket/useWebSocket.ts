@@ -9,6 +9,7 @@ const useWebSocket = (url: string) => {
   >();
   const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
   const [firstRowTrigger, setFirstRowTrigger] = useState<string | null>();
+
   const ws = useRef<WebSocket | null>(null);
 
   const sendMessage = (message: object) => {
@@ -40,6 +41,7 @@ const useWebSocket = (url: string) => {
     };
 
     ws.current.onmessage = (event) => {
+
       const data = JSON.parse(event.data);
 
       if (data.type === "set-counter-status") {

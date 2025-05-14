@@ -153,6 +153,7 @@ export class ReceiptRepository {
        const firstData =  await pool.query(`SELECT * FROM regular_receipt
                     ORDER BY queue_number ASC`); 
 
+        
       if(firstData.rows[0].queue_number === queueNumber)  {
         return "first row triggers"
       } else{
