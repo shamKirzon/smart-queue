@@ -31,7 +31,6 @@ interface ReceiptScreenProps{
 
 const ReceiptScreen: React.FC<ReceiptScreenProps> = ({route, navigation}) => {
   const [receiptPrinted, setReceiptPrinted] = useState(false);
-  const {testingTrigger} = useWebSocketsApp(); 
   const { transaction, customerType, queueNumber, date, time } = route.params;
 
   console.log("Route params:", route.params);
@@ -124,7 +123,6 @@ const ReceiptScreen: React.FC<ReceiptScreenProps> = ({route, navigation}) => {
     <TouchableWithoutFeedback
       onPress={() => {
         if (receiptPrinted) {
-          testingTrigger(); 
           navigation.goBack();
         }
       }}

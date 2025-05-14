@@ -18,6 +18,7 @@ const useWebSocket = (url: string) => {
     }
   };
 
+  
   //eto di ko na ginamit, for specific na message lang pala itu
   const onMessage = (callback: (data: any) => void) => {
     if (ws.current) {
@@ -54,7 +55,7 @@ const useWebSocket = (url: string) => {
       //  console.log("nagtrigger, ", data.response)
       // if nareceive na to, meron na nasimulang code sa part ng tellerScreen. modify nalang
 
-      console.log("FRONTEND - TRIGGER RECEIVED: ", data.response);
+      console.log("FRONTEND - TRIGGER RECEIVED GALING TO KAY INSERT DATA KAY RINZ: ", data.response);
       }
 
 
@@ -97,16 +98,16 @@ const useWebSocket = (url: string) => {
   //   );
   // }, [currentOAQNum]);
 
-  // useEffect(() => {
-  //   console.log("NAG TRIGGER ANG AKING FIRST ROW BROW ", firstRowTrigger);
-  // }, [firstRowTrigger]);
+  useEffect(() => {
+    console.log("NAG TRIGGER ANG AKING FIRST ROW BROW ", firstRowTrigger);
+  }, [firstRowTrigger]);
 
   // FUNCTIONS
-   const testingTrigger = () => {
-    if (ws.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(JSON.stringify({ type: "testing-trigger" }));
-    }
-  };
+  //  const testingTrigger = () => {
+  //   if (ws.current?.readyState === WebSocket.OPEN) {
+  //     ws.current.send(JSON.stringify({ type: "testing-trigger" }));
+  //   }
+  // };
 
 
   const fetchCounterStatus = () => {
@@ -296,7 +297,7 @@ const useWebSocket = (url: string) => {
     sendMessage,
     //onMessage, 
     logout,
-    testingTrigger, 
+    // testingTrigger, 
     firstRowTrigger, 
   };
 };

@@ -97,7 +97,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   route,
 }) => {
-  const {testingTrigger, insertvaluesregular, insertvaluespriority, insertvaluesopenaccount, } = useWebSocketsApp();
+  const {insertvaluesregular, insertvaluespriority, insertvaluesopenaccount, } = useWebSocketsApp();
 
   const currentDate = format(new Date(), "MM/dd/yyyy").toString();
   const currentTime = format(new Date(), "hh:mm a").toString();
@@ -802,7 +802,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   </Text>
                 </TouchableOpacity>
                                   {/* testing part ni shami */}
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => {
                     testingTrigger()
                   }}
@@ -823,7 +823,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   >
                     TESTING TRIGGER
                   </Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             </View>
           </View>

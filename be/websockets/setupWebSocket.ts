@@ -186,7 +186,6 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "Regular") {
-          // trigger = ""first row triggers""
           const trigger = await ReceiptService.createRegularReceipt(
             transaction,
             customerType,
@@ -213,22 +212,20 @@ export function setupWebSocket(server: Server) {
       }
 
       // TESTING - TRIGGER FOR REGULAR: 
-      else if (data.type === "testing-trigger") {
+      // else if (data.type === "testing-trigger") {
       
-        const trigger = "KneeGerRrRrRrRrrrRRrR"; 
+      //   const trigger = "KneeGerRrRrRrRrrrRRrR"; 
         
-          console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
+      //     console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
 
-          ws?.send(
-            JSON.stringify({
-              type: "first-regular-insert-be",
-              response: trigger,
-            })
-          );
+      //     ws?.send(
+      //       JSON.stringify({
+      //         type: "first-regular-insert-be",
+      //         response: trigger,
+      //       })
+      //     );
           
-        }
-      
-
+      //   }
 
       //PRIORITY STARTS HERE
       else if (data.type === "insert-data-priority") {
