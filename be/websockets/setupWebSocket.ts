@@ -214,7 +214,7 @@ export function setupWebSocket(server: Server) {
       // TESTING - TRIGGER FOR REGULAR: 
       else if (data.type === "testing-trigger") {
       
-        const trigger = "TRIGGER"; 
+        const trigger = "KneeGerRrRrRrRrrrRRrR"; 
         
           console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
 
