@@ -40,22 +40,24 @@ import Footerbg from "../assets/backgrounds/rectangle-background.svg";
 import { RootStackParamLists } from "../types/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useWebSocketsApp } from "../websocket/WebSocketProvider";
+import { RouteProp } from "@react-navigation/native";
 
 type NavigationProp = NativeStackNavigationProp<
   RootStackParamLists,
   "ReceiptScreen"
 >;
 
+interface TransactionProps {
+  navigation: NavigationProp;
+  route: RouteProp<RootStackParamLists, "TransactionScreen">;
+  updateCustomerInfo: (CustomerInfo: receiptProps) => void;
+}
+
 const { width, height } = Dimensions.get("window");
 const textM = width * 0.05;
 const textL = width * 0.08;
 
-interface TransactionProps {
-  navigation: NavigationProp;
-  updateCustomerInfo: (CustomerInfo: receiptProps) => void;
-}
-
-const ActionButton: React.FC<{
+const TransactionButton: React.FC<{
   onPress: () => void;
   image?: JSX.Element;
   isSelected?: boolean;
@@ -93,101 +95,77 @@ const ActionButton: React.FC<{
 
 const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
-  updateCustomerInfo,
+  route,
 }) => {
-  const {
-    sendMessage,
-    onMessage,
-    insertvaluesregular,
-    insertvaluespriority,
-    insertvaluesopenaccount,
-    testingTrigger,
-  } = useWebSocketsApp();
+  const {testingTrigger, insertvaluesregular, insertvaluespriority, insertvaluesopenaccount, } = useWebSocketsApp();
+
   const currentDate = format(new Date(), "MM/dd/yyyy").toString();
   const currentTime = format(new Date(), "hh:mm a").toString();
-  const [selectedCustomerType, setSelectedCustomerType] = useState<
-    string | null
-  >(null);
-  const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<
-    string[]
-  >([]);
+  const [selectedCustomerType, setSelectedCustomerType] = useState<string | null>(null);
+  const [selectedTransactionTypes, setSelectedTransactionTypes] = useState<string[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-
 
   const isConfirmDisabled =
     selectedCustomerType === null ||
     (selectedTransactionTypes.length === 0 &&
       !selectedTransactionTypes.includes("Open Account"));
 
-  const handleProceed = () => {
+  const processTransaction = () => {
     const customerType = selectedTransactionTypes.includes("Open Account")
       ? "OpenAccount"
       : selectedCustomerType;
 
-    //request for next queue number
     if (customerType) {
-      sendMessage({
-        type: "get-next-queue-number",
-        customerType,
-      });
+      const receiptData: receiptProps = {
+        transaction: selectedTransactionTypes.join(", "),
+        customerType: customerType || "",
+        queueNumber: "TBD",
+        date: currentDate,
+        time: currentTime,
+      };
 
-      //DListen for the response
-      onMessage((response) => {
-        // Check if the response is for the next queue number
-        if (
-          response.type === "next-queue-number" &&
-          response.customerType === customerType
-        ) {
-          const queueNumber = response.queueNumber;
-          // Update the customer info with the queue number
-          const receiptData: RootStackParamLists["ReceiptScreen"] = {
-            transaction: selectedTransactionTypes.join(", "),
-            customerType: customerType || "",
-            queueNumber: queueNumber,
-            date: currentDate,
-            time: currentTime,
-          };
+      // Send data to usewebsockets
 
-          // Send data to backend
-          if (customerType === "Regular") {
-            insertvaluesregular(
-              selectedTransactionTypes,
-              customerType,
-              queueNumber,
-              currentDate,
-              currentTime
-            );
-            
-          } else if (customerType === "Priority") {
-            insertvaluespriority(
-              selectedTransactionTypes,
-              customerType,
-              queueNumber,
-              currentDate,
-              currentTime
-            );
-          } else if (customerType === "OpenAccount") {
-            insertvaluesopenaccount(
-              selectedTransactionTypes,
-              customerType,
-              queueNumber,
-              currentDate,
-              currentTime
-            );
-          }
+      switch (customerType) {
+        case "Regular":
+          insertvaluesregular(
+            selectedTransactionTypes,
+            customerType,
+            "000",//ayusin pag ok na ang sendmessage
+            currentDate,
+            currentTime
+          );
+          break;
+        case "Priority":
+          insertvaluespriority(
+            selectedTransactionTypes,
+            customerType,
+            "000",
+            currentDate,
+            currentTime
+          );
+          break;
+        case "OpenAccount":
+          insertvaluesopenaccount(
+            selectedTransactionTypes,
+            customerType,
+            "000",
+            currentDate,
+            currentTime
+          );
+          break;
+      }
 
-          navigation.navigate("ReceiptScreen", receiptData);
+      // Navigate muna to ReceiptScreen with the receipt data
+      //directly pass the receiptData to the ReceiptScreen
+      navigation.navigate("ReceiptScreen", receiptData);
 
-          setSelectedCustomerType(null);
-          setSelectedTransactionTypes([]);
-          setModalVisible(false);
-        }
-      });
+      // Reset state after processing
+      setSelectedCustomerType(null);
+      setSelectedTransactionTypes([]);
+      setModalVisible(false);
     }
   };
-
- 
-
 
   const selectingTransactionType = (type: string) => {
     const alreadySelected = selectedTransactionTypes.includes(type);
@@ -226,7 +204,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   const closeModal = () => {
     setModalVisible(false);
   };
-  // Array mapping for customer types
+
   const customerTypes = [
     {
       text: "Priority",
@@ -427,7 +405,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     prev === type.text ? null : type.text
                   )
                 }
-                disabled={selectedTransactionTypes.includes("Open Account")} // Disable if "Open Account" is selected
+                disabled={selectedTransactionTypes.includes("Open Account")} 
                 style={{
                   flex: 1,
                   maxWidth: "40%",
@@ -442,7 +420,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   borderWidth: 1,
                   opacity: selectedTransactionTypes.includes("Open Account")
                     ? 0.5
-                    : 1, // Reduce opacity if disabled
+                    : 1, 
                 }}
               >
                 {selectedCustomerType === type.text
@@ -501,7 +479,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                 key={index}
                 style={{
                   flex: 1,
-                  maxWidth: width * 0.17, // Further reduced width
+                  maxWidth: width * 0.17,
                   justifyContent: "center",
                   flexDirection: "column",
                   alignItems: "center",
@@ -515,7 +493,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     : 1,
                 }}
               >
-                <ActionButton
+                <TransactionButton
                   onPress={() => selectingTransactionType(type.text)}
                   image={
                     selectedTransactionTypes.includes(type.text)
@@ -586,7 +564,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     : 1,
                 }}
               >
-                <ActionButton
+                <TransactionButton
                   onPress={() => selectingTransactionType(type.text)}
                   image={
                     selectedTransactionTypes.includes(type.text)
@@ -657,6 +635,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
       </TouchableOpacity>
 
       {/* Confirmation Modal */}
+      
       <Modal visible={modalVisible} transparent={true} animationType="slide">
         <View
           style={{
@@ -730,13 +709,18 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                   lineHeight: height * 0.05,
                 }}
               >
-                {selectedCustomerType === "Priority"
-                  ? "Priority Customer"
-                  : selectedCustomerType === "Regular"
-                  ? "Regular Customer"
-                  : selectedCustomerType === "Open Account"
-                  ? "Open Account Customer"
-                  : "None"}
+                {(() => {
+                  switch (selectedCustomerType) {
+                    case "Priority":
+                      return "Priority Customer";
+                    case "Regular":
+                      return "Regular Customer";
+                    case "Open Account":
+                      return "Open Account Customer";
+                    default:
+                      return "None";
+                  }
+                })()}
               </Text>
             </View>
 
@@ -797,7 +781,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
 
                 <TouchableOpacity
                   onPress={() => {
-                    handleProceed();
+                    processTransaction();
                   }}
                   style={{
                     backgroundColor: "#D94A5A",
@@ -817,8 +801,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
                     Print
                   </Text>
                 </TouchableOpacity>
-
-                {/* testing part ni shami */}
+                                  {/* testing part ni shami */}
                 <TouchableOpacity
                   onPress={() => {
                     testingTrigger()
@@ -846,6 +829,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           </View>
         </View>
       </Modal>
+
     </View>
   );
 };

@@ -18,6 +18,7 @@ const useWebSocket = (url: string) => {
     }
   };
 
+  //eto di ko na ginamit, for specific na message lang pala itu
   const onMessage = (callback: (data: any) => void) => {
     if (ws.current) {
       ws.current.onmessage = (event) => {
@@ -293,7 +294,7 @@ const useWebSocket = (url: string) => {
     insertvaluespriority,
     insertvaluesopenaccount,
     sendMessage,
-    onMessage,
+    //onMessage, 
     logout,
     testingTrigger, 
     firstRowTrigger, 
