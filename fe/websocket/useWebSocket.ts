@@ -2,15 +2,17 @@ import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 
 const useWebSocket = (url: string) => {
+  const [firstRowTrigger, setFirstRowTrigger] = useState<string | null>();
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
   const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<
     string | null
   >();
   const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
-  const [firstRowTrigger, setFirstRowTrigger] = useState<string | null>();
+  
 
   const ws = useRef<WebSocket | null>(null);
+  let client = 0; 
 
   const sendMessage = (message: object) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
@@ -36,6 +38,7 @@ const useWebSocket = (url: string) => {
   useEffect(() => {
     if (ws.current) return;
     ws.current = new WebSocket(url);
+    client ++; 
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket");
@@ -54,7 +57,7 @@ const useWebSocket = (url: string) => {
        setFirstRowTrigger(data.response)
       //  console.log("nagtrigger, ", data.response)
       // if nareceive na to, meron na nasimulang code sa part ng tellerScreen. modify nalang
-
+        console.log("TRIGGER CLIENT: ", client)
       console.log("FRONTEND - TRIGGER RECEIVED GALING TO KAY INSERT DATA KAY RINZ: ", data.response);
       }
 
@@ -215,7 +218,6 @@ const useWebSocket = (url: string) => {
     }
   };
  
-
 
   //priority
   const insertvaluespriority = (
