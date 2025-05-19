@@ -130,45 +130,7 @@ export class TellerRepository {
     } 
   }
 
-  // static async deleteOpenAccount(
-  //   counter: string,
-  //   client: PoolClient
-  // ): Promise<string | undefined> {
-  //   try {
-  //     await client.query("BEGIN");
-  //     const queryCurrentOpenCustomer = `SELECT open_account_receipt_id
-  //                                   FROM counters
-  //                                   WHERE counter_name = $1`;
-
-  //     const currentOpenAccountIdResult = await client.query(
-  //       queryCurrentOpenCustomer,
-  //       [counter]
-  //     );
-  //     await client.query("COMMIT");
-
-  //     const currentOpenAccountId =
-  //       currentOpenAccountIdResult.rows[0]?.open_account_receipt_id
-
-  //     if (currentOpenAccountId) {
-  //       await client.query("BEGIN");
-  //       const query = `DELETE FROM open_account_receipt WHERE open_account_receipt_id= $1`;
-  //       await client.query(query, [currentOpenAccountId]);
-  //       await client.query("COMMIT");
-  //       console.log(
-  //         `deleted successfully, queue number: ${currentOpenAccountId}`
-  //       );
-  //       await ReceiptService.assignOpenAccountReceipt(counter);
-  //       return await QueueService.getCurrentOpenAccountQueueNum(counter);
-  //     } else {
-  //       await client.query("ROLLBACK");
-  //       console.warn(`No open_account_receipt_id found for counter: ${counter}`);
-  //       client.release();
-  //     }
-  //   } catch (error) {
-  //     await client.query("ROLLBACK");
-  //     console.error("Query Error - deleteRegular: ", error);
-  //   }
-  // }
+  
 
   static async deleteOpenAccount(
     counter: string,

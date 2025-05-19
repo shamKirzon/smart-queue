@@ -2,17 +2,24 @@ import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 
 const useWebSocket = (url: string) => {
-  const [firstRowTrigger, setFirstRowTrigger] = useState<string | null>();
+  const [firstRowRegularTrigger, setFirstRowRegularTrigger] = useState<
+    string | null
+  >();
+  const [firstRowPriorityTrigger, setFirstRowPriorityTrigger] = useState<
+    string | null
+  >();
+  const [firstRowOpenAccountTrigger, setFirstRowOpenAccountTrigger] = useState<
+    string | null
+  >();
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
   const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<
     string | null
   >();
   const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
-  
 
   const ws = useRef<WebSocket | null>(null);
-  let client = 0; 
+  let client = 0;
 
   const sendMessage = (message: object) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
@@ -20,7 +27,6 @@ const useWebSocket = (url: string) => {
     }
   };
 
-  
   //eto di ko na ginamit, for specific na message lang pala itu
   const onMessage = (callback: (data: any) => void) => {
     if (ws.current) {
@@ -38,7 +44,7 @@ const useWebSocket = (url: string) => {
   useEffect(() => {
     if (ws.current) return;
     ws.current = new WebSocket(url);
-    client ++; 
+    client++;
 
     ws.current.onopen = () => {
       console.log("Connected to WebSocket");
@@ -46,23 +52,17 @@ const useWebSocket = (url: string) => {
     };
 
     ws.current.onmessage = (event) => {
-
       const data = JSON.parse(event.data);
 
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
-      }
-      
-      else if(data.type ==="first-regular-insert-be"){
-       setFirstRowTrigger(data.response)
-      //  console.log("nagtrigger, ", data.response)
-      // if nareceive na to, meron na nasimulang code sa part ng tellerScreen. modify nalang
-        console.log("TRIGGER CLIENT: ", client)
-      console.log("FRONTEND - TRIGGER RECEIVED GALING TO KAY INSERT DATA KAY RINZ: ", data.response);
-      }
-
-
-      else if (data.type === "teller-next-regular-be") {
+      } else if (data.type === "first-regular-insert-be") {
+        setFirstRowRegularTrigger(data.response);
+      } else if (data.type === "first-priority-insert-be") {
+        setFirstRowPriorityTrigger(data.response);
+      } else if (data.type === "first-openaccount-insert-be") {
+        setFirstRowOpenAccountTrigger(data.response);
+      } else if (data.type === "teller-next-regular-be") {
         setCurrentRegularQueueNum(data.currentQueueNumber);
       } else if (data.type === "teller-next-open-account-be") {
         setCurrentOpenAccountQueueNum(data.currentQueueNumber);
@@ -94,24 +94,18 @@ const useWebSocket = (url: string) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log(
-  //     "this is my open account current queue number: ",
-  //     currentOAQNum
-  //   );
-  // }, [currentOAQNum]);
+  // first rows triggers
+  useEffect(() => {
+    console.log("REGULAR FIRST ROW TRIGGERS, ", firstRowRegularTrigger);
+  }, [firstRowRegularTrigger]);
 
   useEffect(() => {
-    console.log("NAG TRIGGER ANG AKING FIRST ROW BROW ", firstRowTrigger);
-  }, [firstRowTrigger]);
+    console.log("OPEN ACCOUNT ROW TRIGGERS, ", firstRowOpenAccountTrigger);
+  }, [firstRowOpenAccountTrigger]);
 
-  // FUNCTIONS
-  //  const testingTrigger = () => {
-  //   if (ws.current?.readyState === WebSocket.OPEN) {
-  //     ws.current.send(JSON.stringify({ type: "testing-trigger" }));
-  //   }
-  // };
-
+  useEffect(() => {
+    console.log("PRIORITY FIRST ROW TRIGGERS, ", firstRowPriorityTrigger);
+  }, [firstRowPriorityTrigger]);
 
   const fetchCounterStatus = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
@@ -217,7 +211,6 @@ const useWebSocket = (url: string) => {
       );
     }
   };
- 
 
   //priority
   const insertvaluespriority = (
@@ -297,10 +290,10 @@ const useWebSocket = (url: string) => {
     insertvaluespriority,
     insertvaluesopenaccount,
     sendMessage,
-    //onMessage, 
     logout,
-    // testingTrigger, 
-    firstRowTrigger, 
+    firstRowRegularTrigger, 
+    firstRowPriorityTrigger, 
+    firstRowOpenAccountTrigger, 
   };
 };
 

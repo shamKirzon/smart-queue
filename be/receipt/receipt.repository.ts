@@ -149,11 +149,14 @@ export class ReceiptRepository {
       await pool.query(query1, values);
        console.log("Regular receipt inserted successfully.");
 
-       // shami additional logic: 
+      
        const firstData =  await pool.query(`SELECT * FROM regular_receipt
                     ORDER BY queue_number ASC`); 
 
-        
+        //  const counterStatus = await TellerRepository.getCounterStatus();
+        // firstData.row.lenght === counterStatus
+        // row.length <= counterStatus => {assignCounter}
+
       if(firstData.rows[0].queue_number === queueNumber)  {
         return "first row triggers"
       } else{
@@ -171,7 +174,7 @@ export class ReceiptRepository {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<void> {
+  ): Promise<string | undefined> {
     const query = `
       INSERT INTO priority_receipt (priority_receipt_id, transaction, queue_number, date, time, status)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
@@ -182,6 +185,19 @@ export class ReceiptRepository {
     try {
       await pool.query(query, values);
       console.log("priority receipt inserted successfully.");
+
+        const firstData =  await pool.query(`SELECT * FROM regular_receipt
+                    ORDER BY queue_number ASC`); 
+
+        //  const counterStatus = await TellerRepository.getCounterStatus();
+        // firstData.row.lenght === counterStatus
+        // row.length <= counterStatus => {assignCounter}
+
+      if(firstData.rows[0].queue_number === queueNumber)  {
+        return "first row triggers"
+      } else{
+        return
+      }
     } catch (error) {
       console.error("Error inserting priority receipt:", error);
       throw error;
@@ -194,7 +210,7 @@ export class ReceiptRepository {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<void> {
+  ): Promise<string|undefined> {
     const query = `
       INSERT INTO open_account_receipt (open_account_receipt_id, transaction, queue_number, date, time, status)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
@@ -205,6 +221,18 @@ export class ReceiptRepository {
     try {
       await pool.query(query, values);
       console.log("Open Account receipt inserted successfully.");
+
+        const firstData =  await pool.query(`SELECT * FROM open_account_receipt
+                    ORDER BY queue_number ASC`); 
+
+
+      if(firstData.rows[0].queue_number === queueNumber)  {
+        return "first row triggers"
+      } else{
+        return
+      }
+
+
     } catch (error) {
       console.error("Error inserting Open Account receipt:", error);
       throw error;

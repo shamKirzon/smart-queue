@@ -38,8 +38,12 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     currentOAQNum,
     currentPQNum,
     logout,
-    firstRowTrigger,
+    firstRowRegularTrigger,
+    firstRowOpenAccountTrigger,
+    firstRowPriorityTrigger,
     assignRegularReceipt,
+    assignOpenAccountReceipt,
+    assignPriorityReceipt,
   } = useWebSocketsApp();
   const [numberOfServes, setNumberOfServes] = useState(0);
 
@@ -160,15 +164,41 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     }
   }, [currentOAQNum, currentPQNum, currentRQNum]);
 
-  // RERENDER OF FIRSTROW
+  // RE-RENDER FOR REGULAR FIRST ROW
   useEffect(() => {
+    console.log(
+      "TellerScreen - 'UPDATED SUCCESFULLY' ",
+      firstRowRegularTrigger
+    );
 
-    console.log("TellerScreen - 'UPDATED SUCCESFULLY' ", firstRowTrigger)
-
-    if(firstRowTrigger){
+    if (firstRowRegularTrigger) {
       assignRegularReceipt(counterName);
     }
-  }, [firstRowTrigger]);
+  }, [firstRowRegularTrigger]);
+
+  // RE-RENDER FOR PRIORITY FIRST ROW
+  useEffect(() => {
+    console.log(
+      "TellerScreen - 'UPDATED SUCCESFULLY' ",
+      firstRowPriorityTrigger
+    );
+
+    if (firstRowPriorityTrigger) {
+      assignPriorityReceipt(counterName);
+    }
+  }, [firstRowPriorityTrigger]);
+
+  // RE-RENDER FOR OPEN ACCOUNT FIRST ROW
+  useEffect(() => {
+    console.log(
+      "TellerScreen - 'UPDATED SUCCESFULLY' ",
+      firstRowOpenAccountTrigger
+    );
+
+    if (firstRowOpenAccountTrigger) {
+      assignOpenAccountReceipt(counterName);
+    }
+  }, [firstRowOpenAccountTrigger]);
 
   const displayQueueNumber = (counter: string): string | null | undefined => {
     let queueNumber;

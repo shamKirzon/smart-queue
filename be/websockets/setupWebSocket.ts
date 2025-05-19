@@ -193,50 +193,19 @@ export function setupWebSocket(server: Server) {
             date,
             time
           );
-
-          console.log(
-            "Regular receipt processed successfully.",
-            typeof trigger,
-            trigger
-          );
-          console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
-
-          // ws?.send(
-          //   JSON.stringify({
-          //     type: "first-regular-insert-be",
-          //     response: trigger,
-          //   })
-          // );
-
+          console.log("regular first row triggers: ", trigger);
           wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "first-regular-insert-be",
-                response: trigger,
-              })
-            );
-          }
-        });
-          
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: "first-regular-insert-be",
+                  response: trigger,
+                })
+              );
+            }
+          });
         }
       }
-
-      // TESTING - TRIGGER FOR REGULAR: 
-      // else if (data.type === "testing-trigger") {
-      
-      //   const trigger = "KneeGerRrRrRrRrrrRRrR"; 
-        
-      //     console.log("RESPONSE IF IT IS NAG TRIGGER: ", trigger);
-
-      //     ws?.send(
-      //       JSON.stringify({
-      //         type: "first-regular-insert-be",
-      //         response: trigger,
-      //       })
-      //     );
-          
-      //   }
 
       //PRIORITY STARTS HERE
       else if (data.type === "insert-data-priority") {
@@ -246,18 +215,24 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "Priority") {
-          try {
-            await ReceiptService.createPriorityReceipt(
-              transaction,
-              customerType,
-              queueNumber,
-              date,
-              time
-            );
-            console.log("priority receipt processed successfully.");
-          } catch (error) {
-            console.error("Error processing priority receipt:", error);
-          }
+          const trigger = await ReceiptService.createPriorityReceipt(
+            transaction,
+            customerType,
+            queueNumber,
+            date,
+            time
+          );
+          console.log("priority first row triggers: ", trigger);
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: "first-priority-insert-be",
+                  response: trigger,
+                })
+              );
+            }
+          });
         }
       }
 
@@ -269,18 +244,25 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "OpenAccount") {
-          try {
-            await ReceiptService.createOpenAccountReceipt(
-              transaction,
-              customerType,
-              queueNumber,
-              date,
-              time
-            );
-            console.log("Open Account receipt processed successfully.");
-          } catch (error) {
-            console.error("Error processing Open Account receipt:", error);
-          }
+          const trigger = await ReceiptService.createOpenAccountReceipt(
+            transaction,
+            customerType,
+            queueNumber,
+            date,
+            time
+          );
+
+          console.log("open account first row triggers: ", trigger);
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: "first-openaccount-insert-be",
+                  response: trigger,
+                })
+              );
+            }
+          });
         }
       }
     });
