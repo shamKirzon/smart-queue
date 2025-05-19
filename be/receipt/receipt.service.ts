@@ -4,6 +4,7 @@ import { TellerService } from "../teller/teller.service";
 import { QueueService } from "../queue/queue.service";
 import { ReceiptRepository } from "./receipt.repository";
 import pool from "../database/connection";
+import { PoolClient } from "pg";
 
 export class ReceiptService {
   // ASSIGN:
@@ -203,4 +204,149 @@ export class ReceiptService {
       throw error;
     }
   }
+
+   
+// LOGOUT
+   static async logout(counter: string) {
+    const regularCounters = [
+      "counter_1",
+      "counter_2",
+      "counter_3",
+      "counter_4",
+    ];
+    counter = TellerService.formattedCounter(counter);
+    console.log("THIS IS FROM LOGOUT!! COUNTER: ", counter);
+
+    // const client = await pool.connect();
+
+    // if (regularCounters.includes(counter)) {
+    //   try {
+    //     await client.query("BEGIN");
+
+    //     const result = await client.query(
+    //       `SELECT regular_receipt_id FROM counters WHERE counter_name = $1`,
+    //       [counter]
+    //     );
+
+    //     const currentRegularId = result.rows[0]?.regular_receipt_id;
+
+    //     if (!currentRegularId) {
+    //       // throw new Error(
+    //       //   `No regular_receipt_id found for counter: ${counter}`
+    //       // );
+    //       return;
+    //     }
+
+    //     await client.query(
+    //       `UPDATE regular_receipt SET status = 'waiting' WHERE regular_receipt_id = $1`,
+    //       [currentRegularId]
+    //     );
+
+    //     await client.query(
+    //       `UPDATE counters SET status = 'available', regular_receipt_id = null WHERE counter_name = $1`,
+    //       [counter]
+    //     );
+
+    //     await client.query("COMMIT");
+    //   } catch (error) {
+    //     console.log("receiptRepository - logout() ", error);
+    //     await client.query("ROLLBACK");
+    //   } finally {
+    //     client.release();
+    //   }
+    // } else if (counter === "counter_A1") {
+    //   try {
+    //     await client.query("BEGIN");
+
+    //     const result = await client.query(
+    //       `SELECT open_account_receipt_id FROM counters WHERE counter_name = $1`,
+    //       [counter]
+    //     );
+
+    //     const currentOpenAccountId = result.rows[0]?.open_account_receipt_id;
+
+    //     if (!currentOpenAccountId) {
+    //       // throw new Error(
+    //       //   `No regular_receipt_id found for counter: ${counter}`
+    //       // );
+    //       return;
+    //     }
+
+    //     await client.query(
+    //       `UPDATE open_account_receipt SET status = 'waiting' WHERE open_account_receipt_id = $1`,
+    //       [currentOpenAccountId]
+    //     );
+
+    //     await client.query(
+    //       `UPDATE counters SET status = 'available', open_account_receipt_id = null WHERE counter_name = $1`,
+    //       [counter]
+    //     );
+
+    //     await client.query("COMMIT");
+    //   } catch (error) {
+    //     console.log("receiptRepository - logout() ", error);
+    //     await client.query("ROLLBACK");
+    //   } finally {
+    //     client.release();
+    //   }
+    // } else if (counter === "counter_P1") {
+    //   try {
+    //     await client.query("BEGIN");
+
+    //     const result = await client.query(
+    //       `SELECT priority_receipt_id FROM counters WHERE counter_name = $1`,
+    //       [counter]
+    //     );
+
+    //     const currentPriorityId = result.rows[0]?.priority_receipt_id;
+
+    //     if (!currentPriorityId) {
+    //       // throw new Error(
+    //       //   `No regular_receipt_id found for counter: ${counter}`
+    //       // );
+    //       return;
+    //     }
+
+    //     await client.query(
+    //       `UPDATE priority_receipt SET status = 'waiting' WHERE priority_receipt_id = $1`,
+    //       [currentPriorityId]
+    //     );
+
+    //     await client.query(
+    //       `UPDATE counters SET status = 'available', priority_receipt_id = null WHERE counter_name = $1`,
+    //       [counter]
+    //     );
+
+    //     await client.query("COMMIT");
+    //   } catch (error) {
+    //     console.log("receiptRepository - logout() ", error);
+    //     await client.query("ROLLBACK");
+    //   } finally {
+    //     client.release();
+    //   }
+    // }
+
+    const client = await pool.connect();
+
+try {
+  await client.query("BEGIN");
+
+  if (regularCounters.includes(counter)) {
+    await ReceiptRepository.resetReceipt(client, "regular_receipt", "regular_receipt_id", counter);
+  } else if (counter === "counter_A1") {
+    await ReceiptRepository.resetReceipt(client, "open_account_receipt", "open_account_receipt_id", counter);
+  } else if (counter === "counter_P1") {
+    await ReceiptRepository.resetReceipt(client, "priority_receipt", "priority_receipt_id", counter);
+  }
+
+  await client.query("COMMIT");
+} catch (error) {
+  console.error("logout error:", error);
+  await client.query("ROLLBACK");
+} finally {
+  client.release();
+}
+
+  }
+  
 }

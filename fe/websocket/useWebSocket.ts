@@ -2,15 +2,12 @@ import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 
 const useWebSocket = (url: string) => {
-  const [firstRowRegularTrigger, setFirstRowRegularTrigger] = useState<
-    string | null
-  >();
-  const [firstRowPriorityTrigger, setFirstRowPriorityTrigger] = useState<
-    string | null
-  >();
-  const [firstRowOpenAccountTrigger, setFirstRowOpenAccountTrigger] = useState<
-    string | null
-  >();
+  const [firstRowRegularTrigger, setFirstRowRegularTrigger] =
+    useState<boolean | undefined>(undefined);
+  const [firstRowPriorityTrigger, setFirstRowPriorityTrigger] =
+   useState<boolean | undefined>(undefined);
+  const [firstRowOpenAccountTrigger, setFirstRowOpenAccountTrigger] =
+   useState<boolean | undefined>(undefined);
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
   const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<
@@ -56,13 +53,18 @@ const useWebSocket = (url: string) => {
 
       if (data.type === "set-counter-status") {
         setCounterStatus(data.data);
-      } else if (data.type === "first-regular-insert-be") {
-        setFirstRowRegularTrigger(data.response);
+      } 
+      
+      else if (data.type === "first-regular-insert-be") {
+        data.response ? setFirstRowRegularTrigger((prev) => !prev) : false;
       } else if (data.type === "first-priority-insert-be") {
-        setFirstRowPriorityTrigger(data.response);
+        data.response ? setFirstRowPriorityTrigger((prev) => !prev) : false;
       } else if (data.type === "first-openaccount-insert-be") {
-        setFirstRowOpenAccountTrigger(data.response);
-      } else if (data.type === "teller-next-regular-be") {
+        data.response ? setFirstRowOpenAccountTrigger((prev) => !prev) : false;
+      } 
+      
+      
+      else if (data.type === "teller-next-regular-be") {
         setCurrentRegularQueueNum(data.currentQueueNumber);
       } else if (data.type === "teller-next-open-account-be") {
         setCurrentOpenAccountQueueNum(data.currentQueueNumber);
@@ -291,9 +293,9 @@ const useWebSocket = (url: string) => {
     insertvaluesopenaccount,
     sendMessage,
     logout,
-    firstRowRegularTrigger, 
-    firstRowPriorityTrigger, 
-    firstRowOpenAccountTrigger, 
+    firstRowRegularTrigger,
+    firstRowPriorityTrigger,
+    firstRowOpenAccountTrigger,
   };
 };
 

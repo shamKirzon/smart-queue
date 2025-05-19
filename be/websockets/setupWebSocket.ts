@@ -127,7 +127,7 @@ export function setupWebSocket(server: Server) {
         }
       } // LOGOUT
       else if (data.type === "logout") {
-        await ReceiptRepository.logout(data.counter);
+        await ReceiptService.logout(data.counter);
       }
 
       // ASSIGN REGULAR RECEIPT

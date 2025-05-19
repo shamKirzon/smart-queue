@@ -150,19 +150,19 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   };
 
   // CORRECT INCREMENTATION OF SERVES BASED ON UPDATED QUEUE NUMBER | TYPE
-  useEffect(() => {
-    if (queueNumberStart) {
-      if (regularCounters.includes(counterName)) {
-        handleNumberOfServes(currentRQNum);
-      } else if (counterName === "Counter A1") {
-        handleNumberOfServes(currentOAQNum);
-      } else if (counterName === "Counter P1") {
-        handleNumberOfServes(currentPQNum);
-      }
-    } else {
-      return;
-    }
-  }, [currentOAQNum, currentPQNum, currentRQNum]);
+  // useEffect(() => {
+  //   if (queueNumberStart) {
+  //     if (regularCounters.includes(counterName)) {
+  //       handleNumberOfServes(currentRQNum);
+  //     } else if (counterName === "Counter A1") {
+  //       handleNumberOfServes(currentOAQNum);
+  //     } else if (counterName === "Counter P1") {
+  //       handleNumberOfServes(currentPQNum);
+  //     }
+  //   } else {
+  //    setQueueNumberStart(false)
+  //   }
+  // }, [currentOAQNum, currentPQNum, currentRQNum]);
 
   // RE-RENDER FOR REGULAR FIRST ROW
   useEffect(() => {
@@ -171,9 +171,9 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       firstRowRegularTrigger
     );
 
-    if (firstRowRegularTrigger) {
-      assignRegularReceipt(counterName);
-    }
+    firstRowRegularTrigger
+      ? assignRegularReceipt(counterName)
+      : assignRegularReceipt(counterName);
   }, [firstRowRegularTrigger]);
 
   // RE-RENDER FOR PRIORITY FIRST ROW
@@ -183,9 +183,9 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       firstRowPriorityTrigger
     );
 
-    if (firstRowPriorityTrigger) {
-      assignPriorityReceipt(counterName);
-    }
+    firstRowPriorityTrigger
+      ? assignPriorityReceipt(counterName)
+      : assignPriorityReceipt(counterName);
   }, [firstRowPriorityTrigger]);
 
   // RE-RENDER FOR OPEN ACCOUNT FIRST ROW
@@ -195,9 +195,9 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       firstRowOpenAccountTrigger
     );
 
-    if (firstRowOpenAccountTrigger) {
-      assignOpenAccountReceipt(counterName);
-    }
+    firstRowOpenAccountTrigger
+      ? assignOpenAccountReceipt(counterName)
+      : assignOpenAccountReceipt(counterName);
   }, [firstRowOpenAccountTrigger]);
 
   const displayQueueNumber = (counter: string): string | null | undefined => {
@@ -381,7 +381,19 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 tellerNext(counterName);
-                setQueueNumberStart(true);
+                // setQueueNumberStart(true);
+
+                // if (queueNumberStart) {
+                if (regularCounters.includes(counterName)) {
+                  handleNumberOfServes(currentRQNum);
+                } else if (counterName === "Counter A1") {
+                  handleNumberOfServes(currentOAQNum);
+                } else if (counterName === "Counter P1") {
+                  handleNumberOfServes(currentPQNum);
+                }
+                // } else {
+                //   setQueueNumberStart(false);
+                // }
               }}
               style={{
                 marginTop: height * 0.05,
