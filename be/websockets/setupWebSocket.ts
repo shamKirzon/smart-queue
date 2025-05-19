@@ -10,6 +10,14 @@ import { ReceiptRepository } from "../receipt/receipt.repository";
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
 
+    // Centralized queue numbers
+  const queueNumbers: { Regular: number; Priority: number; OpenAccount: number } = {
+    Regular: 1,
+    Priority: 1,
+    OpenAccount: 1,
+  };
+
+
   let clientCounter = 0;
 
   wss.on("connection", (ws: WebSocket) => {
@@ -20,33 +28,29 @@ export function setupWebSocket(server: Server) {
       console.log(`received: `, message.toString());
 
       const data = JSON.parse(message.toString());
-
+      
       if (data.type === "get-next-queue-number") {
-        const customerType = data.customerType;
+        const customerType = data.customerType as keyof typeof queueNumbers; 
 
-        let lastQueueNumber: string | null = null;
-        let nextQueueNumber: string;
+        if (queueNumbers[customerType] !== undefined) {
+          const nextQueueNumber = queueNumbers[customerType].toString().padStart(3, "0");
+          queueNumbers[customerType] += 1;
 
-        if (customerType === "Regular") {
-          lastQueueNumber = await ReceiptRepository.getLastRegularQueueNumber();
-        } else if (customerType === "Priority") {
-          lastQueueNumber = await ReceiptRepository.getLastPriorityQueueNumber();
-        } else if (customerType === "OpenAccount") {
-          lastQueueNumber = await ReceiptRepository.getLastOpenAccountQueueNumber();
-        }
-
-        if (lastQueueNumber !== null) {
-          nextQueueNumber = (parseInt(lastQueueNumber, 10) + 1).toString().padStart(3, "0");
+          ws.send(
+            JSON.stringify({
+              type: "next-queue-number",
+              customerType,
+              queueNumber: nextQueueNumber,
+            })
+          );
         } else {
-          nextQueueNumber = "001";
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              message: `Invalid customer type: ${customerType}`,
+            })
+          );
         }
-        ws.send(
-          JSON.stringify({
-            type: "next-queue-number",
-            customerType,
-            queueNumber: nextQueueNumber,
-          })
-        );
       } else if (data.type === "get-counter-status") {
         const counterStatus = await TellerRepository.getCounterStatus();
 
