@@ -45,6 +45,8 @@ export class ReceiptRepository {
     return { customer: result };
   }
 
+
+
   // ASSIGN
   static async assignCustomerToCounterRegular(
     customerId: QueryResult<any>,
@@ -238,6 +240,34 @@ export class ReceiptRepository {
       throw error;
     }
   }
+
+
+
+    // Get last queue number for regular_receipt
+  static async getLastRegularQueueNumber(): Promise<string | null> {
+    const result = await pool.query(
+      `SELECT queue_number FROM regular_receipt ORDER BY queue_number::int DESC LIMIT 1`
+    );
+    return result.rows[0]?.queue_number ?? null;
+  }
+
+  // Get last queue number for priority_receipt
+  static async getLastPriorityQueueNumber(): Promise<string | null> {
+    const result = await pool.query(
+      `SELECT queue_number FROM priority_receipt ORDER BY queue_number::int DESC LIMIT 1`
+    );
+    return result.rows[0]?.queue_number ?? null;
+  }
+
+  // Get last queue number for open_account_receipt
+  static async getLastOpenAccountQueueNumber(): Promise<string | null> {
+    const result = await pool.query(
+      `SELECT queue_number FROM open_account_receipt ORDER BY queue_number::int DESC LIMIT 1`
+    );
+    return result.rows[0]?.queue_number ?? null;
+  }
+
+
 
   // LOGOUT
   static async logout(counter: string) {

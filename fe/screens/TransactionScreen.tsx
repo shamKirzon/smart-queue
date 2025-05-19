@@ -97,7 +97,13 @@ const TransactionScreen: React.FC<TransactionProps> = ({
   navigation,
   route,
 }) => {
-  const {insertvaluesregular, insertvaluespriority, insertvaluesopenaccount, } = useWebSocketsApp();
+  const {
+    insertvaluesregular,
+    insertvaluespriority,
+    insertvaluesopenaccount,
+    getNextQueueNumber,
+    nextQueueNumber,
+  } = useWebSocketsApp();
 
   const currentDate = format(new Date(), "MM/dd/yyyy").toString();
   const currentTime = format(new Date(), "hh:mm a").toString();
@@ -115,11 +121,11 @@ const TransactionScreen: React.FC<TransactionProps> = ({
       ? "OpenAccount"
       : selectedCustomerType;
 
-    if (customerType) {
+    if (customerType && nextQueueNumber) {
       const receiptData: receiptProps = {
         transaction: selectedTransactionTypes.join(", "),
         customerType: customerType || "",
-        queueNumber: "TBD",
+        queueNumber: nextQueueNumber,
         date: currentDate,
         time: currentTime,
       };
@@ -131,7 +137,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           insertvaluesregular(
             selectedTransactionTypes,
             customerType,
-            "000",//ayusin pag ok na ang sendmessage
+            nextQueueNumber,
             currentDate,
             currentTime
           );
@@ -140,7 +146,7 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           insertvaluespriority(
             selectedTransactionTypes,
             customerType,
-            "000",
+            nextQueueNumber,
             currentDate,
             currentTime
           );
@@ -149,15 +155,14 @@ const TransactionScreen: React.FC<TransactionProps> = ({
           insertvaluesopenaccount(
             selectedTransactionTypes,
             customerType,
-            "000",
+            nextQueueNumber,
             currentDate,
             currentTime
           );
           break;
       }
 
-      // Navigate muna to ReceiptScreen with the receipt data
-      //directly pass the receiptData to the ReceiptScreen
+      // Navigate to ReceiptScreen with the receipt data
       navigation.navigate("ReceiptScreen", receiptData);
 
       // Reset state after processing
@@ -197,7 +202,17 @@ const TransactionScreen: React.FC<TransactionProps> = ({
     }
   };
 
+
   const openModal = () => {
+    //request here the queue number
+    if (selectedCustomerType === "Regular") {
+      getNextQueueNumber("Regular");
+    } else if (selectedCustomerType === "Priority") {
+      getNextQueueNumber("Priority");
+    } else if (selectedCustomerType === "Open Account") {
+      getNextQueueNumber("OpenAccount");
+    }
+
     setModalVisible(true);
   };
 
