@@ -2,6 +2,7 @@ import { Pool, PoolClient, QueryResult } from "pg";
 import pool from "../database/connection";
 import { TellerService } from "../teller/teller.service";
 import { ReceiptService } from "./receipt.service";
+import { TellerRepository } from "../teller/teller.repository";
 
 export class ReceiptRepository {
   // GET WITH LOCK
@@ -152,15 +153,33 @@ export class ReceiptRepository {
       const firstData = await pool.query(`SELECT * FROM regular_receipt
                     ORDER BY queue_number ASC`);
 
-      //  const counterStatus = await TellerRepository.getCounterStatus();
-      // firstData.row.lenght === counterStatus
+      const waitingRegularCounters =
+        await pool.query(`SELECT counter_name, status FROM counters
+                   WHERE regular_receipt_id IS NULL AND status  = 'inuse'
+                  ORDER BY counter_name ASC
+
+        `);
+
+        const waitingRows = waitingRegularCounters.rows.length; 
+
+      console.log("INSERTING RECEIPT - ", waitingRegularCounters);
+
       // row.length <= counterStatus => {assignCounter}
 
+     
+      // first row new queue number
       if (firstData.rows[0].queue_number === queueNumber) {
         return "first row triggers";
-      } else {
-        return;
+      } 
+      // distribute new incoming queue number on waiting tellers. 
+      else if(firstData.rows.length <= waitingRows ){
+        // const var =  waitingRegularCounters.map(counter => counter.counter_name)
+        // himayin natin ang mga inuse counters na waiting
+        // assignRegularReceipt(counter)
+        
+        // var = ['counter_1', 'counter_2']
       }
+     
     } catch (error) {
       console.error("Error inserting regular receipt:", error);
       throw error;
@@ -254,7 +273,6 @@ export class ReceiptRepository {
     );
     return result.rows[0]?.queue_number ?? null;
   }
-
 
   // LOGOUT /RESET
   static async resetReceipt(

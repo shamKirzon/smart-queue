@@ -161,7 +161,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 lineHeight: width * 0.06 + 2,
               }}
             >
-              Admin
+              Authentication
             </Text>
 
             <Text

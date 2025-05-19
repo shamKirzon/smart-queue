@@ -5,7 +5,7 @@ import { ReceiptService } from "../receipt/receipt.service";
 import { TellerService } from "./teller.service";
 
 export class TellerRepository {
-  static async getCounterStatus() {
+  static async getCounterStatus():Promise<any[]> {
     const query = "SELECT counter_name, status FROM counters ";
     const result = await pool.query(query);
     const rawData = result.rows;

@@ -55,6 +55,7 @@ const useWebSocket = (url: string) => {
       const data = JSON.parse(event.data);
 
       if (data.type === "set-counter-status") {
+        console.log("counter status: ", data.data)
         setCounterStatus(data.data);
       } 
       
