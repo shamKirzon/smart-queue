@@ -15,6 +15,9 @@ const useWebSocket = (url: string) => {
   >();
   const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
 
+  const [nextQueueNumber, setNextQueueNumber] = useState<string | null>(null);
+
+
   const ws = useRef<WebSocket | null>(null);
   let client = 0;
 
@@ -81,6 +84,9 @@ const useWebSocket = (url: string) => {
       } else if (data.type === "assign-priority-receipt-be") {
         const currentId = data.currentPriorityQueueNum;
         setCurrentPriorityQueueNum(currentId);
+        //adding this for the next queue number
+      }else if (data.type === "next-queue-number") {
+        setNextQueueNumber(data.queueNumber);
       }
     };
 
@@ -276,6 +282,17 @@ const useWebSocket = (url: string) => {
     }
   };
 
+  const getNextQueueNumber = (customerType: "Regular" | "Priority" | "OpenAccount") => {
+  if (ws.current?.readyState === WebSocket.OPEN) {
+    ws.current.send(
+      JSON.stringify({
+        type: "get-next-queue-number",
+        customerType,
+      })
+    );
+  }
+};
+
   return {
     fetchCounterStatus,
     getCounterStatus,
@@ -293,9 +310,12 @@ const useWebSocket = (url: string) => {
     insertvaluesopenaccount,
     sendMessage,
     logout,
-    firstRowRegularTrigger,
-    firstRowPriorityTrigger,
-    firstRowOpenAccountTrigger,
+    firstRowRegularTrigger, 
+    firstRowPriorityTrigger, 
+    firstRowOpenAccountTrigger, 
+
+    nextQueueNumber,
+    getNextQueueNumber
   };
 };
 

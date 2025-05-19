@@ -231,11 +231,33 @@ export class ReceiptRepository {
     }
   }
 
+  // Get last queue number for regular_receipt
+  static async getLastRegularQueueNumber(): Promise<string | null> {
+    const result = await pool.query(
+      `SELECT queue_number FROM regular_receipt ORDER BY queue_number::int DESC LIMIT 1`
+    );
+    return result.rows[0]?.queue_number ?? null;
+  }
 
- 
+  // Get last queue number for priority_receipt
+  static async getLastPriorityQueueNumber(): Promise<string | null> {
+    const result = await pool.query(
+      `SELECT queue_number FROM priority_receipt ORDER BY queue_number::int DESC LIMIT 1`
+    );
+    return result.rows[0]?.queue_number ?? null;
+  }
 
-  // RESET RECEIPT/LOGOUT
- static async resetReceipt(
+  // Get last queue number for open_account_receipt
+  static async getLastOpenAccountQueueNumber(): Promise<string | null> {
+    const result = await pool.query(
+      `SELECT queue_number FROM open_account_receipt ORDER BY queue_number::int DESC LIMIT 1`
+    );
+    return result.rows[0]?.queue_number ?? null;
+  }
+
+
+  // LOGOUT /RESET
+  static async resetReceipt(
     client: PoolClient,
     tableName: string,
     receiptColumn: string,
@@ -254,12 +276,9 @@ export class ReceiptRepository {
       [receiptId]
     );
 
-    
     await client.query(
       `UPDATE counters SET status = 'available', ${receiptColumn} = null WHERE counter_name = $1`,
       [counter]
     );
   }
-
-  
 }
