@@ -250,6 +250,7 @@ export class ReceiptRepository {
     }
   }
 
+  /**
   // Get last queue number for regular_receipt
   static async getLastRegularQueueNumber(): Promise<string | null> {
     const result = await pool.query(
@@ -273,6 +274,8 @@ export class ReceiptRepository {
     );
     return result.rows[0]?.queue_number ?? null;
   }
+
+   */
 
   // LOGOUT /RESET
   static async resetReceipt(
