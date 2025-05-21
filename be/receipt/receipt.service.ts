@@ -126,14 +126,15 @@ export class ReceiptService {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<string | undefined> {
+  ): Promise<string> {
     if (customerType !== "Regular") {
       console.warn("Customer type is not 'Regular'. Skipping insertion.");
-      return;
+     
     }
 
     try {
-      const trigger = await ReceiptRepository.insertRegularReceipt(
+      const counter = await ReceiptRepository.insertRegularReceipt(
+
         transaction,
         customerType,
         queueNumber,
@@ -141,7 +142,7 @@ export class ReceiptService {
         time
       );
 
-      return trigger;
+      return counter ? counter : '';
     } catch (error) {
       console.error("Error creating regular receipt:", error);
       throw error;

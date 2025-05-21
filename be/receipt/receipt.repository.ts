@@ -153,6 +153,7 @@ export class ReceiptRepository {
       const firstData = await pool.query(`SELECT * FROM regular_receipt
                     ORDER BY queue_number ASC`);
 
+      // waiting regular counters
       const waitingRegularCounters =
         await pool.query(`SELECT counter_name, status FROM counters
                    WHERE regular_receipt_id IS NULL AND status  = 'inuse'
@@ -160,26 +161,30 @@ export class ReceiptRepository {
 
         `);
 
-        const waitingRows = waitingRegularCounters.rows.length; 
+      const inuseRegular = waitingRegularCounters.rows.map((rows) => ({
+        counterName: rows.counter_name,
+        status: rows.status,
+      }));
 
-      console.log("INSERTING RECEIPT - ", waitingRegularCounters);
+        const firstCounterAvailable = inuseRegular.find(
+          (counter) => counter.counterName
+        );
+      console.log("QUERY WAITING REGULAR  - ", waitingRegularCounters);
+      console.log("WAITING REGULAR COUNTERS MAP - ", inuseRegular);
+      console.log("FIRST COUNTER AVAILABLE- ", firstCounterAvailable);
+      
 
-      // row.length <= counterStatus => {assignCounter}
+      if (firstData.rows[0].queue_number === queueNumber || firstCounterAvailable?.counterName ) {
 
-     
-      // first row new queue number
-      if (firstData.rows[0].queue_number === queueNumber) {
-        return "first row triggers";
-      } 
-      // distribute new incoming queue number on waiting tellers. 
-      else if(firstData.rows.length <= waitingRows ){
-        // const var =  waitingRegularCounters.map(counter => counter.counter_name)
-        // himayin natin ang mga inuse counters na waiting
-        // assignRegularReceipt(counter)
-        
-        // var = ['counter_1', 'counter_2']
+       console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
+         await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
+        return firstCounterAvailable?.counterName;
+      } else{
+        // console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
+        //  await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
+        //  return firstCounterAvailable?.counterName;
+        return; 
       }
-     
     } catch (error) {
       console.error("Error inserting regular receipt:", error);
       throw error;

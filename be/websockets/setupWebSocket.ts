@@ -10,13 +10,16 @@ import { ReceiptRepository } from "../receipt/receipt.repository";
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
 
-    // Centralized queue numbers
-  const queueNumbers: { Regular: number; Priority: number; OpenAccount: number } = {
+  // Centralized queue numbers
+  const queueNumbers: {
+    Regular: number;
+    Priority: number;
+    OpenAccount: number;
+  } = {
     Regular: 1,
     Priority: 1,
     OpenAccount: 1,
   };
-
 
   let clientCounter = 0;
 
@@ -28,12 +31,14 @@ export function setupWebSocket(server: Server) {
       console.log(`received: `, message.toString());
 
       const data = JSON.parse(message.toString());
-      
+
       if (data.type === "get-next-queue-number") {
-        const customerType = data.customerType as keyof typeof queueNumbers; 
+        const customerType = data.customerType as keyof typeof queueNumbers;
 
         if (queueNumbers[customerType] !== undefined) {
-          const nextQueueNumber = queueNumbers[customerType].toString().padStart(3, "0");
+          const nextQueueNumber = queueNumbers[customerType]
+            .toString()
+            .padStart(3, "0");
           queueNumbers[customerType] += 1;
 
           ws.send(
@@ -179,24 +184,43 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "Regular") {
-          const trigger = await ReceiptService.createRegularReceipt(
+          const waitingCounter = await ReceiptService.createRegularReceipt(
             transaction,
             customerType,
             queueNumber,
             date,
             time
           );
-          console.log("regular first row triggers: ", trigger);
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(
-                JSON.stringify({
-                  type: "first-regular-insert-be",
-                  response: trigger,
-                })
-              );
-            }
-          });
+          console.log("counter's queue number updated: ", waitingCounter);
+    const currentRegularQueueNum =
+              await QueueService.getCurrentRegularQueueNum(waitingCounter);
+
+           if(waitingCounter){
+             wss.clients.forEach((client) => {
+              if (client.readyState === WebSocket.OPEN) {
+                client.send(
+                  JSON.stringify({
+                    type: "assign-regular-receipt-be",
+                    currentRegularQueueNum: currentRegularQueueNum,
+                    currentWaitingRegularCounter: waitingCounter
+                  })
+                );
+              }
+            });
+           }
+            else if(!waitingCounter){
+             wss.clients.forEach((client) => {
+              if (client.readyState === WebSocket.OPEN) {
+                console.log("trigger no waiting ")
+                client.send(
+                  JSON.stringify({
+                    type: "trigger-no-waiting-regular-counter",
+                  })
+                );
+              }
+            });
+           }
+          
         }
       }
 

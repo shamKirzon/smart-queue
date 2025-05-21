@@ -1,22 +1,29 @@
 import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
+import { transformWithEsbuild } from "vite";
 
 const useWebSocket = (url: string) => {
-  const [firstRowRegularTrigger, setFirstRowRegularTrigger] =
-    useState<boolean | undefined>(undefined);
-  const [firstRowPriorityTrigger, setFirstRowPriorityTrigger] =
-   useState<boolean | undefined>(undefined);
-  const [firstRowOpenAccountTrigger, setFirstRowOpenAccountTrigger] =
-   useState<boolean | undefined>(undefined);
+  const [firstRowRegularTrigger, setFirstRowRegularTrigger] = useState<
+    boolean | undefined
+  >(undefined);
+  const [firstRowPriorityTrigger, setFirstRowPriorityTrigger] = useState<
+    boolean | undefined
+  >(undefined);
+  const [firstRowOpenAccountTrigger, setFirstRowOpenAccountTrigger] = useState<
+    boolean | undefined
+  >(undefined);
+  const [noWaitingRegular, setNoWaitingRegular] = useState<
+    boolean
+  >(false);
+  
   const [status, setStatus] = useState<{ [key: string]: string }>({});
   const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
   const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<
     string | null
   >();
   const [currentPQNum, setCurrentPriorityQueueNum] = useState<string | null>();
-
+  const [currentWaitingRegularCounter, setCurrentWaitingRegularCounter] = useState<string>()
   const [nextQueueNumber, setNextQueueNumber] = useState<string | null>(null);
-
 
   const ws = useRef<WebSocket | null>(null);
   let client = 0;
@@ -55,38 +62,54 @@ const useWebSocket = (url: string) => {
       const data = JSON.parse(event.data);
 
       if (data.type === "set-counter-status") {
-        console.log("counter status: ", data.data)
+        console.log("counter status: ", data.data);
         setCounterStatus(data.data);
-      } 
-      
-      else if (data.type === "first-regular-insert-be") {
-        data.response ? setFirstRowRegularTrigger((prev) => !prev) : false;
+      } else if (data.type === "first-regular-insert-be") {
+        // data.response ? setFirstRowRegularTrigger((prev) => !prev) : false;
       } else if (data.type === "first-priority-insert-be") {
         data.response ? setFirstRowPriorityTrigger((prev) => !prev) : false;
       } else if (data.type === "first-openaccount-insert-be") {
         data.response ? setFirstRowOpenAccountTrigger((prev) => !prev) : false;
-      } 
-      
-      
-      else if (data.type === "teller-next-regular-be") {
+      } else if (data.type === "teller-next-regular-be") {
         setCurrentRegularQueueNum(data.currentQueueNumber);
       } else if (data.type === "teller-next-open-account-be") {
         setCurrentOpenAccountQueueNum(data.currentQueueNumber);
       } else if (data.type === "teller-next-priority-be") {
         setCurrentPriorityQueueNum(data.currentQueueNumber);
       }
-      // fetching current queue number (without next logic)
+      // fetching current queue number (without next logic) && first 
       else if (data.type === "assign-regular-receipt-be") {
-        const currentregular = data.currentRegularQueueNum;
-        setCurrentRegularQueueNum(currentregular);
-      } else if (data.type === "assign-open-account-receipt-be") {
+        const currentCounter = data.currentWaitingRegularCounter;
+        const currentRegular = data.currentRegularQueueNum;
+
+        const formattedCounterName = (name: string) =>{
+          const formattedString = name.replace(/_/g, ' ')
+          return formattedString.charAt(0).toUpperCase() + formattedString.slice(1)
+        }
+
+        // i have corresponding websocket logic about here. 
+        if (currentRegular && !currentCounter) {
+          setCurrentRegularQueueNum(currentRegular);
+        }
+        // queue num. <= waiting regular counter
+        else if(currentCounter){
+          setNoWaitingRegular(false)
+          console.log("THIS IS MY CURRENT COUNTER FROM BACKEND: ", formattedCounterName(currentCounter))
+            setCurrentRegularQueueNum(currentRegular);
+          setCurrentWaitingRegularCounter(formattedCounterName(currentCounter))
+        }
+      } 
+      
+      else if(data.type === "trigger-no-waiting-regular-counter"){
+          setNoWaitingRegular(true)
+      }else if (data.type === "assign-open-account-receipt-be") {
         const currentId = data.currentOpenAccountQueueNum;
         setCurrentOpenAccountQueueNum(currentId);
       } else if (data.type === "assign-priority-receipt-be") {
         const currentId = data.currentPriorityQueueNum;
         setCurrentPriorityQueueNum(currentId);
         //adding this for the next queue number
-      }else if (data.type === "next-queue-number") {
+      } else if (data.type === "next-queue-number") {
         setNextQueueNumber(data.queueNumber);
       }
     };
@@ -283,16 +306,18 @@ const useWebSocket = (url: string) => {
     }
   };
 
-  const getNextQueueNumber = (customerType: "Regular" | "Priority" | "OpenAccount") => {
-  if (ws.current?.readyState === WebSocket.OPEN) {
-    ws.current.send(
-      JSON.stringify({
-        type: "get-next-queue-number",
-        customerType,
-      })
-    );
-  }
-};
+  const getNextQueueNumber = (
+    customerType: "Regular" | "Priority" | "OpenAccount"
+  ) => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(
+        JSON.stringify({
+          type: "get-next-queue-number",
+          customerType,
+        })
+      );
+    }
+  };
 
   return {
     fetchCounterStatus,
@@ -311,12 +336,13 @@ const useWebSocket = (url: string) => {
     insertvaluesopenaccount,
     sendMessage,
     logout,
-    firstRowRegularTrigger, 
-    firstRowPriorityTrigger, 
-    firstRowOpenAccountTrigger, 
-
+    firstRowRegularTrigger,
+    firstRowPriorityTrigger,
+    firstRowOpenAccountTrigger,
     nextQueueNumber,
-    getNextQueueNumber
+    getNextQueueNumber,
+    currentWaitingRegularCounter, 
+    noWaitingRegular
   };
 };
 

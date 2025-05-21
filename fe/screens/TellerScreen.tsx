@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React, { JSX, useEffect } from "react";
+import React, { JSX, useEffect, useRef } from "react";
 import { Dimensions } from "react-native";
 import HomeBackground from "../assets/backgrounds/home-background.svg";
 import TellerBottomBackground from "../assets/backgrounds/teller-bottom-background.svg";
@@ -44,8 +44,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     assignRegularReceipt,
     assignOpenAccountReceipt,
     assignPriorityReceipt,
+    currentWaitingRegularCounter,
+    noWaitingRegular, 
   } = useWebSocketsApp();
   const [numberOfServes, setNumberOfServes] = useState(0);
+  const prevCounterMap = useRef<Record<string, string | null>>({});
 
   const modalContent = (): JSX.Element => {
     return (
@@ -165,18 +168,19 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   // }, [currentOAQNum, currentPQNum, currentRQNum]);
 
   // RE-RENDER FOR REGULAR FIRST ROW
-  useEffect(() => {
-    console.log(
-      "TellerScreen - 'UPDATED SUCCESFULLY' ",
-      firstRowRegularTrigger
-    );
+  // useEffect(() => {
+  //   console.log(
+  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
+  //     firstRowRegularTrigger
+  //   );
 
-    firstRowRegularTrigger
-      ? assignRegularReceipt(counterName)
-      : assignRegularReceipt(counterName);
-  }, [firstRowRegularTrigger]);
+  //   firstRowRegularTrigger
+  //     ? assignRegularReceipt(counterName)
+  //     : assignRegularReceipt(counterName);
+  // }, [firstRowRegularTrigger]);
 
   // RE-RENDER FOR PRIORITY FIRST ROW
+
   useEffect(() => {
     console.log(
       "TellerScreen - 'UPDATED SUCCESFULLY' ",
@@ -202,18 +206,57 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
 
   const displayQueueNumber = (counter: string): string | null | undefined => {
     let queueNumber;
+    let prev;
 
-    if (regularCounters.includes(counter) && currentRQNum) {
-      queueNumber = currentRQNum;
+    // counter 3
+    // create a another copy that has no waiting (pending)
+
+    if  (regularCounters.includes(counter) && currentRQNum ) {
+    
+      console.log('STATUS NI CURRENT WAITING REGULAR COUNTER', currentWaitingRegularCounter)
+      if(!noWaitingRegular){
+        if (currentWaitingRegularCounter === counter) {
+        console.log(`kay ${counter}`, currentRQNum);
+        console.log("currentWaitingRegularCounter equal sa device counter");
+        prevCounterMap.current[counter] = currentRQNum;
+        console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap);
+        return currentRQNum;
+
+      } else if (currentWaitingRegularCounter !== counter) {
+        // second iteration
+        // has value
+        console.log(`kay ${counter}`, currentRQNum);
+        console.log(
+          "currentWaitingRegularCounter not equal sa device counter",
+          prevCounterMap.current[counter]
+        );
+       
+
+        console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap.current);
+        //  prevCounterMap.current[counter] ? prevCounterMap.current[counter] = null : null;
+         return prevCounterMap.current[counter] || '...'
+      }
+      }
+
+       console.log("CURRENT QUEUE NUMBER", currentRQNum)
+    
+
+       
+       if(prevCounterMap.current[counter] !== currentRQNum) {
+          return  prevCounterMap.current[counter] = currentRQNum
+       }
+       // 
+       else return prevCounterMap.current[counter] 
+     
+      
     } else if (counter === "Counter A1" && currentOAQNum) {
-      queueNumber = currentOAQNum;
+      return currentOAQNum;
     } else if (counter === "Counter P1" && currentPQNum) {
-      queueNumber = currentPQNum;
-    } else {
-      queueNumber = "...";
+      return currentPQNum;
+    }  
+      else {
+      return "...";
     }
-
-    return queueNumber;
   };
 
   return (
