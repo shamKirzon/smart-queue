@@ -45,7 +45,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     assignOpenAccountReceipt,
     assignPriorityReceipt,
     currentWaitingRegularCounter,
-    noWaitingRegular, 
+    WaitingRegular,
   } = useWebSocketsApp();
   const [numberOfServes, setNumberOfServes] = useState(0);
   const prevCounterMap = useRef<Record<string, string | null>>({});
@@ -180,83 +180,116 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   // }, [firstRowRegularTrigger]);
 
   // RE-RENDER FOR PRIORITY FIRST ROW
-
   useEffect(() => {
     console.log(
-      "TellerScreen - 'UPDATED SUCCESFULLY' ",
-      firstRowPriorityTrigger
+      "UPDATED VALUE OPEN ACCOUNT:  ",
+      currentOAQNum
     );
 
-    firstRowPriorityTrigger
-      ? assignPriorityReceipt(counterName)
-      : assignPriorityReceipt(counterName);
-  }, [firstRowPriorityTrigger]);
+     console.log(
+      "UPDATED VALUE PRIORITY:  ",
+      currentPQNum
+    );
+
+     console.log(
+      "UPDATED VALUE REGULAR:  ",
+      currentRQNum
+    );
+  }, [currentOAQNum, currentPQNum, currentRQNum]);
+
+
+  // useEffect(() => {
+  //   console.log(
+  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
+  //     firstRowPriorityTrigger
+  //   );
+
+  //   firstRowPriorityTrigger
+  //     ? assignPriorityReceipt(counterName)
+  //     : assignPriorityReceipt(counterName);
+  // }, [firstRowPriorityTrigger]);
 
   // RE-RENDER FOR OPEN ACCOUNT FIRST ROW
-  useEffect(() => {
-    console.log(
-      "TellerScreen - 'UPDATED SUCCESFULLY' ",
-      firstRowOpenAccountTrigger
-    );
+  // useEffect(() => {
+  //   console.log(
+  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
+  //     firstRowOpenAccountTrigger
+  //   );
 
-    firstRowOpenAccountTrigger
-      ? assignOpenAccountReceipt(counterName)
-      : assignOpenAccountReceipt(counterName);
-  }, [firstRowOpenAccountTrigger]);
+  //   firstRowOpenAccountTrigger
+  //     ? assignOpenAccountReceipt(counterName)
+  //     : assignOpenAccountReceipt(counterName);
+  // }, [firstRowOpenAccountTrigger]);
 
   const displayQueueNumber = (counter: string): string | null | undefined => {
-    let queueNumber;
-    let prev;
 
-    // counter 3
-    // create a another copy that has no waiting (pending)
-
-    if  (regularCounters.includes(counter) && currentRQNum ) {
     
-      console.log('STATUS NI CURRENT WAITING REGULAR COUNTER', currentWaitingRegularCounter)
-      if(!noWaitingRegular){
+    if (regularCounters.includes(counter) && currentRQNum) {
+      console.log(
+        "STATUS NI CURRENT WAITING REGULAR COUNTER",
+        currentWaitingRegularCounter
+      );
+      if (WaitingRegular) {
         if (currentWaitingRegularCounter === counter) {
-        console.log(`kay ${counter}`, currentRQNum);
-        console.log("currentWaitingRegularCounter equal sa device counter");
-        prevCounterMap.current[counter] = currentRQNum;
-        console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap);
-        return currentRQNum;
+          console.log(`kay ${counter}`, currentRQNum);
+          console.log("currentWaitingRegularCounter equal sa device counter");
+          prevCounterMap.current[counter] = currentRQNum;
+          console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap.current);
+          return currentRQNum;
+        } else if (currentWaitingRegularCounter !== counter) {
+          // second iteration
+          // has value
+          console.log(`kay ${counter}`, currentRQNum);
+          console.log(
+            "currentWaitingRegularCounter not equal sa device counter",
+            prevCounterMap.current[counter]
+          );
 
-      } else if (currentWaitingRegularCounter !== counter) {
-        // second iteration
-        // has value
-        console.log(`kay ${counter}`, currentRQNum);
-        console.log(
-          "currentWaitingRegularCounter not equal sa device counter",
-          prevCounterMap.current[counter]
-        );
-       
-
-        console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap.current);
-        //  prevCounterMap.current[counter] ? prevCounterMap.current[counter] = null : null;
-         return prevCounterMap.current[counter] || '...'
+          console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap.current);
+          console.log("CURRENT QUEUE NUMBER: ", currentRQNum);
+          //  prevCounterMap.current[counter] ? prevCounterMap.current[counter] = null : null;
+          return prevCounterMap.current[counter] || "..." ;
+        }
       }
+
+      else if(currentWaitingRegularCounter === undefined){
+        return currentRQNum
       }
 
-       console.log("CURRENT QUEUE NUMBER", currentRQNum)
-    
-
-       
-       if(prevCounterMap.current[counter] !== currentRQNum) {
-          return  prevCounterMap.current[counter] = currentRQNum
-       }
-       // 
-       else return prevCounterMap.current[counter] 
-     
-      
-    } else if (counter === "Counter A1" && currentOAQNum) {
-      return currentOAQNum;
-    } else if (counter === "Counter P1" && currentPQNum) {
-      return currentPQNum;
-    }  
+      // not waiting, only triggers when queue number generated
       else {
+        console.log("WaitingRegular is False trigger");
+        console.log(
+          `********* ${counter} : ${prevCounterMap.current[counter]} `
+        );
+        console.log("CURRENT QUEUE NUMBER FROM BACKEND: ", currentRQNum);
+        console.log("WAITING COUNTERS ", currentWaitingRegularCounter);
+
+
+        if (prevCounterMap.current[counter] === null) {
+          console.log("prevCounter.curent natin ay null ", );
+          return currentRQNum ? currentRQNum : '...';
+        } else if (prevCounterMap.current[counter] !== currentRQNum) {
+          return prevCounterMap.current[counter];
+        } else {
+          console.log("else part ito ");
+          return prevCounterMap.current[counter];}
+      }
+      // part lang ng displaying kapag merong naka pila agad na queue number. 
+      // return currentRQNum
+    } else if (counter === "Counter A1"&& currentOAQNum) {
+       return currentOAQNum;
+    } else if (counter === "Counter P1" && currentPQNum) {
+        return currentPQNum;
+    } else {
       return "...";
     }
+
+   
+
+
+
+    
   };
 
   return (
@@ -423,6 +456,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
           <View style={{ alignItems: "flex-end", width: width * 0.7 }}>
             <TouchableOpacity
               onPress={() => {
+                prevCounterMap.current[counterName] = null;
                 tellerNext(counterName);
                 // setQueueNumberStart(true);
 
