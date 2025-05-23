@@ -246,6 +246,7 @@ export function setupWebSocket(server: Server) {
                 JSON.stringify({
                   type: "first-priority-insert-be",
                   response: trigger,
+                  counter: "Counter P1"
                 })
               );
             }
@@ -276,6 +277,7 @@ export function setupWebSocket(server: Server) {
                 JSON.stringify({
                   type: "first-openaccount-insert-be",
                   response: trigger,
+                  counter: "Counter A1"
                 })
               );
             }

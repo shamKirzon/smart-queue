@@ -180,37 +180,50 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
   // }, [firstRowRegularTrigger]);
 
   // RE-RENDER FOR PRIORITY FIRST ROW
-
   useEffect(() => {
     console.log(
-      "TellerScreen - 'UPDATED SUCCESFULLY' ",
-      firstRowPriorityTrigger
+      "UPDATED VALUE OPEN ACCOUNT:  ",
+      currentOAQNum
     );
 
-    firstRowPriorityTrigger
-      ? assignPriorityReceipt(counterName)
-      : assignPriorityReceipt(counterName);
-  }, [firstRowPriorityTrigger]);
+     console.log(
+      "UPDATED VALUE PRIORITY:  ",
+      currentPQNum
+    );
+
+     console.log(
+      "UPDATED VALUE REGULAR:  ",
+      currentRQNum
+    );
+  }, [currentOAQNum, currentPQNum, currentRQNum]);
+
+
+  // useEffect(() => {
+  //   console.log(
+  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
+  //     firstRowPriorityTrigger
+  //   );
+
+  //   firstRowPriorityTrigger
+  //     ? assignPriorityReceipt(counterName)
+  //     : assignPriorityReceipt(counterName);
+  // }, [firstRowPriorityTrigger]);
 
   // RE-RENDER FOR OPEN ACCOUNT FIRST ROW
-  useEffect(() => {
-    console.log(
-      "TellerScreen - 'UPDATED SUCCESFULLY' ",
-      firstRowOpenAccountTrigger
-    );
+  // useEffect(() => {
+  //   console.log(
+  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
+  //     firstRowOpenAccountTrigger
+  //   );
 
-    firstRowOpenAccountTrigger
-      ? assignOpenAccountReceipt(counterName)
-      : assignOpenAccountReceipt(counterName);
-  }, [firstRowOpenAccountTrigger]);
+  //   firstRowOpenAccountTrigger
+  //     ? assignOpenAccountReceipt(counterName)
+  //     : assignOpenAccountReceipt(counterName);
+  // }, [firstRowOpenAccountTrigger]);
 
   const displayQueueNumber = (counter: string): string | null | undefined => {
-    let queueNumber;
-    let prev;
 
-    // counter 3
-    // create a another copy that has no waiting (pending)
-
+    
     if (regularCounters.includes(counter) && currentRQNum) {
       console.log(
         "STATUS NI CURRENT WAITING REGULAR COUNTER",
@@ -264,13 +277,19 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       }
       // part lang ng displaying kapag merong naka pila agad na queue number. 
       // return currentRQNum
-    } else if (counter === "Counter A1" && currentOAQNum) {
-      return currentOAQNum;
+    } else if (counter === "Counter A1"&& currentOAQNum) {
+       return currentOAQNum;
     } else if (counter === "Counter P1" && currentPQNum) {
-      return currentPQNum;
+        return currentPQNum;
     } else {
       return "...";
     }
+
+   
+
+
+
+    
   };
 
   return (

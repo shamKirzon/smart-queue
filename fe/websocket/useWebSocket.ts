@@ -66,11 +66,21 @@ const useWebSocket = (url: string) => {
         setCounterStatus(data.data);
       } else if (data.type === "first-regular-insert-be") {
         // data.response ? setFirstRowRegularTrigger((prev) => !prev) : false;
-      } else if (data.type === "first-priority-insert-be") {
-        data.response ? setFirstRowPriorityTrigger((prev) => !prev) : false;
+      } 
+      
+      else if (data.type === "first-priority-insert-be") {
+        // data.response ? setFirstRowPriorityTrigger((prev) => !prev) : false;
+        if(data.response){
+          assignPriorityReceipt(data.counter)
+        }
       } else if (data.type === "first-openaccount-insert-be") {
-        data.response ? setFirstRowOpenAccountTrigger((prev) => !prev) : false;
-      } else if (data.type === "teller-next-regular-be") {
+        // data.response ? setFirstRowOpenAccountTrigger((prev) => !prev) : false;
+          if(data.response){
+          assignOpenAccountReceipt(data.counter)
+        }
+      } 
+      
+      else if (data.type === "teller-next-regular-be") {
         setCurrentRegularQueueNum(data.currentQueueNumber);
       } else if (data.type === "teller-next-open-account-be") {
         setCurrentOpenAccountQueueNum(data.currentQueueNumber);
