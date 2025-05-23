@@ -19,7 +19,7 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
 
-  const {testingTrigger} = useWebSocketsApp(); 
+  //const {testingTrigger} = useWebSocketsApp(); 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <StartBackground
@@ -114,6 +114,36 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
           }}
         >
           PROCEED
+        </Text>
+      </TouchableOpacity>
+      {/* Reset Button */}
+      <TouchableOpacity
+        onPress={() => {
+          console.log("Reset button pressed");
+        }}
+        style={{
+          width: width * 0.5,
+          height: height * 0.07,
+          backgroundColor: "#808080",
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: 28,
+          marginTop: height * 0.02,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.8,
+          shadowRadius: 4,
+          elevation: 5,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: width * 0.07,
+            color: "white",
+            fontFamily: "Poppins-Bold",
+            lineHeight: width * 0.07 + 9
+          }}
+        >
+          RESET
         </Text>
       </TouchableOpacity>
     </View>

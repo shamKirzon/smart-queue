@@ -50,6 +50,8 @@ const App = () => {
   const initialRouteName =
     Platform.OS === "web" ? "MonitorScreen" : "WelcomeScreen";
 
+  const contentPaddingTop = initialRouteName === "MonitorScreen" ? 0 : height * 0.05;
+
   return (
     <WebSocketProvider>
       <SafeAreaProvider className="flex-1 ">
@@ -62,7 +64,7 @@ const App = () => {
               headerShown: false,
               animation: "none",
               contentStyle: {
-                paddingTop: height * 0.05, // 5% of screen height
+              paddingTop: contentPaddingTop, // Adjust padding para sa aking monitor screen
               },
             }}
           >
