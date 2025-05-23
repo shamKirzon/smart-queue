@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Dimensions, RootTagContext } from "react-native";
+import { View, Text, Dimensions, Platform } from "react-native";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
@@ -46,60 +46,66 @@ const App = () => {
     //counter: null,
   });
 
+  // set initial route based on platform if web or mobile para di na mahirapan isetup sa web
+  const initialRouteName =
+    Platform.OS === "web" ? "MonitorScreen" : "WelcomeScreen";
+
   return (
-   <WebSocketProvider >
-     <SafeAreaProvider className="flex-1 ">
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="TellerHomeScreen"
-          screenOptions={{
-            headerShown: false,
-            animation: "none",
-            contentStyle: {
-              paddingTop: height * 0.05, // 5% of screen height
-            },
-          }}
-        >
-          {/* DIMENSIONS GUIDES */}
-          <Stack.Screen
-            name="DimensionGuideScreen"
-            component={DimensionGuides}
-          />
+    <WebSocketProvider>
+      <SafeAreaProvider className="flex-1 ">
+        <NavigationContainer>
+          <Stack.Navigator
+          //lipat mo nalang to pre if need mo
+            //initialRouteName="TellerHomeScreen"
+            initialRouteName={initialRouteName}
+            screenOptions={{
+              headerShown: false,
+              animation: "none",
+              contentStyle: {
+                paddingTop: height * 0.05, // 5% of screen height
+              },
+            }}
+          >
+            {/* DIMENSIONS GUIDES */}
+            <Stack.Screen
+              name="DimensionGuideScreen"
+              component={DimensionGuides}
+            />
 
-          {/* WELCOME SCREEN */}
-          <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+            {/* WELCOME SCREEN */}
+            <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
 
-          {/* HOME SCREEN */}
-          <Stack.Screen name="HomeScreen" component={HomeScreen} />
+            {/* HOME SCREEN */}
+            <Stack.Screen name="HomeScreen" component={HomeScreen} />
 
-          {/* Teller  Screen */}
-          <Stack.Screen name="TellerScreen" component={TellerScreen} />
+            {/* Teller  Screen */}
+            <Stack.Screen name="TellerScreen" component={TellerScreen} />
 
-          {/* Teller Home Screen */}
-          <Stack.Screen name="TellerHomeScreen" component={TellerHomeScreen} />
+            {/* Teller Home Screen */}
+            <Stack.Screen name="TellerHomeScreen" component={TellerHomeScreen} />
 
 
-          {/* Monitor Screen*/}
-          <Stack.Screen name="MonitorScreen" component={MonitorScreen} />
+            {/* Monitor Screen*/}
+            <Stack.Screen name="MonitorScreen" component={MonitorScreen} />
 
-          {/* TRANSACTION SCREEN */}
-          <Stack.Screen name="TransactionScreen">
-            {(props: any) => (
-              <TransactionScreen
-                {...props}
-                updateCustomerInfo={setCustomerInfo}
-              />
-            )}
-          </Stack.Screen>
+            {/* TRANSACTION SCREEN */}
+            <Stack.Screen name="TransactionScreen">
+              {(props: any) => (
+                <TransactionScreen
+                  {...props}
+                  updateCustomerInfo={setCustomerInfo}
+                />
+              )}
+            </Stack.Screen>
 
-          {/* RECEIPT SCREEN */}
-          <Stack.Screen name="ReceiptScreen">
-            {(props: any) => <ReceiptScreen {...props} />}
-          </Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
-   </WebSocketProvider>
+            {/* RECEIPT SCREEN */}
+            <Stack.Screen name="ReceiptScreen">
+              {(props: any) => <ReceiptScreen {...props} />}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </WebSocketProvider>
   );
 };
 

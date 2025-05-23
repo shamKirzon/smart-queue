@@ -5,6 +5,8 @@ import Background from "../assets/backgrounds/monitor-background.svg";
 // Selected Icons
 import Logout from "../assets/icons/log-out.svg";
 
+import { useWebSocketsApp } from "../websocket/WebSocketProvider";
+
 const { width, height } = Dimensions.get("window");
 
 interface MonitorScreenProps {
@@ -15,6 +17,10 @@ interface MonitorScreenProps {
 //rendercounterBox soon.. for cleaning
 
 const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
+  // Access websocket context
+  const ws = useWebSocketsApp();
+
+
   return (
     <View style={{ flex: 1, position: 'relative' }}>
       <Background
