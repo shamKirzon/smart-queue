@@ -7,7 +7,7 @@ export class QueueRepository {
   static async getRegQueueNum(
     counter: string,
     client: PoolClient
-  ): Promise<any> {
+  ): Promise<string|undefined|any> {
     counter = TellerService.formattedCounter(counter);
     console.log("getRegQueueNum() ", counter);
 

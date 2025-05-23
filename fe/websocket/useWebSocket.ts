@@ -12,12 +12,12 @@ const useWebSocket = (url: string) => {
   const [firstRowOpenAccountTrigger, setFirstRowOpenAccountTrigger] = useState<
     boolean | undefined
   >(undefined);
-  const [noWaitingRegular, setNoWaitingRegular] = useState<
+  const [WaitingRegular, setWaitingRegular] = useState<
     boolean
   >(false);
   
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null>();
+  const [currentRQNum, setCurrentRegularQueueNum] = useState<string | null| undefined>();
   const [currentOAQNum, setCurrentOpenAccountQueueNum] = useState<
     string | null
   >();
@@ -93,7 +93,7 @@ const useWebSocket = (url: string) => {
         }
         // queue num. <= waiting regular counter
         else if(currentCounter){
-          setNoWaitingRegular(false)
+          setWaitingRegular(true)
           console.log("THIS IS MY CURRENT COUNTER FROM BACKEND: ", formattedCounterName(currentCounter))
             setCurrentRegularQueueNum(currentRegular);
           setCurrentWaitingRegularCounter(formattedCounterName(currentCounter))
@@ -101,7 +101,7 @@ const useWebSocket = (url: string) => {
       } 
       
       else if(data.type === "trigger-no-waiting-regular-counter"){
-          setNoWaitingRegular(true)
+          setWaitingRegular(false)
       }else if (data.type === "assign-open-account-receipt-be") {
         const currentId = data.currentOpenAccountQueueNum;
         setCurrentOpenAccountQueueNum(currentId);
@@ -182,6 +182,7 @@ const useWebSocket = (url: string) => {
       );
     }
   };
+  
   const assignOpenAccountReceipt = (counter: string) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(
@@ -342,7 +343,7 @@ const useWebSocket = (url: string) => {
     nextQueueNumber,
     getNextQueueNumber,
     currentWaitingRegularCounter, 
-    noWaitingRegular
+    WaitingRegular
   };
 };
 

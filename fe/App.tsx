@@ -48,7 +48,7 @@ const App = () => {
 
   // set initial route based on platform if web or mobile para di na mahirapan isetup sa web
   const initialRouteName =
-    Platform.OS === "web" ? "MonitorScreen" : "WelcomeScreen";
+    Platform.OS === "web" ? "MonitorScreen" : "TellerHomeScreen";
 
   return (
     <WebSocketProvider>

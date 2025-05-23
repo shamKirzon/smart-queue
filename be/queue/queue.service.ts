@@ -4,7 +4,7 @@ import { TellerService } from "../teller/teller.service";
 import { QueueRepository } from "./queue.repository";
 
 export class QueueService {
-  static async getCurrentRegularQueueNum(counter: string): Promise<any> {
+  static async getCurrentRegularQueueNum(counter: string): Promise<string | undefined |any> {
     counter = TellerService.formattedCounter(counter);
     const client = await pool.connect();
 
@@ -17,7 +17,8 @@ export class QueueService {
       const queueNumber = rawQueueNumber?.rows[0]?.queue_number;
       await client.query("COMMIT");
 
-      return queueNumber;
+      console.log("getCurrentRegularQueueNum() trigger: ", queueNumber)
+      return queueNumber ? queueNumber : undefined;
 
     } catch (error) {
       client.query("ROLLBACK");
