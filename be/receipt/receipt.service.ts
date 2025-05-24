@@ -155,14 +155,14 @@ export class ReceiptService {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<string | undefined> {
+  ) {
     if (customerType !== "Priority") {
       console.warn("Customer type is not 'Priority'. Skipping insertion.");
       return;
     }
 
     try {
-      const trigger = await ReceiptRepository.insertPriorityReceipt(
+      await ReceiptRepository.insertPriorityReceipt(
         transaction,
         customerType,
         queueNumber,
@@ -170,7 +170,8 @@ export class ReceiptService {
         time
       );
 
-      return trigger;
+
+    
     } catch (error) {
       console.error("Error creating Priority receipt:", error);
       throw error;
@@ -183,14 +184,14 @@ export class ReceiptService {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<string | undefined> {
+  ){
     if (customerType !== "OpenAccount") {
       console.warn("Customer type is not 'Open Account'. Skipping insertion.");
       return;
     }
 
     try {
-      const trigger = await ReceiptRepository.insertOpenAccountReceipt(
+      await ReceiptRepository.insertOpenAccountReceipt(
         transaction,
         customerType,
         queueNumber,
@@ -198,7 +199,7 @@ export class ReceiptService {
         time
       );
 
-      return trigger;
+      
     } catch (error) {
       console.error("Error creating Open Account receipt:", error);
       throw error;

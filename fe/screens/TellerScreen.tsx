@@ -38,14 +38,10 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     currentOAQNum,
     currentPQNum,
     logout,
-    firstRowRegularTrigger,
-    firstRowOpenAccountTrigger,
-    firstRowPriorityTrigger,
-    assignRegularReceipt,
-    assignOpenAccountReceipt,
-    assignPriorityReceipt,
-    currentWaitingRegularCounter,
-    WaitingRegular,
+    getCurrentQueueNumberWithCounter,
+    currentQueueNumberWithCounter,
+    counterTableRerender,
+    triggerCounterTable,
   } = useWebSocketsApp();
   const [numberOfServes, setNumberOfServes] = useState(0);
   const prevCounterMap = useRef<Record<string, string | null>>({});
@@ -152,144 +148,24 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
     }
   };
 
-  // CORRECT INCREMENTATION OF SERVES BASED ON UPDATED QUEUE NUMBER | TYPE
-  // useEffect(() => {
-  //   if (queueNumberStart) {
-  //     if (regularCounters.includes(counterName)) {
-  //       handleNumberOfServes(currentRQNum);
-  //     } else if (counterName === "Counter A1") {
-  //       handleNumberOfServes(currentOAQNum);
-  //     } else if (counterName === "Counter P1") {
-  //       handleNumberOfServes(currentPQNum);
-  //     }
-  //   } else {
-  //    setQueueNumberStart(false)
-  //   }
-  // }, [currentOAQNum, currentPQNum, currentRQNum]);
-
-  // RE-RENDER FOR REGULAR FIRST ROW
-  // useEffect(() => {
-  //   console.log(
-  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
-  //     firstRowRegularTrigger
-  //   );
-
-  //   firstRowRegularTrigger
-  //     ? assignRegularReceipt(counterName)
-  //     : assignRegularReceipt(counterName);
-  // }, [firstRowRegularTrigger]);
-
-  // RE-RENDER FOR PRIORITY FIRST ROW
+  // to re-render the current queue number and the counter
   useEffect(() => {
-    console.log(
-      "UPDATED VALUE OPEN ACCOUNT:  ",
-      currentOAQNum
-    );
-
-     console.log(
-      "UPDATED VALUE PRIORITY:  ",
-      currentPQNum
-    );
-
-     console.log(
-      "UPDATED VALUE REGULAR:  ",
-      currentRQNum
-    );
-  }, [currentOAQNum, currentPQNum, currentRQNum]);
-
-
-  // useEffect(() => {
-  //   console.log(
-  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
-  //     firstRowPriorityTrigger
-  //   );
-
-  //   firstRowPriorityTrigger
-  //     ? assignPriorityReceipt(counterName)
-  //     : assignPriorityReceipt(counterName);
-  // }, [firstRowPriorityTrigger]);
-
-  // RE-RENDER FOR OPEN ACCOUNT FIRST ROW
-  // useEffect(() => {
-  //   console.log(
-  //     "TellerScreen - 'UPDATED SUCCESFULLY' ",
-  //     firstRowOpenAccountTrigger
-  //   );
-
-  //   firstRowOpenAccountTrigger
-  //     ? assignOpenAccountReceipt(counterName)
-  //     : assignOpenAccountReceipt(counterName);
-  // }, [firstRowOpenAccountTrigger]);
+    console.log("RRENDER AND GET CURRENT QUEUE NUMBER WITH COUNTER ");
+    getCurrentQueueNumberWithCounter();
+  }, [currentRQNum, currentOAQNum, currentPQNum, counterTableRerender]);
 
   const displayQueueNumber = (counter: string): string | null | undefined => {
-
-    
-    if (regularCounters.includes(counter) && currentRQNum) {
-      console.log(
-        "STATUS NI CURRENT WAITING REGULAR COUNTER",
-        currentWaitingRegularCounter
-      );
-      if (WaitingRegular) {
-        if (currentWaitingRegularCounter === counter) {
-          console.log(`kay ${counter}`, currentRQNum);
-          console.log("currentWaitingRegularCounter equal sa device counter");
-          prevCounterMap.current[counter] = currentRQNum;
-          console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap.current);
-          return currentRQNum;
-        } else if (currentWaitingRegularCounter !== counter) {
-          // second iteration
-          // has value
-          console.log(`kay ${counter}`, currentRQNum);
-          console.log(
-            "currentWaitingRegularCounter not equal sa device counter",
-            prevCounterMap.current[counter]
-          );
-
-          console.log("my PREVIOUS COUNTER MAP: ", prevCounterMap.current);
-          console.log("CURRENT QUEUE NUMBER: ", currentRQNum);
-          //  prevCounterMap.current[counter] ? prevCounterMap.current[counter] = null : null;
-          return prevCounterMap.current[counter] || "..." ;
-        }
-      }
-
-      else if(currentWaitingRegularCounter === undefined){
-        return currentRQNum
-      }
-
-      // not waiting, only triggers when queue number generated
-      else {
-        console.log("WaitingRegular is False trigger");
-        console.log(
-          `********* ${counter} : ${prevCounterMap.current[counter]} `
-        );
-        console.log("CURRENT QUEUE NUMBER FROM BACKEND: ", currentRQNum);
-        console.log("WAITING COUNTERS ", currentWaitingRegularCounter);
-
-
-        if (prevCounterMap.current[counter] === null) {
-          console.log("prevCounter.curent natin ay null ", );
-          return currentRQNum ? currentRQNum : '...';
-        } else if (prevCounterMap.current[counter] !== currentRQNum) {
-          return prevCounterMap.current[counter];
-        } else {
-          console.log("else part ito ");
-          return prevCounterMap.current[counter];}
-      }
-      // part lang ng displaying kapag merong naka pila agad na queue number. 
-      // return currentRQNum
-    } else if (counter === "Counter A1"&& currentOAQNum) {
-       return currentOAQNum;
-    } else if (counter === "Counter P1" && currentPQNum) {
-        return currentPQNum;
-    } else {
-      return "...";
-    }
-
    
+    const convertFormat = (counter: string): string => {
+      return counter.replace(/^Counter/i, "counter").replace(" ", "_");
+    };
 
+    const queueNumber =
+      Object.entries(currentQueueNumberWithCounter).find(
+        ([key, _]) => key === convertFormat(counter)
+      )?.[1] ?? "...";
 
-
-    
+    return queueNumber;
   };
 
   return (
@@ -297,7 +173,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
       <HomeBackground
         height={height * 0.87}
         width={width}
-        preserveAspectRatio="none" // to have a control on your svg(height, width)
+        preserveAspectRatio="none"
         style={{
           position: "absolute",
           top: 0,
@@ -456,11 +332,9 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
           <View style={{ alignItems: "flex-end", width: width * 0.7 }}>
             <TouchableOpacity
               onPress={() => {
-                prevCounterMap.current[counterName] = null;
+                triggerCounterTable();
                 tellerNext(counterName);
-                // setQueueNumberStart(true);
 
-                // if (queueNumberStart) {
                 if (regularCounters.includes(counterName)) {
                   handleNumberOfServes(currentRQNum);
                 } else if (counterName === "Counter A1") {
@@ -468,9 +342,6 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                 } else if (counterName === "Counter P1") {
                   handleNumberOfServes(currentPQNum);
                 }
-                // } else {
-                //   setQueueNumberStart(false);
-                // }
               }}
               style={{
                 marginTop: height * 0.05,
@@ -480,11 +351,11 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                 justifyContent: "center",
                 height: height * 0.08,
                 borderRadius: 15,
-                // i dont know why shadows only works on iphone
-                shadowOffset: { width: 0, height: 2 }, // Shadow position
-                shadowOpacity: 0.8, // Shadow transparency
-                shadowRadius: 4, // Blur radius of the shadow
-                elevation: 5, // Elevation for Android
+                
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.8, 
+                shadowRadius: 4, 
+                elevation: 5, 
               }}
             >
               <Text

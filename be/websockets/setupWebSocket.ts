@@ -147,7 +147,6 @@ export function setupWebSocket(server: Server) {
           await QueueService.getCurrentRegularQueueNum(data.counter);
         console.log("backend regular receipt : ", currentRegularQueueNum);
 
-
         const allQueueNumbers = await QueueService.monitorGetData();
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
@@ -178,7 +177,6 @@ export function setupWebSocket(server: Server) {
           currentOpenAccountQueueNum
         );
 
-
         const allQueueNumbers = await QueueService.monitorGetData();
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
@@ -205,7 +203,6 @@ export function setupWebSocket(server: Server) {
         const currentPriorityQueueNum =
           await QueueService.getCurrentPriorityQueueNum(data.counter);
         console.log("backend priority queue number: ", currentPriorityQueueNum);
-
 
         const allQueueNumbers = await QueueService.monitorGetData();
         wss.clients.forEach((client) => {
@@ -243,10 +240,7 @@ export function setupWebSocket(server: Server) {
             time
           );
           console.log("counter's queue number updated: ", waitingCounter);
-          const currentRegularQueueNum =
-            await QueueService.getCurrentRegularQueueNum(waitingCounter);
-
-
+          
           const allQueueNumbers = await QueueService.monitorGetData();
           wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -259,23 +253,25 @@ export function setupWebSocket(server: Server) {
             }
           });
 
-          if(waitingCounter){
-             wss.clients.forEach((client) => {
+          if (waitingCounter) {
+            const currentRegularQueueNum =
+              await QueueService.getCurrentRegularQueueNum(waitingCounter);
+
+            wss.clients.forEach((client) => {
               if (client.readyState === WebSocket.OPEN) {
                 client.send(
                   JSON.stringify({
                     type: "assign-regular-receipt-be",
                     currentRegularQueueNum: currentRegularQueueNum,
-                    currentWaitingRegularCounter: waitingCounter
+                    currentWaitingRegularCounter: waitingCounter,
                   })
                 );
               }
             });
-           }
-            else if(!waitingCounter){
-             wss.clients.forEach((client) => {
+          } else if (!waitingCounter) {
+            wss.clients.forEach((client) => {
               if (client.readyState === WebSocket.OPEN) {
-                console.log("trigger no waiting ")
+                console.log("trigger no waiting ");
                 client.send(
                   JSON.stringify({
                     type: "trigger-no-waiting-regular-counter",
@@ -283,8 +279,7 @@ export function setupWebSocket(server: Server) {
                 );
               }
             });
-           }
-          
+          }
         }
       }
 
@@ -296,7 +291,7 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "Priority") {
-          const trigger = await ReceiptService.createPriorityReceipt(
+           await ReceiptService.createPriorityReceipt(
             transaction,
             customerType,
             queueNumber,
@@ -304,7 +299,6 @@ export function setupWebSocket(server: Server) {
             time
           );
 
-          
           const allQueueNumbers = await QueueService.monitorGetData();
           wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -316,18 +310,18 @@ export function setupWebSocket(server: Server) {
               );
             }
           });
-          console.log("priority first row triggers: ", trigger);
+
           wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
               client.send(
                 JSON.stringify({
-                  type: "first-priority-insert-be",
-                  response: trigger,
-                  counter: "Counter P1"
+                  type: "counter-table-re-render",
                 })
               );
             }
           });
+
+        
         }
       }
 
@@ -339,14 +333,14 @@ export function setupWebSocket(server: Server) {
           data.dataReceipt;
 
         if (customerType === "OpenAccount") {
-          const trigger = await ReceiptService.createOpenAccountReceipt(
+            await ReceiptService.createOpenAccountReceipt(
             transaction,
             customerType,
             queueNumber,
             date,
             time
           );
-          
+
           const allQueueNumbers = await QueueService.monitorGetData();
           wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -358,19 +352,37 @@ export function setupWebSocket(server: Server) {
               );
             }
           });
-          console.log("open account first row triggers: ", trigger);
-          wss.clients.forEach((client) => {
+          
+            wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
               client.send(
                 JSON.stringify({
-                  type: "first-openaccount-insert-be",
-                  response: trigger,
-                  counter: "Counter A1"
+                  type: "counter-table-re-render",
                 })
               );
             }
           });
+          
         }
+      }
+
+      // GET CURRENT QUEUE NUMBER WITH COUNTER
+      else if (data.type === "get-current-queueNum-with-counter") {
+        const currentQueueNumberWithCounters =
+          await QueueService.getQueueNumberWithCounterFromCounter();
+
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            console.log("FETCHING LATEST COPY OF COUNTERS WITH QUEUE NUMBERS",JSON.stringify(currentQueueNumberWithCounters));
+            client.send(
+              JSON.stringify({
+                type: "get-current-queueNum-with-counter-be",
+                countersAndQueueNum: currentQueueNumberWithCounters
+              })
+            );
+          }
+        });
+        
       }
 
       // OWN: GET ALL QUEUE NUMBERS FOR MONITOR SCREEN

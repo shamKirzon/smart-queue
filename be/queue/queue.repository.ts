@@ -7,16 +7,22 @@ export class QueueRepository {
   static async getRegQueueNum(
     counter: string,
     client: PoolClient
-  ): Promise<string|undefined|any> {
+  ): Promise<string | undefined | any> {
     counter = TellerService.formattedCounter(counter);
     console.log("getRegQueueNum() ", counter);
 
-    const rawRegularId = await client.query(`SELECT regular_receipt_id FROM counters
-                              WHERE counter_name = $1`, [counter]);
+    const rawRegularId = await client.query(
+      `SELECT regular_receipt_id FROM counters
+                              WHERE counter_name = $1`,
+      [counter]
+    );
     const regularId = rawRegularId?.rows[0]?.regular_receipt_id;
-    
-    const rawQueueNumber = await client.query(`SELECT * FROM regular_receipt
-                                WHERE regular_receipt_id = $1`, [regularId]);
+
+    const rawQueueNumber = await client.query(
+      `SELECT * FROM regular_receipt
+                                WHERE regular_receipt_id = $1`,
+      [regularId]
+    );
 
     return { rawQueueNumber };
   }
@@ -63,9 +69,9 @@ export class QueueRepository {
     return { rawQueueNumber };
   }
 
-
-
-  static async getAllCountersWithQueueNumbers(client: PoolClient): Promise<any[]> {
+  static async getAllCountersWithQueueNumbers(
+    client: PoolClient
+  ): Promise<any[]> {
     const countersQuery = `
       SELECT 
         c.counter_name,
@@ -81,4 +87,55 @@ export class QueueRepository {
     return res.rows;
   }
 
+  static async fetchGetQueueNumberWithCounterFromCounter(client: PoolClient): Promise<Record<string, string> | undefined> {
+    const hashCounterQueueNum: Record<string, string > | undefined = {};
+   
+
+    try {
+      const uuidWithCounter = await client.query(`
+  SELECT * FROM counters 
+  WHERE status = 'inuse' AND (
+    regular_receipt_id IS NOT NULL OR 
+    priority_receipt_id IS NOT NULL OR 
+    open_account_receipt_id IS NOT NULL
+  )
+    ORDER BY counters ASC
+`);
+
+      // fetching inuse counter and their uuid 
+      for (const row of uuidWithCounter.rows) {
+        let uuid;
+       let queueNum; 
+
+        if (row.priority_receipt_id) {
+          uuid = row.priority_receipt_id;
+          const queryQueueNum = await client.query(`SELECT queue_number  FROM priority_receipt
+                                WHERE priority_receipt_id = $1`, [uuid])
+            queueNum = queryQueueNum.rows[0].queue_number
+        } else if (row.regular_receipt_id) {
+          uuid = row.regular_receipt_id;
+           const queryQueueNum = await client.query(`SELECT queue_number  FROM regular_receipt
+                                WHERE regular_receipt_id = $1`, [uuid])
+            queueNum = queryQueueNum.rows[0].queue_number
+        } else if (row.open_account_receipt_id) {
+          uuid = row.open_account_receipt_id;
+          const queryQueueNum = await client.query(`SELECT queue_number  FROM open_account_receipt
+                                WHERE open_account_receipt_id = $1`, [uuid])
+            queueNum = queryQueueNum.rows[0].queue_number
+        } else uuid = undefined
+
+        if(queueNum){
+          hashCounterQueueNum[row.counter_name] = queueNum
+        }
+      }
+
+      return hashCounterQueueNum
+
+    
+      
+      // counter_name = queue number 
+    } catch (err) {}
+
+   
+  }
 }

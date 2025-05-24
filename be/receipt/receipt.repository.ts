@@ -109,9 +109,10 @@ export class ReceiptRepository {
     counter: string,
     client: PoolClient
   ) {
+    // check if the status of the counter is 'inuse' if yes do this:
     const query1 = `UPDATE counters 
                     SET priority_receipt_id = $1
-                    WHERE counter_name = $2`;
+                    WHERE counter_name = $2 `;
 
     const value1 = [customerId, counter];
 
@@ -166,24 +167,34 @@ export class ReceiptRepository {
         status: rows.status,
       }));
 
-        const firstCounterAvailable = inuseRegular.find(
-          (counter) => counter.counterName
-        );
+      const firstCounterAvailable = inuseRegular.find(
+        (counter) => counter.counterName
+      );
       console.log("QUERY WAITING REGULAR  - ", waitingRegularCounters);
       console.log("WAITING REGULAR COUNTERS MAP - ", inuseRegular);
       console.log("FIRST COUNTER AVAILABLE- ", firstCounterAvailable);
-      
 
-      if (firstData.rows[0].queue_number === queueNumber || firstCounterAvailable?.counterName ) {
-
-       console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
-         await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
+      if (
+        (firstData.rows[0].queue_number === queueNumber &&
+          firstCounterAvailable?.counterName) ||
+        firstCounterAvailable?.counterName
+      ) {
+        console.log(
+          "FIRST COUNTER WAITING: ",
+          firstCounterAvailable?.counterName
+        );
+        await ReceiptService.assignRegularReceipt(
+          firstCounterAvailable?.counterName
+        );
         return firstCounterAvailable?.counterName;
-      } else{
+        // }else if(firstCounterAvailable?.counterName <=0 ){
+        //   return undefined
+        // }
+      } else {
         // console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
         //  await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
         //  return firstCounterAvailable?.counterName;
-        return; 
+        return;
       }
     } catch (error) {
       console.error("Error inserting regular receipt:", error);
@@ -197,7 +208,7 @@ export class ReceiptRepository {
     queueNumber: string,
     date: string,
     time: string
-  ): Promise<string | undefined> {
+  ) {
     const query = `
       INSERT INTO priority_receipt (priority_receipt_id, transaction, queue_number, date, time, status)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
@@ -212,8 +223,16 @@ export class ReceiptRepository {
       const firstData = await pool.query(`SELECT * FROM priority_receipt
                     ORDER BY queue_number ASC`);
 
-      if (firstData.rows[0].queue_number === queueNumber) {
-        return "first row triggers";
+   
+      const queryPriorityStatus = await pool.query(
+        `SELECT status FROM counters WHERE counter_name = 'counter_P1'`
+      );
+
+      if (firstData.rows[0].queue_number === queueNumber && queryPriorityStatus.rows[0].status === 'inuse') {
+         await ReceiptService.assignPriorityReceipt(
+          'Counter P1'
+        );
+        
       } else {
         return;
       }
@@ -244,8 +263,14 @@ export class ReceiptRepository {
       const firstData = await pool.query(`SELECT * FROM open_account_receipt
                     ORDER BY queue_number ASC`);
 
-      if (firstData.rows[0].queue_number === queueNumber) {
-        return "first row triggers";
+         const queryOpenAccountStatus = await pool.query(
+        `SELECT status FROM counters WHERE counter_name = 'counter_A1'`
+      );
+
+      if (firstData.rows[0].queue_number === queueNumber && queryOpenAccountStatus.rows[0].status === 'inuse') {
+         await ReceiptService.assignOpenAccountReceipt(
+          'Counter A1'
+        );
       } else {
         return;
       }
@@ -255,33 +280,7 @@ export class ReceiptRepository {
     }
   }
 
-  /**
-  // Get last queue number for regular_receipt
-  static async getLastRegularQueueNumber(): Promise<string | null> {
-    const result = await pool.query(
-      `SELECT queue_number FROM regular_receipt ORDER BY queue_number::int DESC LIMIT 1`
-    );
-    return result.rows[0]?.queue_number ?? null;
-  }
-
-  // Get last queue number for priority_receipt
-  static async getLastPriorityQueueNumber(): Promise<string | null> {
-    const result = await pool.query(
-      `SELECT queue_number FROM priority_receipt ORDER BY queue_number::int DESC LIMIT 1`
-    );
-    return result.rows[0]?.queue_number ?? null;
-  }
-
-  // Get last queue number for open_account_receipt
-  static async getLastOpenAccountQueueNumber(): Promise<string | null> {
-    const result = await pool.query(
-      `SELECT queue_number FROM open_account_receipt ORDER BY queue_number::int DESC LIMIT 1`
-    );
-    return result.rows[0]?.queue_number ?? null;
-  }
-
-   */
-
+  
   // LOGOUT /RESET
   static async resetReceipt(
     client: PoolClient,
