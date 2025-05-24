@@ -141,61 +141,93 @@ export class ReceiptRepository {
     date: string,
     time: string
   ): Promise<string | undefined> {
+
+    // queue-based waiting counters. (FIFO ito )
+    const waitingRegularCounterQueue: string[] = [];
+
+    try {
+    async function updateWaitingRegularCounterQueue() {
+
+       const waitingRegularCounters =
+        await pool.query(`SELECT counter_name, status FROM counters
+                   WHERE regular_receipt_id IS NULL AND status  = 'inuse'
+        `);
+
+      waitingRegularCounters.rows.forEach((row) => {
+        const counter = row.counter_name; 
+
+        if(!waitingRegularCounterQueue.includes(counter)){
+          waitingRegularCounterQueue.push(counter); 
+        }
+      })
+
+    }
+
     const query1 = `
       INSERT INTO regular_receipt (regular_receipt_id, transaction, queue_number, date, time, status)
       VALUES (gen_random_uuid(), $1, $2, $3, $4, 'waiting')
     `;
     const values = [transaction, queueNumber, date, time];
 
-    try {
+    
       await pool.query(query1, values);
       console.log("Regular receipt inserted successfully.");
 
       const firstData = await pool.query(`SELECT * FROM regular_receipt
                     ORDER BY queue_number ASC`);
-
-      // waiting regular counters
-      const waitingRegularCounters =
-        await pool.query(`SELECT counter_name, status FROM counters
-                   WHERE regular_receipt_id IS NULL AND status  = 'inuse'
-                  ORDER BY counter_name ASC
-
-        `);
-
-      const inuseRegular = waitingRegularCounters.rows.map((rows) => ({
-        counterName: rows.counter_name,
-        status: rows.status,
-      }));
-
-      const firstCounterAvailable = inuseRegular.find(
-        (counter) => counter.counterName
-      );
-      console.log("QUERY WAITING REGULAR  - ", waitingRegularCounters);
-      console.log("WAITING REGULAR COUNTERS MAP - ", inuseRegular);
-      console.log("FIRST COUNTER AVAILABLE- ", firstCounterAvailable);
+          
+      await updateWaitingRegularCounterQueue()
 
       if (
-        (firstData.rows[0].queue_number === queueNumber &&
-          firstCounterAvailable?.counterName) ||
-        firstCounterAvailable?.counterName
+        (firstData.rows[0].queue_number === queueNumber && waitingRegularCounterQueue.length > 0) ||
+        waitingRegularCounterQueue.length > 0
       ) {
-        console.log(
-          "FIRST COUNTER WAITING: ",
-          firstCounterAvailable?.counterName
-        );
-        await ReceiptService.assignRegularReceipt(
-          firstCounterAvailable?.counterName
-        );
-        return firstCounterAvailable?.counterName;
-        // }else if(firstCounterAvailable?.counterName <=0 ){
-        //   return undefined
-        // }
-      } else {
-        // console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
-        //  await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
-        //  return firstCounterAvailable?.counterName;
-        return;
+        console.log("PUMAPASOK SA GINAWA MONG FIFO !")
+        const firstWaitingCounter = waitingRegularCounterQueue.shift();
+        if (firstWaitingCounter) {
+          await ReceiptService.assignRegularReceipt(firstWaitingCounter);
+          return firstWaitingCounter
+        }
+        return
       }
+      else return 
+      
+
+      // waiting regular counters
+     
+      // const inuseRegular = waitingRegularCounters.rows.map((rows) => ({
+      //   counterName: rows.counter_name,
+      //   status: rows.status,
+      // }));
+
+      // const firstCounterAvailable = inuseRegular.find(
+      //   (counter) => counter.counterName
+      // );
+      
+      // console.log("QUERY WAITING REGULAR  - ", waitingRegularCounters);
+      // console.log("WAITING REGULAR COUNTERS MAP - ", inuseRegular);
+      // console.log("FIRST COUNTER AVAILABLE- ", firstCounterAvailable);
+
+      // if (
+      //   (firstData.rows[0].queue_number === queueNumber &&
+      //     firstCounterAvailable?.counterName) ||
+      //   firstCounterAvailable?.counterName
+      // ) {
+      //   console.log(
+      //     "FIRST COUNTER WAITING: ",
+      //     firstCounterAvailable?.counterName
+      //   );
+      //   await ReceiptService.assignRegularReceipt(
+      //     firstCounterAvailable?.counterName
+      //   );
+      //   return firstCounterAvailable?.counterName;
+        
+      // } else {
+      //   // console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
+      //   //  await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
+      //   //  return firstCounterAvailable?.counterName;
+      //   return;
+      // }
     } catch (error) {
       console.error("Error inserting regular receipt:", error);
       throw error;
