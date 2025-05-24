@@ -20,8 +20,7 @@ interface MonitorScreenProps {
 //MAKALAT
 
 const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
-  
-  const ws = useWebSocketsApp();
+  const { monitorCounters, getMonitorQueueData } = useWebSocketsApp();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -29,7 +28,12 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
       setCurrentTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
+    // Fetch all counters for monitor on mount
+    getMonitorQueueData();
+
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
 
   const formatDate = (date: Date) => {
@@ -197,10 +201,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   marginBottom: 6,
                   alignItems: "center",
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40,paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins'  }}>Counter 1</Text>
+                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 1</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {"000".split('').map((digit, index) => (
+                  {(monitorCounters["Counter 1"] || "000").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -232,10 +236,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   marginBottom: 6,
                   alignItems: "center",
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40,paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 2</Text>
+                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 2</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {"000".split('').map((digit, index) => (
+                  {(monitorCounters["Counter 2"] || "000").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -267,10 +271,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   marginBottom: 6,
                   alignItems: "center",
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40,paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 3</Text>
+                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 3</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {"000".split('').map((digit, index) => (
+                  {(monitorCounters["Counter 3"] || "000").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -302,10 +306,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   marginBottom: 6,
                   alignItems: "center",
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40,paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 4</Text>
+                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 4</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {"000".split('').map((digit, index) => (
+                  {(monitorCounters["Counter 4"] || "000").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -352,10 +356,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   marginBottom: 6,
                   alignItems: "center",
                 }}>
-                  <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 40,paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter A1</Text>
+                  <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter A1</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {"000".split('').map((digit, index) => (
+                  {(monitorCounters["Counter A1"] || "000").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#FFFFFF",
                       fontSize: 95,
@@ -389,7 +393,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>PRIORITY</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {"000".split('').map((digit, index) => (
+                  {(monitorCounters["Counter P1"] || "000").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#FFFFFF",
                       fontSize: 95,

@@ -62,4 +62,23 @@ export class QueueRepository {
 
     return { rawQueueNumber };
   }
+
+
+
+  static async getAllCountersWithQueueNumbers(client: PoolClient): Promise<any[]> {
+    const countersQuery = `
+      SELECT 
+        c.counter_name,
+        r.queue_number AS regular_queue_number,
+        oa.queue_number AS open_account_queue_number,
+        p.queue_number AS priority_queue_number
+      FROM counters c
+      LEFT JOIN regular_receipt r ON c.regular_receipt_id = r.regular_receipt_id
+      LEFT JOIN open_account_receipt oa ON c.open_account_receipt_id = oa.open_account_receipt_id
+      LEFT JOIN priority_receipt p ON c.priority_receipt_id = p.priority_receipt_id
+    `;
+    const res = await client.query(countersQuery);
+    return res.rows;
+  }
+
 }

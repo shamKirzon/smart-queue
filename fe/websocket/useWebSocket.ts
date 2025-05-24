@@ -25,6 +25,10 @@ const useWebSocket = (url: string) => {
   const [currentWaitingRegularCounter, setCurrentWaitingRegularCounter] = useState<string>()
   const [nextQueueNumber, setNextQueueNumber] = useState<string | null>(null);
 
+
+
+  const [monitorCounters, setMonitorCounters] = useState<{ [counter: string]: string }>({});
+
   const ws = useRef<WebSocket | null>(null);
   let client = 0;
 
@@ -56,6 +60,8 @@ const useWebSocket = (url: string) => {
     ws.current.onopen = () => {
       console.log("Connected to WebSocket");
       fetchCounterStatus();
+      // Always request monitor queue data when socket opens
+      ws.current?.send(JSON.stringify({ type: "get-monitor-queue-data" }));
     };
 
     ws.current.onmessage = (event) => {
@@ -121,6 +127,9 @@ const useWebSocket = (url: string) => {
         //adding this for the next queue number
       } else if (data.type === "next-queue-number") {
         setNextQueueNumber(data.queueNumber);
+      }
+      else if (data.type === "monitor-queue-data") {
+        setMonitorCounters(data.data || {});
       }
     };
 
@@ -330,6 +339,15 @@ const useWebSocket = (url: string) => {
     }
   };
 
+
+
+
+  const getMonitorQueueData = () => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "get-monitor-queue-data" }));
+    }
+  };
+
   return {
     fetchCounterStatus,
     getCounterStatus,
@@ -353,7 +371,10 @@ const useWebSocket = (url: string) => {
     nextQueueNumber,
     getNextQueueNumber,
     currentWaitingRegularCounter, 
-    WaitingRegular
+    WaitingRegular,
+
+    getMonitorQueueData,
+    monitorCounters,
   };
 };
 
