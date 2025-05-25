@@ -1,6 +1,7 @@
 import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 import { transformWithEsbuild } from "vite";
+import { Platform } from "react-native"; // add this import
 import { navigationRef } from "../navigationRef";
 
 const useWebSocket = (url: string) => {
@@ -116,8 +117,8 @@ const useWebSocket = (url: string) => {
       }
       else if (data.type === "reset-transaction-success") {
         console.log("Transaction reset successfully");
-        if (navigationRef.current && navigationRef.current.navigate) {
-          console.log("AAll Connected device navigate to WelcomeScreen");
+        if (Platform.OS !== "web" && navigationRef.current && navigationRef.current.navigate) {
+          console.log("All Connected device navigate to WelcomeScreen");
           navigationRef.current.navigate("WelcomeScreen");
         }
       }
