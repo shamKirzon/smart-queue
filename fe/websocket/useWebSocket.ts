@@ -2,7 +2,7 @@ import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 import { transformWithEsbuild } from "vite";
 
-const useWebSocket = (url: string) => {
+const useWebSocket = (url: string, navigation?: any) => {
   // const [WaitingRegular, setWaitingRegular] = useState<boolean>(false);
 
   const [status, setStatus] = useState<{ [key: string]: string }>({});
@@ -115,6 +115,11 @@ const useWebSocket = (url: string) => {
       }
       else if (data.type === "reset-transaction-success") {
         console.log("Transaction reset successfully");
+        
+      } else if (data.type === "navigate-welcome-screen") {
+        if (navigation && typeof navigation.navigate === "function") {
+          navigation.navigate("WelcomeScreen");
+        }
       }
     };
 
@@ -330,7 +335,7 @@ const useWebSocket = (url: string) => {
   }
 
 
-  const deleteTransaction = () => {
+  const resetTransaction = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       console.log("Sending reset transaction request to WebSocket");
       ws.current.send(JSON.stringify({ type: "reset-transaction" }));
@@ -363,8 +368,7 @@ const useWebSocket = (url: string) => {
     counterTableRerender, 
     triggerCounterTable,
 
-
-    deleteTransaction,
+    resetTransaction,
   };
 };
 

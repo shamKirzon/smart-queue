@@ -19,9 +19,9 @@ interface WelcomeScreenProps {
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
 
-  const {deleteTransaction} = useWebSocketsApp();
+  const {resetTransaction} = useWebSocketsApp();
   const resetDayTransaction = () => {
-    deleteTransaction();
+    resetTransaction();
   };
 
   return (
@@ -29,7 +29,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
       <StartBackground
         height={height * 0.8}
         width={width}
-        preserveAspectRatio="none" // para di magadjust both height and width
+        preserveAspectRatio="none" 
         style={{
           position: "absolute",
           top: 0,
