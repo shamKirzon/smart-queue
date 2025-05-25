@@ -109,10 +109,12 @@ const useWebSocket = (url: string) => {
       } else if (data.type === "monitor-queue-data") {
         setMonitorCounters(data.data || {});
       }
-
       // rerender priority 
       else if(data.type === "counter-table-re-render"){
         setCounterTableRerender(prev => !prev)
+      }
+      else if (data.type === "reset-transaction-success") {
+        console.log("Transaction reset successfully");
       }
     };
 
@@ -325,9 +327,15 @@ const useWebSocket = (url: string) => {
 
   const triggerCounterTable = () => {
     setCounterTableRerender(prev => !prev)
-      
   }
 
+
+  const deleteTransaction = () => {
+    if (ws.current?.readyState === WebSocket.OPEN) {
+      console.log("Sending reset transaction request to WebSocket");
+      ws.current.send(JSON.stringify({ type: "reset-transaction" }));
+  }
+  };
   
 
   return {
@@ -353,7 +361,10 @@ const useWebSocket = (url: string) => {
     getCurrentQueueNumberWithCounter,
     currentQueueNumberWithCounter,
     counterTableRerender, 
-    triggerCounterTable
+    triggerCounterTable,
+
+
+    deleteTransaction,
   };
 };
 

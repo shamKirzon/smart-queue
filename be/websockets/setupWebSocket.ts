@@ -404,7 +404,40 @@ export function setupWebSocket(server: Server) {
           );
         }
       }
+
+
+      // OWN: RESET TRANSACTION
+      else if (data.type === "reset-transaction") {
+        console.log("Successfully reset transaction");
+
+        // Reset in-memory queue numbers
+        queueNumbers.Regular = 1;
+        queueNumbers.Priority = 1;
+        queueNumbers.OpenAccount = 1;
+
+        await ReceiptService.resetAllReceiptsForTheDay();
+
+        const allQueueNumbers = await QueueService.monitorGetData();
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "monitor-queue-data",
+                data: allQueueNumbers,
+              })
+            );
+            client.send(
+              JSON.stringify({
+                type: "reset-transaction-success",
+                message: "reset-transaction-success",
+              })
+            );
+          }
+        });
+      }
     });
+      
+
 
     ws.on("close", () => console.log(`Client ${clientCounter} disconnected`));
   });

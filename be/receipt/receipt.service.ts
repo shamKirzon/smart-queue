@@ -253,4 +253,9 @@ export class ReceiptService {
       client.release();
     }
   }
+
+  // RESET ALL RECEIPTS FOR THE DAY
+  static async resetAllReceiptsForTheDay(): Promise<void> {
+    await ReceiptRepository.deleteAllReceipts();
+  }
 }

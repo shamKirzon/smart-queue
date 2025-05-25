@@ -338,4 +338,42 @@ export class ReceiptRepository {
       [counter]
     );
   }
+
+  //reset all receipts for the day
+  static async deleteAllReceipts(): Promise<void> {
+    
+    try {
+      const client = await pool.connect();
+      await client.query("BEGIN");
+      await client.query("DELETE FROM regular_receipt");
+      await client.query("DELETE FROM priority_receipt");
+      await client.query("DELETE FROM open_account_receipt");
+      await client.query(
+        "UPDATE counters SET status = 'available', regular_receipt_id = NULL, priority_receipt_id = NULL, open_account_receipt_id = NULL"
+      );
+      
+      await client.query("COMMIT");
+
+      client.release();
+    } 
+    
+    catch (error) {
+      console.error("Query Error - deleteAllReceipts: ", error);
+    }
+
+  }
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
 }
