@@ -10,7 +10,6 @@ import { ReceiptRepository } from "../receipt/receipt.repository";
 export function setupWebSocket(server: Server) {
   const wss = new WebSocketServer({ server });
 
-  // Centralized queue numbers
   const queueNumbers: {
     Regular: number;
     Priority: number;
@@ -23,6 +22,21 @@ export function setupWebSocket(server: Server) {
 
   let clientCounter = 0;
 
+
+  async function broadcastMonitorQueueData() {
+    const allQueueNumbers = await QueueService.monitorGetData();
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(
+          JSON.stringify({
+            type: "monitor-queue-data",
+            data: allQueueNumbers,
+          })
+        );
+      }
+    });
+  }
+
   wss.on("connection", (ws: WebSocket) => {
     clientCounter++;
     console.log(`Client ${clientCounter} connected`);
@@ -31,6 +45,7 @@ export function setupWebSocket(server: Server) {
       console.log(`received: `, message.toString());
 
       const data = JSON.parse(message.toString());
+      
 
       if (data.type === "get-next-queue-number") {
         const customerType = data.customerType as keyof typeof queueNumbers;
@@ -65,7 +80,6 @@ export function setupWebSocket(server: Server) {
       } else if (data.type === "set-counter-available") {
         await TellerRepository.setCounterAvailable(data.counter);
         const counterStatus = await TellerRepository.getCounterStatus();
-
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(
@@ -79,7 +93,6 @@ export function setupWebSocket(server: Server) {
       } else if (data.type === "set-counter-inuse") {
         await TellerRepository.setCounterInuse(data.counter);
         const counterStatus = await TellerRepository.getCounterStatus();
-
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(
@@ -101,17 +114,7 @@ export function setupWebSocket(server: Server) {
         console.log("teller-next-fe - queue_number: ", queueNum);
         console.log("counter format as my basis: ", data.counter);
 
-        const allQueueNumbers = await QueueService.monitorGetData();
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "monitor-queue-data",
-                data: allQueueNumbers,
-              })
-            );
-          }
-        });
+        await broadcastMonitorQueueData();
 
         if (regularCounters.includes(data.counter)) {
           ws?.send(
@@ -138,6 +141,7 @@ export function setupWebSocket(server: Server) {
       } // LOGOUT
       else if (data.type === "logout") {
         await ReceiptService.logout(data.counter);
+        await broadcastMonitorQueueData();
       }
 
       // ASSIGN REGULAR RECEIPT
@@ -147,17 +151,7 @@ export function setupWebSocket(server: Server) {
           await QueueService.getCurrentRegularQueueNum(data.counter);
         console.log("backend regular receipt : ", currentRegularQueueNum);
 
-        const allQueueNumbers = await QueueService.monitorGetData();
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "monitor-queue-data",
-                data: allQueueNumbers,
-              })
-            );
-          }
-        });
+        await broadcastMonitorQueueData();
 
         ws?.send(
           JSON.stringify({
@@ -177,17 +171,7 @@ export function setupWebSocket(server: Server) {
           currentOpenAccountQueueNum
         );
 
-        const allQueueNumbers = await QueueService.monitorGetData();
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "monitor-queue-data",
-                data: allQueueNumbers,
-              })
-            );
-          }
-        });
+        await broadcastMonitorQueueData();
 
         ws?.send(
           JSON.stringify({
@@ -204,17 +188,7 @@ export function setupWebSocket(server: Server) {
           await QueueService.getCurrentPriorityQueueNum(data.counter);
         console.log("backend priority queue number: ", currentPriorityQueueNum);
 
-        const allQueueNumbers = await QueueService.monitorGetData();
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "monitor-queue-data",
-                data: allQueueNumbers,
-              })
-            );
-          }
-        });
+        await broadcastMonitorQueueData();
 
         ws?.send(
           JSON.stringify({
@@ -241,17 +215,7 @@ export function setupWebSocket(server: Server) {
           );
           console.log("counter's queue number updated: ", waitingCounter);
           
-          const allQueueNumbers = await QueueService.monitorGetData();
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(
-                JSON.stringify({
-                  type: "monitor-queue-data",
-                  data: allQueueNumbers,
-                })
-              );
-            }
-          });
+          await broadcastMonitorQueueData();
 
           if (waitingCounter) {
             const currentRegularQueueNum =
@@ -299,17 +263,7 @@ export function setupWebSocket(server: Server) {
             time
           );
 
-          const allQueueNumbers = await QueueService.monitorGetData();
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(
-                JSON.stringify({
-                  type: "monitor-queue-data",
-                  data: allQueueNumbers,
-                })
-              );
-            }
-          });
+          await broadcastMonitorQueueData();
 
           wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -341,17 +295,7 @@ export function setupWebSocket(server: Server) {
             time
           );
 
-          const allQueueNumbers = await QueueService.monitorGetData();
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(
-                JSON.stringify({
-                  type: "monitor-queue-data",
-                  data: allQueueNumbers,
-                })
-              );
-            }
-          });
+          await broadcastMonitorQueueData();
           
             wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
@@ -418,6 +362,11 @@ export function setupWebSocket(server: Server) {
         await ReceiptService.resetAllReceiptsForTheDay();
 
         const allQueueNumbers = await QueueService.monitorGetData();
+        const counterStatus = await TellerRepository.getCounterStatus();
+        
+        ws.send(
+          JSON.stringify({ type: "set-counter-status", data: counterStatus })
+        );
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
             client.send(

@@ -1,6 +1,7 @@
 import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
 import { transformWithEsbuild } from "vite";
+import { navigationRef } from "../navigationRef";
 
 const useWebSocket = (url: string) => {
   // const [WaitingRegular, setWaitingRegular] = useState<boolean>(false);
@@ -115,6 +116,10 @@ const useWebSocket = (url: string) => {
       }
       else if (data.type === "reset-transaction-success") {
         console.log("Transaction reset successfully");
+        if (navigationRef.current && navigationRef.current.navigate) {
+          console.log("AAll Connected device navigate to WelcomeScreen");
+          navigationRef.current.navigate("WelcomeScreen");
+        }
       }
     };
 
@@ -336,7 +341,7 @@ const useWebSocket = (url: string) => {
       ws.current.send(JSON.stringify({ type: "reset-transaction" }));
   }
   };
-  
+
 
   return {
     fetchCounterStatus,
@@ -362,7 +367,7 @@ const useWebSocket = (url: string) => {
     currentQueueNumberWithCounter,
     counterTableRerender, 
     triggerCounterTable,
-    resetTransaction,
+    resetTransaction
   };
 };
 

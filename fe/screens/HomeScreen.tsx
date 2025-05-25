@@ -200,6 +200,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                       handleDelete(pin, index);
                     }
                   }}
+                  secureTextEntry={true}
                   style={{
                     backgroundColor: "#D9D9D9",
                     width: width * 0.16,

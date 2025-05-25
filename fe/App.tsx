@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Dimensions, Platform } from "react-native";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import { useFonts } from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, NavigationContainerRef } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import TransactionScreen from "./screens/TransactionScreen";
@@ -17,6 +17,7 @@ import { RootStackParamLists } from "./types/types";
 import { receiptProps } from "./types/receiptProps";
 import WS_URL from "./constant/constant";
 import { WebSocketProvider } from "./websocket/WebSocketProvider";
+import { navigationRef } from "./navigationRef";
 
 // Get screen dimensions
 const { width, height } = Dimensions.get("window");
@@ -46,7 +47,7 @@ const App = () => {
     //counter: null,
   });
 
-  // set initial route based on platform if web or mobile para di na mahirapan isetup sa web
+
   const initialRouteName =
     Platform.OS === "web" ? "MonitorScreen" : "WelcomeScreen";
 
@@ -55,7 +56,7 @@ const App = () => {
   return (
     <WebSocketProvider>
       <SafeAreaProvider className="flex-1 ">
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <Stack.Navigator
           //lipat mo nalang to pre if need mo
             //initialRouteName="TellerHomeScreen"

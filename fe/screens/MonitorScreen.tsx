@@ -28,7 +28,6 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
       setCurrentTime(new Date());
     }, 1000);
 
-    // Fetch all counters for monitor on mount
     getMonitorQueueData();
 
     return () => {
@@ -165,7 +164,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
           marginTop: height * 0.03,
           flexDirection: "row",
           justifyContent: "space-between",
-          width: width * 0.80,
+          width: width * 0.90,
           gap: 8,
         }}>
           {/* Left Section - Counter 1 to 4 */}
@@ -352,11 +351,11 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   backgroundColor: "#FFFFFF",
                   borderRadius: 6,
                   paddingVertical: 4,
-                  paddingHorizontal: 6,
+                  //paddingHorizontal: 2,
                   marginBottom: 6,
                   alignItems: "center",
                 }}>
-                  <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter A1</Text>
+                  <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 37, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins',textAlign: 'center' }}>OPEN ACCOUNT</Text>
                 </View>
                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
                   {(monitorCounters["Counter A1"] || "000").split('').map((digit, index) => (
