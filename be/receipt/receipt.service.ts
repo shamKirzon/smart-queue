@@ -129,12 +129,10 @@ export class ReceiptService {
   ): Promise<string> {
     if (customerType !== "Regular") {
       console.warn("Customer type is not 'Regular'. Skipping insertion.");
-     
     }
 
     try {
       const counter = await ReceiptRepository.insertRegularReceipt(
-
         transaction,
         customerType,
         queueNumber,
@@ -142,7 +140,7 @@ export class ReceiptService {
         time
       );
 
-      return counter ? counter : '';
+      return counter ? counter : "";
     } catch (error) {
       console.error("Error creating regular receipt:", error);
       throw error;
@@ -169,9 +167,6 @@ export class ReceiptService {
         date,
         time
       );
-
-
-    
     } catch (error) {
       console.error("Error creating Priority receipt:", error);
       throw error;
@@ -184,7 +179,7 @@ export class ReceiptService {
     queueNumber: string,
     date: string,
     time: string
-  ){
+  ) {
     if (customerType !== "OpenAccount") {
       console.warn("Customer type is not 'Open Account'. Skipping insertion.");
       return;
@@ -198,8 +193,6 @@ export class ReceiptService {
         date,
         time
       );
-
-      
     } catch (error) {
       console.error("Error creating Open Account receipt:", error);
       throw error;
@@ -216,36 +209,121 @@ export class ReceiptService {
     ];
     counter = TellerService.formattedCounter(counter);
     console.log("THIS IS FROM LOGOUT!! COUNTER: ", counter);
-
     const client = await pool.connect();
+
+    const waitingRegularCounterQueue: string[] = [];
+
+    async function updateWaitingRegularCounterQueue() {
+      const waitingRegularCounters =
+        await client.query(`SELECT counter_name, status FROM counters
+                   WHERE regular_receipt_id IS NULL AND status  = 'inuse'
+        `);
+
+      waitingRegularCounters.rows.forEach((row) => {
+        const counter = row.counter_name;
+
+        if (!waitingRegularCounterQueue.includes(counter)) {
+          waitingRegularCounterQueue.push(counter);
+        }
+      });
+    }
 
     try {
       await client.query("BEGIN");
 
       if (regularCounters.includes(counter)) {
-        await ReceiptRepository.resetReceipt(
-          client,
-          "regular_receipt",
-          "regular_receipt_id",
-          counter
-        );
+        try {
+          const result = await client.query(
+            `SELECT regular_receipt_id FROM counters WHERE counter_name = $1`,
+            [counter]
+          );
+
+          const currentRegularId = result.rows[0]?.regular_receipt_id;
+
+          if (!currentRegularId) {
+            return;
+          }
+
+          await client.query(
+            `UPDATE regular_receipt SET status = 'waiting' WHERE regular_receipt_id = $1`,
+            [currentRegularId]
+          );
+
+          await client.query(
+            `UPDATE counters SET status = 'available', regular_receipt_id = null WHERE counter_name = $1`,
+            [counter]
+          );
+        } catch (error) {
+          console.log("receiptRepository - logout() ", error);
+        }
       } else if (counter === "counter_A1") {
-        await ReceiptRepository.resetReceipt(
-          client,
-          "open_account_receipt",
-          "open_account_receipt_id",
-          counter
-        );
+        try {
+          const result = await client.query(
+            `SELECT open_account_receipt_id FROM counters WHERE counter_name = $1`,
+            [counter]
+          );
+
+          const currentOpenAccountId = result.rows[0]?.open_account_receipt_id;
+
+          if (!currentOpenAccountId) {
+            return;
+          }
+
+          await client.query(
+            `UPDATE open_account_receipt SET status = 'waiting' WHERE open_account_receipt_id = $1`,
+            [currentOpenAccountId]
+          );
+
+          await client.query(
+            `UPDATE counters SET status = 'available', open_account_receipt_id = null WHERE counter_name = $1`,
+            [counter]
+          );
+        } catch (error) {
+          console.log("receiptRepository - logout() ", error);
+        }
       } else if (counter === "counter_P1") {
-        await ReceiptRepository.resetReceipt(
-          client,
-          "priority_receipt",
-          "priority_receipt_id",
-          counter
-        );
+        try {
+          const result = await client.query(
+            `SELECT priority_receipt_id FROM counters WHERE counter_name = $1`,
+            [counter]
+          );
+
+          const currentPriorityId = result.rows[0]?.priority_receipt_id;
+
+          if (!currentPriorityId) {
+            return;
+          }
+
+          await client.query(
+            `UPDATE priority_receipt SET status = 'waiting' WHERE priority_receipt_id = $1`,
+            [currentPriorityId]
+          );
+
+          await client.query(
+            `UPDATE counters SET status = 'available', priority_receipt_id = null WHERE counter_name = $1`,
+            [counter]
+          );
+        } catch (error) {
+          console.log("receiptRepository - logout() ", error);
+        }
       }
 
+      await updateWaitingRegularCounterQueue();
       await client.query("COMMIT");
+
+
+      console.log("HERE SA PART NG LOGOUT!!! ", waitingRegularCounterQueue)
+       const firstWaitingCounter = waitingRegularCounterQueue.shift();
+
+
+        if (firstWaitingCounter) {
+          console.log("MERON SIYANG NA ASSIGN SA REGULAR PRE ")
+          await ReceiptService.assignRegularReceipt(firstWaitingCounter);
+        }else console.log("WALANG WAITING......")
+
+
+
+     
     } catch (error) {
       console.error("logout error:", error);
       await client.query("ROLLBACK");

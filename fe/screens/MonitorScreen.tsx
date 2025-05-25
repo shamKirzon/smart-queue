@@ -15,9 +15,7 @@ const { width, height } = Dimensions.get("window");
 interface MonitorScreenProps {
   navigation: any
 }
-//rendercounterBox soon.. for cleaning
 
-//MAKALAT
 
 const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
   const { monitorCounters, getMonitorQueueData } = useWebSocketsApp();

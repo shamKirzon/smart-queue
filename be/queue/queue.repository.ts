@@ -133,7 +133,7 @@ export class QueueRepository {
 
     
       
-      // counter_name = queue number 
+      
     } catch (err) {}
 
    

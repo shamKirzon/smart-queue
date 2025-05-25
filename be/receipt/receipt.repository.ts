@@ -191,43 +191,7 @@ export class ReceiptRepository {
         return
       }
       else return 
-      
 
-      // waiting regular counters
-     
-      // const inuseRegular = waitingRegularCounters.rows.map((rows) => ({
-      //   counterName: rows.counter_name,
-      //   status: rows.status,
-      // }));
-
-      // const firstCounterAvailable = inuseRegular.find(
-      //   (counter) => counter.counterName
-      // );
-      
-      // console.log("QUERY WAITING REGULAR  - ", waitingRegularCounters);
-      // console.log("WAITING REGULAR COUNTERS MAP - ", inuseRegular);
-      // console.log("FIRST COUNTER AVAILABLE- ", firstCounterAvailable);
-
-      // if (
-      //   (firstData.rows[0].queue_number === queueNumber &&
-      //     firstCounterAvailable?.counterName) ||
-      //   firstCounterAvailable?.counterName
-      // ) {
-      //   console.log(
-      //     "FIRST COUNTER WAITING: ",
-      //     firstCounterAvailable?.counterName
-      //   );
-      //   await ReceiptService.assignRegularReceipt(
-      //     firstCounterAvailable?.counterName
-      //   );
-      //   return firstCounterAvailable?.counterName;
-        
-      // } else {
-      //   // console.log('FIRST COUNTER WAITING: ', firstCounterAvailable?.counterName)
-      //   //  await ReceiptService.assignRegularReceipt(firstCounterAvailable?.counterName)
-      //   //  return firstCounterAvailable?.counterName;
-      //   return;
-      // }
     } catch (error) {
       console.error("Error inserting regular receipt:", error);
       throw error;
@@ -311,34 +275,6 @@ export class ReceiptRepository {
       throw error;
     }
   }
-
-  
-  // LOGOUT /RESET
-  static async resetReceipt(
-    client: PoolClient,
-    tableName: string,
-    receiptColumn: string,
-    counter: string
-  ) {
-    const result = await client.query(
-      `SELECT ${receiptColumn} FROM counters WHERE counter_name = $1`,
-      [counter]
-    );
-    const receiptId = result.rows[0]?.[receiptColumn];
-
-    if (!receiptId) return;
-
-    await client.query(
-      `UPDATE ${tableName} SET status = 'waiting' WHERE ${receiptColumn} = $1`,
-      [receiptId]
-    );
-
-    await client.query(
-      `UPDATE counters SET status = 'available', ${receiptColumn} = null WHERE counter_name = $1`,
-      [counter]
-    );
-  }
-
   //reset all receipts for the day
   static async deleteAllReceipts(): Promise<void> {
     

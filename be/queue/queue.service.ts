@@ -143,13 +143,12 @@ export class QueueService {
 
 
     } catch (err) {
-
+      
       await client.query("ROLLBACK")
     }finally{
        client.release(); 
     }
 
-    return { hello: "hello" };
   
   }
 }

@@ -44,7 +44,6 @@ const App = () => {
     queueNumber: null,
     date: null,
     time: null,
-    //counter: null,
   });
 
 
@@ -58,8 +57,6 @@ const App = () => {
       <SafeAreaProvider className="flex-1 ">
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator
-          //lipat mo nalang to pre if need mo
-            //initialRouteName="TellerHomeScreen"
             initialRouteName={initialRouteName}
             screenOptions={{
               headerShown: false,

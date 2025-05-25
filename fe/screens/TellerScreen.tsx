@@ -110,6 +110,7 @@ const TellerScreen: React.FC<TellerScreenProps> = ({ route, navigation }) => {
                   if (row === "Cancel") {
                     setModalVisible(false);
                   } else if (row === "Yes, Proceed") {
+                    triggerCounterTable(); 
                     setToAvailable(counterName);
                     navigation.navigate("TellerHomeScreen");
                     logout(counterName);

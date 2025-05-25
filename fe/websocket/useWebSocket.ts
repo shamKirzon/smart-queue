@@ -8,7 +8,8 @@ const useWebSocket = (url: string) => {
   // const [WaitingRegular, setWaitingRegular] = useState<boolean>(false);
 
   const [status, setStatus] = useState<{ [key: string]: string }>({});
-  const [counterTableRerender, setCounterTableRerender] = useState<boolean>(false)
+  const [counterTableRerender, setCounterTableRerender] =
+    useState<boolean>(false);
   const [currentRQNum, setCurrentRegularQueueNum] = useState<
     string | null | undefined
   >();
@@ -42,7 +43,6 @@ const useWebSocket = (url: string) => {
       };
     }
   };
-
 
   useEffect(() => {
     if (ws.current) return;
@@ -94,8 +94,6 @@ const useWebSocket = (url: string) => {
         else if (currentCounter) {
           setCurrentRegularQueueNum(currentRegular);
         }
-      // } else if (data.type === "trigger-no-waiting-regular-counter") {
-      //   setWaitingRegular(false);
       } else if (data.type === "assign-open-account-receipt-be") {
         const currentId = data.currentOpenAccountQueueNum;
         setCurrentOpenAccountQueueNum(currentId);
@@ -111,13 +109,16 @@ const useWebSocket = (url: string) => {
       } else if (data.type === "monitor-queue-data") {
         setMonitorCounters(data.data || {});
       }
-      // rerender priority 
-      else if(data.type === "counter-table-re-render"){
-        setCounterTableRerender(prev => !prev)
-      }
-      else if (data.type === "reset-transaction-success") {
+      // rerender priority
+      else if (data.type === "counter-table-re-render") {
+        setCounterTableRerender((prev) => !prev);
+      } else if (data.type === "reset-transaction-success") {
         console.log("Transaction reset successfully");
-        if (Platform.OS !== "web" && navigationRef.current && navigationRef.current.navigate) {
+        if (
+          Platform.OS !== "web" &&
+          navigationRef.current &&
+          navigationRef.current.navigate
+        ) {
           console.log("All Connected device navigate to WelcomeScreen");
           navigationRef.current.navigate("WelcomeScreen");
         }
@@ -332,17 +333,15 @@ const useWebSocket = (url: string) => {
   };
 
   const triggerCounterTable = () => {
-    setCounterTableRerender(prev => !prev)
-  }
-
+    setCounterTableRerender((prev) => !prev);
+  };
 
   const resetTransaction = () => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       console.log("Sending reset transaction request to WebSocket");
       ws.current.send(JSON.stringify({ type: "reset-transaction" }));
-  }
+    }
   };
-
 
   return {
     fetchCounterStatus,
@@ -366,9 +365,9 @@ const useWebSocket = (url: string) => {
     monitorCounters,
     getCurrentQueueNumberWithCounter,
     currentQueueNumberWithCounter,
-    counterTableRerender, 
+    counterTableRerender,
     triggerCounterTable,
-    resetTransaction
+    resetTransaction,
   };
 };
 

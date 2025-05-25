@@ -141,7 +141,20 @@ export function setupWebSocket(server: Server) {
       } // LOGOUT
       else if (data.type === "logout") {
         await ReceiptService.logout(data.counter);
+
         await broadcastMonitorQueueData();
+
+
+          wss.clients.forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: "counter-table-re-render",
+                })
+              );
+            }
+          });                                                           
+    
       }
 
       // ASSIGN REGULAR RECEIPT
@@ -228,17 +241,6 @@ export function setupWebSocket(server: Server) {
                     type: "assign-regular-receipt-be",
                     currentRegularQueueNum: currentRegularQueueNum,
                     currentWaitingRegularCounter: waitingCounter,
-                  })
-                );
-              }
-            });
-          } else if (!waitingCounter) {
-            wss.clients.forEach((client) => {
-              if (client.readyState === WebSocket.OPEN) {
-                console.log("trigger no waiting ");
-                client.send(
-                  JSON.stringify({
-                    type: "trigger-no-waiting-regular-counter",
                   })
                 );
               }
