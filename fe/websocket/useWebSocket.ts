@@ -1,7 +1,7 @@
 import { View, Text, requireNativeComponent } from "react-native";
 import { useRef, useEffect, useState } from "react";
-import { transformWithEsbuild } from "vite";
-import { Platform } from "react-native"; // add this import
+//import { transformWithEsbuild } from "vite";
+import { Platform } from "react-native";
 import { navigationRef } from "../navigationRef";
 
 const useWebSocket = (url: string) => {
@@ -24,6 +24,8 @@ const useWebSocket = (url: string) => {
   const [monitorCounters, setMonitorCounters] = useState<{
     [counter: string]: string;
   }>({});
+
+  //const [monitorCounterStatus, setMonitorCounterStatus] = useState<any>(null); DELETE THIS SHIT
 
   const ws = useRef<WebSocket | null>(null);
   let client = 0;
@@ -52,7 +54,6 @@ const useWebSocket = (url: string) => {
     ws.current.onopen = () => {
       console.log("Connected to WebSocket");
       fetchCounterStatus();
-      // Always request monitor queue data when socket opens
       ws.current?.send(JSON.stringify({ type: "get-monitor-queue-data" }));
     };
 
@@ -62,6 +63,7 @@ const useWebSocket = (url: string) => {
       if (data.type === "set-counter-status") {
         console.log("counter status: ", data.data);
         setCounterStatus(data.data);
+        //setMonitorCounterStatus(data.data); DELETE THIS SHIT
       } else if (data.type === "first-priority-insert-be") {
         // data.response ? setFirstRowPriorityTrigger((prev) => !prev) : false;
         if (data.response) {
@@ -108,6 +110,7 @@ const useWebSocket = (url: string) => {
         setCurrentQueueNumberWithCounter(data.countersAndQueueNum);
       } else if (data.type === "monitor-queue-data") {
         setMonitorCounters(data.data || {});
+        //setMonitorCounterStatus(data.counterStatus || null); DLEETE THIS SHIT
       }
       // rerender priority
       else if (data.type === "counter-table-re-render") {

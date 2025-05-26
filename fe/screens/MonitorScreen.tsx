@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // Backgrounds
 import Background from "../assets/backgrounds/monitor-background1.svg";
 // Selected Icons
@@ -9,6 +9,7 @@ import Logout from "../assets/icons/log-out.svg";
 import Logo from "../assets/icons/logomonitor.svg";
 
 import { useWebSocketsApp } from "../websocket/WebSocketProvider";
+import { Audio } from 'expo-av';
 
 const { width, height } = Dimensions.get("window");
 
@@ -16,22 +17,16 @@ interface MonitorScreenProps {
   navigation: any
 }
 
-
 const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
-  const { monitorCounters, getMonitorQueueData } = useWebSocketsApp();
+  const { 
+    monitorCounters, 
+    getMonitorQueueData, 
+    fetchCounterStatus,
+    getCounterStatus: getCounterStatusObj 
+  } = useWebSocketsApp();
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    getMonitorQueueData();
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  const soundRef = useRef<Audio.Sound | null>(null);
+  const prevCountersRef = useRef<{ [key: string]: string }>({});
 
   const formatDate = (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -51,7 +46,87 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
     });
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    const playSound = async () => {
+      try {
+        if (soundRef.current) {
+          await soundRef.current.unloadAsync();
+        }
+        const { sound } = await Audio.Sound.createAsync(
+          require('../assets/sounds/dingdong.mp3')
+        );
+        soundRef.current = sound;
+        await sound.playAsync();
+      } catch (e) {
+      }
+    };
+
+    let shouldPlay = false;
+    for (const key of Object.keys(monitorCounters)) {
+      const prev = prevCountersRef.current[key] || "000";
+      const curr = monitorCounters[key] || "000";
+      if (parseInt(curr, 10) >= 1 && prev !== curr) {
+        shouldPlay = true;
+        break;
+      }
+    }
+
+    if (shouldPlay) {
+      playSound();
+    }
+
+    prevCountersRef.current = { ...monitorCounters };
+  }, [monitorCounters]);
+
+  useEffect(() => {
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchCounterStatus();
+    getMonitorQueueData();
+  }, []);
+
+
+  const getCounterStatus = (counterName: string) => {
+    const statusObj = typeof getCounterStatusObj === "function"
+      ? getCounterStatusObj()
+      : undefined;
+    if (!statusObj) return "inuse";
+    let key = "";
+    if (counterName.startsWith("Counter ")) {
+      if (counterName === "Counter A1") key = "counter_A1";
+      else if (counterName === "Counter P1") key = "counter_P1";
+      else key = "counter_" + counterName.split(" ")[1];
+    }
+
+    if (Array.isArray(statusObj)) {
+      return statusObj.find((c: any) => c.counter_name === key)?.status || "inuse";
+    } else {
+      return statusObj[key] || "inuse";
+    }
+  };
+
+  const getDisplayQueueNumber = (counterName: string) => {
+    return getCounterStatus(counterName) === "inuse"
+      ? (monitorCounters[counterName] || "000")
+      : "000";
+  };
+
+  const getCounterOpacity = (counterName: string) =>
+    getCounterStatus(counterName) === "available" ? 0.4 : 1;
+
   return (
+    
+
     <View style={{ flex: 1, position: 'relative' }}>
       <Background
         height={height}
@@ -141,6 +216,10 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
  */
 }
 
+
+
+{/* regular */}
+
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <View style={{
           backgroundColor: "#FFFFFF",
@@ -189,6 +268,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 padding: 6,
                 alignItems: "center",
                 paddingTop: 15,
+                opacity: getCounterOpacity("Counter 1"),
               }}>
                 <View style={{
                   backgroundColor: "#D64F5A",
@@ -197,11 +277,26 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   paddingHorizontal: 6,
                   marginBottom: 6,
                   alignItems: "center",
+                  opacity: getCounterOpacity("Counter 1"),
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 1</Text>
+                  <Text style={{
+                    color: "#FFFFFF",
+                    fontWeight: "bold",
+                    fontSize: 40,
+                    paddingRight: 60,
+                    paddingLeft: 60,
+                    fontFamily: 'Poppins'
+                  }}>
+                    Counter 1
+                  </Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {(monitorCounters["Counter 1"] || "000").split('').map((digit, index) => (
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: getCounterOpacity("Counter 1"),
+                }}>
+                  {getDisplayQueueNumber("Counter 1").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -224,6 +319,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 padding: 6,
                 alignItems: "center",
                 paddingTop: 15,
+                opacity: getCounterOpacity("Counter 2"),
               }}>
                 <View style={{
                   backgroundColor: "#D64F5A",
@@ -232,11 +328,26 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   paddingHorizontal: 6,
                   marginBottom: 6,
                   alignItems: "center",
+                  opacity: getCounterOpacity("Counter 2"),
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 2</Text>
+                  <Text style={{
+                    color: "#FFFFFF",
+                    fontWeight: "bold",
+                    fontSize: 40,
+                    paddingRight: 60,
+                    paddingLeft: 60,
+                    fontFamily: 'Poppins'
+                  }}>
+                    Counter 2
+                  </Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {(monitorCounters["Counter 2"] || "000").split('').map((digit, index) => (
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: getCounterOpacity("Counter 2"),
+                }}>
+                  {getDisplayQueueNumber("Counter 2").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -259,6 +370,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 padding: 6,
                 alignItems: "center",
                 paddingTop: 15,
+                opacity: getCounterOpacity("Counter 3"),
               }}>
                 <View style={{
                   backgroundColor: "#D64F5A",
@@ -267,11 +379,26 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   paddingHorizontal: 6,
                   marginBottom: 6,
                   alignItems: "center",
+                  opacity: getCounterOpacity("Counter 3"),
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 3</Text>
+                  <Text style={{
+                    color: "#FFFFFF",
+                    fontWeight: "bold",
+                    fontSize: 40,
+                    paddingRight: 60,
+                    paddingLeft: 60,
+                    fontFamily: 'Poppins'
+                  }}>
+                    Counter 3
+                  </Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {(monitorCounters["Counter 3"] || "000").split('').map((digit, index) => (
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: getCounterOpacity("Counter 3"),
+                }}>
+                  {getDisplayQueueNumber("Counter 3").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -294,6 +421,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 padding: 6,
                 alignItems: "center",
                 paddingTop: 15,
+                opacity: getCounterOpacity("Counter 4"),
               }}>
                 <View style={{
                   backgroundColor: "#D64F5A",
@@ -302,11 +430,26 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   paddingHorizontal: 6,
                   marginBottom: 6,
                   alignItems: "center",
+                  opacity: getCounterOpacity("Counter 4"),
                 }}>
-                  <Text style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>Counter 4</Text>
+                  <Text style={{
+                    color: "#FFFFFF",
+                    fontWeight: "bold",
+                    fontSize: 40,
+                    paddingRight: 60,
+                    paddingLeft: 60,
+                    fontFamily: 'Poppins'
+                  }}>
+                    Counter 4
+                  </Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {(monitorCounters["Counter 4"] || "000").split('').map((digit, index) => (
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: getCounterOpacity("Counter 4"),
+                }}>
+                  {getDisplayQueueNumber("Counter 4").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#D64F5A",
                       fontSize: 95,
@@ -344,6 +487,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 padding: 6,
                 alignItems: "center",
                 paddingTop: 15,
+                opacity: getCounterOpacity("Counter A1"),
               }}>
                 <View style={{
                   backgroundColor: "#FFFFFF",
@@ -352,11 +496,25 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   //paddingHorizontal: 2,
                   marginBottom: 6,
                   alignItems: "center",
+                  opacity: getCounterOpacity("Counter A1"),
                 }}>
-                  <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 37, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins',textAlign: 'center' }}>OPEN ACCOUNT</Text>
+                  <Text style={{
+                    color: "#D64F5A",
+                    fontWeight: "bold",
+                    fontSize: 37,
+                    paddingRight: 60,
+                    paddingLeft: 60,
+                    fontFamily: 'Poppins',
+                    textAlign: 'center'
+                  }}>OPEN ACCOUNT</Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {(monitorCounters["Counter A1"] || "000").split('').map((digit, index) => (
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: getCounterOpacity("Counter A1"),
+                }}>
+                  {getDisplayQueueNumber("Counter A1").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#FFFFFF",
                       fontSize: 95,
@@ -378,6 +536,7 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                 padding: 6,
                 alignItems: "center",
                 paddingTop: 15,
+                opacity: getCounterOpacity("Counter P1"),
               }}>
                 <View style={{
                   backgroundColor: "#FFFFFF",
@@ -386,11 +545,24 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
                   paddingHorizontal: 6,
                   marginBottom: 6,
                   alignItems: "center",
+                  opacity: getCounterOpacity("Counter P1"),
                 }}>
-                  <Text style={{ color: "#D64F5A", fontWeight: "bold", fontSize: 40, paddingRight: 60, paddingLeft: 60, fontFamily: 'Poppins' }}>PRIORITY</Text>
+                  <Text style={{
+                    color: "#D64F5A",
+                    fontWeight: "bold",
+                    fontSize: 40,
+                    paddingRight: 60,
+                    paddingLeft: 60,
+                    fontFamily: 'Poppins'
+                  }}>PRIORITY</Text>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-                  {(monitorCounters["Counter P1"] || "000").split('').map((digit, index) => (
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  opacity: getCounterOpacity("Counter P1"),
+                }}>
+                  {getDisplayQueueNumber("Counter P1").split('').map((digit, index) => (
                     <Text key={index} style={{
                       color: "#FFFFFF",
                       fontSize: 95,

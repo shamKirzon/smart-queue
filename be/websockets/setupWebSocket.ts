@@ -22,15 +22,16 @@ export function setupWebSocket(server: Server) {
 
   let clientCounter = 0;
 
-
   async function broadcastMonitorQueueData() {
     const allQueueNumbers = await QueueService.monitorGetData();
+    //const counterStatus = await TellerRepository.getCounterStatus();
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(
           JSON.stringify({
             type: "monitor-queue-data",
             data: allQueueNumbers,
+            //counterStatus: counterStatus, 
           })
         );
       }
@@ -45,16 +46,43 @@ export function setupWebSocket(server: Server) {
       console.log(`received: `, message.toString());
 
       const data = JSON.parse(message.toString());
-      
 
       if (data.type === "get-next-queue-number") {
         const customerType = data.customerType as keyof typeof queueNumbers;
+        let nextQueueNumber;
 
         if (queueNumbers[customerType] !== undefined) {
-          const nextQueueNumber = queueNumbers[customerType]
-            .toString()
+          // const nextQueueNumber = queueNumbers[customerType]          
+          // .toString()
+          //   .padStart(3, "0");
+          // queueNumbers[customerType] += 1;
+
+          // ws.send(
+          //   JSON.stringify({
+          //     type: "next-queue-number",
+          //     customerType,
+          //     queueNumber: nextQueueNumber,
+          //   })
+          // );
+          if(customerType === "Regular") {
+             nextQueueNumber = "R" + queueNumbers[customerType]          
+          .toString()
             .padStart(3, "0");
           queueNumbers[customerType] += 1;
+
+          }else if(customerType === "Priority") {
+             nextQueueNumber = "P" + queueNumbers[customerType]          
+          .toString()
+            .padStart(3, "0");
+          queueNumbers[customerType] += 1;
+
+          }else if(customerType === "OpenAccount") {
+             nextQueueNumber = "A" + queueNumbers[customerType]          
+          .toString()
+            .padStart(3, "0");
+          queueNumbers[customerType] += 1;
+
+          }
 
           ws.send(
             JSON.stringify({
@@ -63,6 +91,7 @@ export function setupWebSocket(server: Server) {
               queueNumber: nextQueueNumber,
             })
           );
+
         } else {
           ws.send(
             JSON.stringify({
@@ -144,17 +173,15 @@ export function setupWebSocket(server: Server) {
 
         await broadcastMonitorQueueData();
 
-
-          wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(
-                JSON.stringify({
-                  type: "counter-table-re-render",
-                })
-              );
-            }
-          });                                                           
-    
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "counter-table-re-render",
+              })
+            );
+          }
+        });
       }
 
       // ASSIGN REGULAR RECEIPT
@@ -227,7 +254,7 @@ export function setupWebSocket(server: Server) {
             time
           );
           console.log("counter's queue number updated: ", waitingCounter);
-          
+
           await broadcastMonitorQueueData();
 
           if (waitingCounter) {
@@ -276,8 +303,6 @@ export function setupWebSocket(server: Server) {
               );
             }
           });
-
-        
         }
       }
 
@@ -335,10 +360,12 @@ export function setupWebSocket(server: Server) {
       else if (data.type === "get-monitor-queue-data") {
         try {
           const allQueueNumbers = await QueueService.monitorGetData();
+          const counterStatus = await TellerRepository.getCounterStatus();
           ws.send(
             JSON.stringify({
               type: "monitor-queue-data",
               data: allQueueNumbers,
+              counterStatus: counterStatus, // send status together
             })
           );
         } catch (error) {
@@ -375,6 +402,13 @@ export function setupWebSocket(server: Server) {
               JSON.stringify({
                 type: "monitor-queue-data",
                 data: allQueueNumbers,
+                counterStatus: counterStatus,
+              })
+            );
+            client.send(
+              JSON.stringify({
+                type: "set-counter-status",
+                data: counterStatus,
               })
             );
             client.send(

@@ -95,23 +95,31 @@ export class QueueService {
       counterRows.forEach((row) => {
         let displayName: string;
         let queueNumber: string | null | undefined;
+        let defaultQueueNumber; 
 
         if (TellerService.isRegularCounter(row.counter_name)) {
           displayName = row.counter_name.replace(/counter_/, "Counter ");
           queueNumber = row.regular_queue_number;
+          defaultQueueNumber = "R000"
         } else if (row.counter_name.toLowerCase() === "counter_a1") {
           displayName = "Counter A1";
           queueNumber = row.open_account_queue_number;
+          defaultQueueNumber = "A000"
         } else if (row.counter_name.toLowerCase() === "counter_p1") {
           displayName = "Counter P1";
           queueNumber = row.priority_queue_number;
+          defaultQueueNumber = "P000"
         } else {
           return;
         }
 
         monitorQueueNumbers[displayName] = queueNumber
           ? queueNumber.toString().padStart(3, "0")
-          : "000";
+          : defaultQueueNumber;
+
+
+
+
       });
 
       return monitorQueueNumbers;
