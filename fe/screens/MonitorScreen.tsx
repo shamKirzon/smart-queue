@@ -67,12 +67,26 @@ const MonitorScreen: React.FC<MonitorScreenProps> = ({ navigation }) => {
 
     let shouldPlay = false;
     for (const key of Object.keys(monitorCounters)) {
-      const prev = prevCountersRef.current[key] || "000";
+
+      const prev = prevCountersRef.current[key]|| "000";
       const curr = monitorCounters[key] || "000";
-      if (parseInt(curr, 10) >= 1 && prev !== curr) {
-        shouldPlay = true;
+
+      console.log("PREV:", prev )
+      console.log("CUR:", curr )
+      console.log("shammy pogi ")
+
+
+      const prevSlice = prev ? prev.slice(1) : "000"
+      const currSlice = curr ? curr.slice(1)  : "000";
+
+      console.log("BEFORE VALIDATION: ")
+      if (parseInt(currSlice, 10) >= 1 && prevSlice !== currSlice) {
+        console.log("inside of validation")
+        // shouldPlay = true;
+        playSound()
         break;
       }
+      
     }
 
     if (shouldPlay) {
