@@ -14,7 +14,8 @@ import HomeBackground from "../assets/backgrounds/home-background.svg";
 import Back from "../assets/icons/back.svg";
 import ExitModal from "../assets/icons/exit-modal.svg";
 import Lock from "../assets/icons/lock.svg";
-
+import Endshift from "../assets/icons/endshift.svg";
+import { useWebSocketsApp } from "../websocket/WebSocketProvider";
 
 
 interface HomeScreenProps {
@@ -23,10 +24,14 @@ interface HomeScreenProps {
 const { width, height } = Dimensions.get("window");
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+
+  const {resetTransaction } = useWebSocketsApp();
+
   // Pins:
   const RECEIPT_GENERATOR_PIN = "1111";
   const TELLER_PIN = "2222";
   const MONITOR_PIN = "3333";
+  const RESET_QUEUE_PIN = "5555";
 
   // websocket
  
@@ -85,11 +90,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       handleResetPin()
       navigation.navigate("TellerHomeScreen");
 
-    } else if (buttonClicked === "Monitor" && pin === MONITOR_PIN) {
-      setModalVisible(false)
-      handleResetPin()
-      navigation.navigate("MonitorScreen");
-    } else {
+    }
+    //  else if (buttonClicked === "Monitor" && pin === MONITOR_PIN) {
+    //   setModalVisible(false)
+    //   handleResetPin()
+    //   navigation.navigate("MonitorScreen");
+    // } 
+    else if (buttonClicked == "End Shift" && pin === RESET_QUEUE_PIN) {
+      setModalVisible(false);
+      handleResetPin();
+      resetTransaction();
+    }
+    else {
       handleResetPin()
     }
     return 
@@ -102,7 +114,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         width={width}
         preserveAspectRatio="none" // para di magadjust both height and width
         style={{
-          position: "absolute",
+          position: "absolute", 
           top: 0,
           left: 0,
         }}
@@ -257,7 +269,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           marginTop: height * 0.04,
         }}
       >
-        {["Receipt Generator", "Teller", "Monitor"].map((choices, index) => (
+        {["Receipt Generator", "Teller", "End Shift"].map((choices, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => {
@@ -265,29 +277,34 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               setButtonClicked(choices);
             }}
             style={{
-              backgroundColor: "#FFFFFF",
+              flexDirection: choices === "End Shift" ? "row" : "column",
+              alignItems: "center",
+              backgroundColor: choices === "End Shift" ? "#FF2D2D" : "#FFFFFF",
               height: height * 0.1,
               width: width * 0.68,
               justifyContent: "center",
-              alignItems: "center",
               borderRadius: 10,
               marginTop: height * 0.04,
               shadowColor: "#000",
-            shadowOffset: {
-              width: 0,
-              height: 4,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
+              shadowOffset: {
+                width: 0,
+                height: 4,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
             }}
           >
+            {choices === "End Shift" && (
+              <Endshift width={width * 0.07} height={width * 0.07} style={{ marginRight: 10 }} />
+            )}
             <Text
               style={{
                 fontFamily: "Poppins-Semi-Bold",
                 fontSize: width * 0.057,
-                color: "#737373",
+                color: choices === "End Shift" ? "#FFFFFF" : "#737373",
                 lineHeight: width * 0.057 + 2,
+                marginLeft: choices === "End Shift" ? 10 : 0,
               }}
             >
               {choices}
@@ -295,6 +312,51 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         ))}
       </View>
+
+
+      
+      {/* <View
+        style={{
+          position: "absolute",
+          bottom: height * 0.04,
+          left: 0,
+          right: 0,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: "Poppins",
+            fontSize: width * 0.038,
+            color: "#000000",
+            marginRight: 6,
+          }}
+        >
+          Done for Today?
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            setModalVisible(true);
+            setButtonClicked("Reset Queue");
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: "Poppins",
+              fontSize: width * 0.038,
+              color: "#FF2D2D",
+              fontWeight: "bold",
+            }}
+          >
+            Reset Queue
+          </Text>
+        </TouchableOpacity>
+      </View> */}
+
+
+
     </View>
   );
 };
